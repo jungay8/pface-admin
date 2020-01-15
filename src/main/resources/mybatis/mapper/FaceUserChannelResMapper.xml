@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.pface.admin.modules.member.mapper.FaceUserChannelResMapper" >
+  <resultMap id="BaseResultMap" type="com.pface.admin.modules.member.po.FaceUserChannelRes" >
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="sys_userid" property="sysUserid" jdbcType="INTEGER" />
+    <result column="device_id" property="deviceId" jdbcType="VARCHAR" />
+    <result column="channel" property="channel" jdbcType="TINYINT" />
+    <result column="auth_begindate" property="authBegindate" jdbcType="TIMESTAMP" />
+    <result column="auth_enddate" property="authEnddate" jdbcType="TIMESTAMP" />
+    <result column="sys_sceneid" property="sysSceneid" jdbcType="INTEGER" />
+    <result column="create_by" property="createBy" jdbcType="VARCHAR" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
+    <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="del_flag" property="delFlag" jdbcType="VARCHAR" />
+  </resultMap>
+
+  <resultMap id="FaceUserChannelResResultMap" type="com.pface.admin.modules.member.vo.FaceUserChannelResVo">
+    <result column="id" jdbcType="BIGINT" property="id"/>
+    <result column="username" property="username" jdbcType="VARCHAR" />
+    <result column="device_id" property="deviceId" jdbcType="VARCHAR" />
+    <result column="channel" property="channel" jdbcType="TINYINT" />
+    <result column="auth_begindate" property="authBegindate" jdbcType="TIMESTAMP" />
+    <result column="auth_enddate" property="authEnddate" jdbcType="TIMESTAMP" />
+    <result column="scene_name" property="sceneName" jdbcType="VARCHAR" />
+    <result column="camera_name" property="cameraName" jdbcType="VARCHAR" />
+    <result column="camera_status" property="cameraStatus" jdbcType="VARCHAR" />
+    <result column="camera_install_location" property="cameraInstallLocation" jdbcType="VARCHAR" />
+    <result column="camera_mode" property="cameraMode" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="queryFaceUserChannelResColumns">
+    res.id,
+	us.username,
+	res.device_id,
+	res.channel,
+	res.auth_begindate,
+	res.auth_enddate,
+	ca.camera_name,
+	IFNULL(ca.`status`,'-1') AS camera_status,
+	ca.install_location AS camera_install_location,
+	ca. MODE AS camera_mode
+  </sql>
+  <select id="queryFaceUserChannelResList"  resultMap="FaceUserChannelResResultMap">
+    SELECT
+      <include refid="queryFaceUserChannelResColumns"/>
+    FROM
+    face_user_channel_res res
+    LEFT JOIN face_camera ca ON res.device_id = ca.device_id AND res.channel = ca.channel
+    INNER JOIN face_user us ON res.sys_userid = us.id
+    <where>
+      1=1 and res.del_flag = '1'
+      <if test="username!=null and username!=''">
+        and res.sys_userid =#{username}
+      </if>
+      <if test="deviceId!=null and deviceId!=''">
+        and res.device_id =#{deviceId}
+      </if>
+      <if test="cameraStatus!=null and cameraStatus!=''">
+        and ca.status =#{cameraStatus}
+      </if>
+    </where>
+    order by 	res.auth_begindate desc
+  </select>
+
+
+</mapper>

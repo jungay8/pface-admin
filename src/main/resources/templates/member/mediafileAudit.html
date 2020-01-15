@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+
+<section class="content-header" style="">
+    <h1>
+        内容审核管理
+        <small>内容审核管理页面</small>
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> 主页</a></li>
+        <li><a href="#">内容审核管理</a></li>
+        <li class="active">内容审核管理</li>
+    </ol>
+</section>
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box">
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <div>
+                        <form class="form-inline" id="searchForm">
+
+                            <div class="form-group">
+                                <label for="member">会员</label>
+                                <!--<select name="uid" id="member" class="form-control"
+                                        data-placeholder="请从列表选择一项" required>
+                                    <option value="-1">全部</option>
+                                    <option th:each="members : ${memberList}" th:value="${members.id}" th:text="${members.uname}">
+                                        会员不存在
+                                    </option>
+                                </select>-->
+                                <input type="text" class="form-control input-sm" name="uid" id="member" placeholder="请输入会员名称">
+
+                                <label for="mediaType">媒体类型</label>
+                                <select name="mediaType" id="mediaType" class="form-control"
+                                        data-placeholder="请从列表选择一项" required>
+                                    <option value="all">全部</option>
+                                    <option th:each="type : ${mediaTypes}" th:value="${type.name}" th:text="${type.text}">
+                                        媒体类型不存在
+                                    </option>
+                                </select>
+                                <label for="mediaType">分类</label>
+                                <select name="catalogId" id="catalogId" class="form-control"
+                                        data-placeholder="请从列表选择一项" required>
+                                    <option value="-1">全部</option>
+                                    <option th:each="catalog : ${catalogList}" th:value="${catalog.id}" th:text="${catalog.name}">
+                                        分类不存在
+                                    </option>
+                                </select>
+                                <label for="auditStatus">审核状态</label>
+                                <select name="auditStatus" id="auditStatus" class="form-control"
+                                        data-placeholder="请从列表选择一项" required>
+                                    <!--<option th:each="audit : ${auditStatus}" th:value="${audit.name}" th:text="${audit.text}">
+                                        审核状态不存在
+                                    </option>-->
+                                    <option value="AUDITING">审核中</option>
+                                    <option value="AUDITED">审核通过</option>
+                                    <option value="UNAUDITED">审核不通过</option>
+                                    <option value="ALL">全部</option>
+
+                                </select>
+
+                            </div>
+                            <!--<div class="form-group" style="display: none">
+                                <label for="reservation">时间</label>
+                                <div class="input-group">
+                                    <div class="input-group-addon">
+                                        <i class="fa fa-calendar"></i>
+                                    </div>
+                                    <input type="text" class="form-control input-sm" id="reservation">
+                                    <input type="hidden" name="startDate" id="startDate">
+                                    <input type="hidden" name="endDate" id="endDate">
+                                </div>
+                            </div>-->
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-default btn-sm" onclick="javascript:Search();">
+                                    <i class="glyphicon glyphicon-search"></i>
+                                    查询
+                                </button>
+                                <!--<button type="reset" class="btn btn-default btn-sm" id="reset"-->
+                                        <!--onclick="javascript:document.querySelectorAll('#startDate, #endDate').forEach(d=> d.value='')">-->
+                                    <!--<i class="glyphicon glyphicon-trash"></i>-->
+                                    <!--清空-->
+                                <!--</button>-->
+                            </div>
+                        </form>
+                    </div>
+                    <div id="toolbar">
+
+                    </div>
+                    <table id="table"></table>
+                </div>
+                <!-- /.box-body -->
+            </div>
+            <!-- /.box -->
+
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+</section>
+<!-- /.content -->
+
+<div id="actionButtons" class="admin-hide">
+    <!--<a style="display:none;" class="like" href="javascript:void(0)" data-toggle="tooltip" title="Like"><i class="glyphicon glyphicon-heart"></i></a>　-->
+    <!--<a style="display:none;" shiro:hasPermission="mediafile:update" class="edit ml10" href="javascript:void(0)" data-toggle="tooltip" title="编辑"><i class="glyphicon glyphicon-edit"></i></a>　-->
+    <a  class="audit ml10" href="javascript:void(0)" data-toggle="tooltip" title="审核"><i class="glyphicon glyphicon-user"></i>审核</a>　
+    <!--<a style="display:none;" shiro:hasPermission="mediafile:delete" class="remove ml10" href="javascript:void(0)" data-toggle="tooltip" title="删除"><i class="glyphicon glyphicon-remove"></i></a>　-->
+</div>
+
+<div id="actionViewButtons" class="admin-hide">
+    <!--<a style="display:none;" class="like" href="javascript:void(0)" data-toggle="tooltip" title="Like"><i class="glyphicon glyphicon-heart"></i></a>　-->
+    <!--<a style="display:none;" shiro:hasPermission="mediafile:update" class="edit ml10" href="javascript:void(0)" data-toggle="tooltip" title="编辑"><i class="glyphicon glyphicon-edit"></i></a>　-->
+    <a  class="audit ml10" href="javascript:void(0)" data-toggle="tooltip" title="查看"><i class="glyphicon glyphicon-user"></i>查看</a>　
+    <!--<a style="display:none;" shiro:hasPermission="mediafile:delete" class="remove ml10" href="javascript:void(0)" data-toggle="tooltip" title="删除"><i class="glyphicon glyphicon-remove"></i></a>　-->
+</div>
+
+<div class="modal fade" id="videoModal" tabindex="-1" role="dialog" aria-labelledby="showVideoModal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="showVideoModal">视频审核</h4>
+            </div>
+
+            <div class="modal-body  ls_alertM" style="overflow-y: auto; overflow-x: hidden;"> <!--这里的高度是如果你觉得太长了，可以用个下拉条-->
+                <form>
+                    <input type="hidden" name="videoMediaId" id="videoMediaId"/>
+                    <div class="form-group lsvideoM">
+                        <!--video的poster为视频封面 -->
+                        <video name="myMovie" id="myMovie" src="http://edge.ivideo.sina.com.cn/29599354901.mp4?KID=sina,viask&amp;Expires=1562428800&amp;ssig=h6hmzqEP%2Fl" width="568" height="256" controls="" preload="auto" poster="https://5b0988e595225.cdn.sohucs.com/images/20190625/4656f3121d604b5bbe70bff4fdd89592.jpeg"></video>
+                    </div>
+                    <div class="form-group">
+                        <span>视频大小:</span><label class="control-label" id="videoSize">600M</label>
+                        <small class="ls_fr ls_ml25" id="videoUpdateTime">更新时间:2019-7-5</small>
+                    </div>
+
+                    <div class="form-group clearfix">
+                        <label class="col-sm-2 control-label">*视频标题:</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="videoTitle"
+                                   placeholder="请输入标题" value="">
+                        </div>
+                    </div>
+                    <div class="form-group clearfix">
+                        <label class="col-sm-2 control-label">*关键词:</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="videoKeyWord"
+                                   placeholder="请输入关键词" value="">
+                        </div>
+                    </div>
+                    <div class="form-group clearfix">
+                        <div class="col-sm-6">
+                            <label  class="col-sm-4 control-label">类型:</label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="videoCatalog">
+                                    <option th:each="catalog : ${catalogList}" th:value="${catalog.id}" th:text="${catalog.name}">
+                                        分类不存在
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="col-sm-4 control-label">*价格:</label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="videoPrice">
+                                    <option>￥20.00</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group clearfix">
+                        <label class="col-sm-2 control-label">*归属标签:</label>
+                        <div class="col-sm-10" id="videoBelongLabelsDiv">
+                            <!--<label class="checkbox-inline">
+                                <input class="ls_alertCheckbox" type="checkbox" value="option3">
+                                <span class="ls_CheckboxLabel">3</span>
+                            </label>
+                            -->
+                        </div>
+                    </div>
+                    <div class="form-group clearfix">
+                        <label  class="col-sm-2 control-label">转载来源:</label>
+                        <div class="col-sm-6">
+                            <select class="form-control" id="videoPubLabel">
+                                <option>教育类</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group clearfix">
+                        <label class="col-sm-2 control-label">简介:</label>
+                        <div class="col-sm-10">
+                            <textarea class="form-control" rows="3" id="videoBref"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label">是否审核通过:</label>
+                        <label class="checkbox-inline">
+                            <input type="radio" name="videoYes" value="y"> 是
+                        </label>
+                        <label class="checkbox-inline">
+                            <input type="radio" name="videoYes" value="n"> 否
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" >审核说明:</label>
+                        <textarea class="form-control maxlength" rows="3" id="videoReason" maxlength="64"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button"  id="auditSubmitVideo" class="btn btn-primary" onclick="submitAuditFile('video')">确定 </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="audioModal" tabindex="-1" role="dialog" aria-labelledby="showAudioModal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="showAudioModal">音频审核</h4>
+            </div>
+
+            <div class="modal-body ls_alertM" style="overflow-y: auto; overflow-x: hidden;"> <!--这里的高度是如果你觉得太长了，可以用个下拉条-->
+                <form>
+                    <input type="hidden" name="audioMediaId" id="audioMediaId"/>
+                    <div class="form-group ">
+                        <audio id="music" style=" width: 100%; display: block;" src="" controls="controls">不支持音频播放</audio>
+                        <div class="clearfix media lsAudio_m">
+                            <div class="ls_fl lsAudio_poster lsAudio_click">
+                                <img id="audioCover" src="https://y.gtimg.cn/music/photo_new/T002R90x90M0000025pAMM0FugAQ.jpg"/><!--这里是音频的封面-->
+                                <!--<div class="lsAudio_inco"></div>-->
+                            </div>
+                            <div class="ls_fl ls_ml25 lsAudio_intro">
+
+                                <h6><span>音频大小:</span><label class="control-label" id="audioSize">600M</label>
+                                    <span class="ls_ml25">更新时间:<label class="control-label" id="audioUpdateTime">2019-7-26 23：55</label></span>
+                                </h6>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group clearfix">
+                        <label class="col-sm-2 control-label">*音频标题:</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="audioTitle"
+                                   placeholder="请输入名称" value="此处为name">
+                        </div>
+                    </div>
+                    <div class="form-group clearfix">
+                        <label class="col-sm-2 control-label">*关键词:</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="audioKeyWord"
+                                   placeholder="请输入名称" value="此处为关键词">
+                        </div>
+                    </div>
+                    <div class="form-group clearfix">
+                        <div class="col-sm-6">
+                            <label  class="col-sm-4 control-label">类型:</label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="audioCatalog">
+                                    <option th:each="catalog : ${catalogList}" th:value="${catalog.id}" th:text="${catalog.name}">
+                                        分类不存在
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="col-sm-4 control-label">价格:</label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="audioPrice">
+                                    <option>￥20.00</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group clearfix">
+                        <label class="col-sm-2 control-label">*归属标签:</label>
+                        <div class="col-sm-10" id="audioBelongLabelsDiv">
+                            <!--<label class="checkbox-inline">
+                                <input class="ls_alertCheckbox" type="checkbox" value="option3">
+                                <span class="ls_CheckboxLabel">3</span>
+                            </label>-->
+                        </div>
+                    </div>
+                    <div class="form-group clearfix">
+                        <label  class="col-sm-2 control-label">转载来源:</label>
+                        <div class="col-sm-6">
+                            <select class="form-control" id="audioPubLabel">
+                                <!--<option>教育类</option>-->
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group clearfix">
+                        <label class="col-sm-2 control-label">简介:</label>
+                        <div class="col-sm-10">
+                            <textarea class="form-control" rows="3" id="audioBref"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label">是否审核通过:</label>
+                        <label class="checkbox-inline">
+                            <input type="radio" name="audioYes" value="y"> 是
+                        </label>
+                        <label class="checkbox-inline">
+                            <input type="radio" name="audioYes" value="n" checked> 否
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" >审核说明:</label>
+                        <textarea class="form-control" rows="3" id="audioReason" maxlength="64"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary"  onclick="closeaAdioModal()">关闭</button>
+                    <button type="button"  id="auditSubmitAudio" class="btn btn-primary" onclick="submitAuditFile('audio')">确定 </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="fileModal" tabindex="-1" role="dialog" aria-labelledby="showFileModal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="showFileModal">图文审核</h4>
+            </div>
+
+            <div class="modal-body ls_alertM" style="overflow-y: auto; overflow-x: hidden;">
+                <form>
+                    <input type="hidden" name="fileMediaId" id="fileMediaId"/>
+                    <div class="form-group ">
+                        <div class="clearfix media lsAudio_m">
+                            <div class="ls_fl lsAudio_poster">
+                                <img id="imageCover" src="https://y.gtimg.cn/music/photo_new/T002R90x90M0000025pAMM0FugAQ.jpg"/>
+                            </div>
+                            <div class="ls_fl ls_ml25 lsAudio_intro">
+                                <!--<h4 class="ls_bluefont"><span class="glyphicon glyphicon-paperclip"></span> 这里是文件名.pdf</h4>-->
+                                <div><span>文件大小:</span><label class="control-label" id="imageSize">600M</label>
+                                    <span class="ls_ml25">时间:<label class="control-label" id="imageUpdateTime">2019-7-27 0:01:01</label></span>
+
+                                </div>
+                                <div>
+                                    <a href="javascript:viod(0)" id="viewFile"><span class="glyphicon glyphicon-zoom-in"></span>查看</a>
+                                    <!--<a href="javascript:viod(0)" class="ls_ml25"><span class="glyphicon glyphicon-download"></span>下载</a>-->
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">文件图片：</label>
+                        <ul class="clearfix ls_fileImg" id="imgUl">
+                            <!--<li>
+                                <img src="https://5b0988e595225.cdn.sohucs.com/images/20190625/4656f3121d604b5bbe70bff4fdd89592.jpeg" />
+                            </li>-->
+
+                        </ul>
+                    </div>
+
+                    <div class="form-group clearfix">
+                        <label class="col-sm-2 control-label">*图文标题:</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="imageTitle"
+                                   placeholder="请输入图文标题" value="">
+                        </div>
+                    </div>
+                    <div class="form-group clearfix">
+                        <label class="col-sm-2 control-label">*关键词:</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="imageKeyWord"
+                                   placeholder="请输入名称" value="此处为关键词">
+                        </div>
+                    </div>
+                    <div class="form-group clearfix">
+                        <div class="col-sm-6">
+                            <label  class="col-sm-4 control-label">类型:</label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="imageCatalog">
+                                    <option th:each="catalog : ${catalogList}" th:value="${catalog.id}" th:text="${catalog.name}">
+                                        分类不存在
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="col-sm-4 control-label">价格:</label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="imagePrice">
+                                    <option>￥20.00</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group clearfix">
+                        <label class="col-sm-2 control-label">*归属标签:</label>
+                        <div class="col-sm-10" id="imageBelongLabelsDiv">
+                            <!--<label class="checkbox-inline">
+                                <input class="ls_alertCheckbox" type="checkbox" value="option3">
+                                <span class="ls_CheckboxLabel">3</span>
+                            </label>-->
+                        </div>
+                    </div>
+                    <div class="form-group clearfix">
+                        <label  class="col-sm-2 control-label">转载来源:</label>
+                        <div class="col-sm-6">
+                            <select class="form-control" id="imagePubLabel">
+                                <option>教育类</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group clearfix">
+                        <label class="col-sm-2 control-label">简介:</label>
+                        <div class="col-sm-10">
+                            <textarea class="form-control" rows="3" id="imageBref"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label">是否审核通过:</label>
+                        <label class="checkbox-inline">
+                            <input type="radio" name="fileYes" value="y"> 是
+                        </label>
+                        <label class="checkbox-inline">
+                            <input type="radio" name="fileYes" value="n" checked> 否
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" >审核说明:</label>
+                        <textarea class="form-control" rows="3" id="fileReason" maxlength="64"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button"  id="auditSubmitFile" class="btn btn-primary" onclick="submitAuditFile('file')">确定 </button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--<div class="modal fade" id="videoModal" tabindex="-1" role="dialog" aria-labelledby="showVideoModal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="showVideoModal">视频审核</h4>
+            </div>
+
+            <div class="modal-body" style=" width:600px; overflow-x:hidden; overflow-y: auto;"> &lt;!&ndash;这里的高度是如果你觉得太长了，可以用个下拉条&ndash;&gt;
+                <form>
+                    <input type="hidden" name="videoMediaId" id="videoMediaId"/>
+                    <div class="form-group ls_teaC">
+                        <h4  class="ls_bluefont" id="videoTitle">这里是视频名称</h4>
+                        <p class="ls_bdb"><span>视频大小:</span><label class="control-label" id="videoSize">600M</label>
+                            <small class="ls_ml25" id="videoUpdateTime">更新时间:2019-7-5</small>
+                            <span class="ls_ml25">类型:<label class="control-label" id="videoCatalog">教育类</label></span>
+                            <span class="ls_ml25">价格:<label class="control-label ls_redfont" id="videoPrice">￥20.00</label></span>
+                        </p>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">关键词：</label><span id="videoKeyWord">教育、教学、数学</span>
+                    </div>
+                    <div class="form-group lsvideoM">
+                        &lt;!&ndash;video的poster为视频封面 &ndash;&gt;
+                        <video name="myMovie" id="myMovie"  width="568" height="256" controls="" preload="auto" ></video>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" for="videoLabel">归属标签:</label>
+                        <span id="videoLabel">新闻、教育、导游</span>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" >转载标签:</label>
+                        <span id="videoPubLabel">本视频来源于新浪新闻视频内容</span>
+                    </div>
+                    <div class="form-group ls_bgG">
+                        <label class="control-label" >介绍:</label>
+                        <span id="videoBref">3日下午，香港立法会被暴力冲击后首次开放，环球时报—环球网记者进入了立法会内部。大楼内部设施被严重破坏，现场一片狼藉：有议员的储物箱被撬开，立法院的服务器和内部监控器被破坏，二楼历届立法会议员的合影也被涂黑，立法会秘书室的监控系统也被破坏满地散落着文件，立法会大楼闭路电视被破坏、墙面被凿开、网线被剪断，手法十分专业。</span>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">是否审核通过:</label>
+                        <label class="checkbox-inline">
+                            <input type="radio" name="videoYes" value="y"> 是
+                        </label>
+                        <label class="checkbox-inline">
+                            <input type="radio" name="videoYes" value="n" checked> 否
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" >审核说明:</label>
+                        <textarea class="form-control maxlength" rows="3" id="videoReason" maxlength="64"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button"  id="auditSubmitVideo" class="btn btn-primary" onclick="submitAuditFile('video')">确定 </button>
+            </div>
+        </div>
+    </div>
+</div>-->
+<!--
+<div class="modal fade" id="audioModal" tabindex="-1" role="dialog" aria-labelledby="showAudioLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close"   onclick="closeaAdioModal()"><span >&times;</span>
+                </button>
+                <h4 class="modal-title" id="showAudioLabel">音频审核</h4>
+            </div>
+
+            <div class="modal-body" style="overflow-x:hidden; overflow-y: auto;"> &lt;!&ndash;这里的高度是如果你觉得太长了，可以用个下拉条&ndash;&gt;
+                <form>
+                    <input type="hidden" name="audioMediaId" id="audioMediaId"/>
+                    <div class="form-group ">
+                        <audio id="music"  preload="auto"  style="width: 100%" controls="controls">您的浏览器不支持音频预览</audio>
+                        <div class="clearfix media lsAudio_m">
+                            <div class="ls_fl lsAudio_poster lsAudio_click">
+                                <img id="audioCover"/>
+                            </div>
+                            <div class="ls_fl ls_ml25 lsAudio_intro">
+                                <h4 class="ls_bluefont" id="audioTitle">这里是音频名称这里是音频名称这里是音频名称这里是音频名称</h4>
+                                <h6><span>音频大小:</span><label class="control-label" id="audioSize">600M</label>
+                                    <span class="ls_ml25">类型:<label class="control-label" id="audioCatalog">教育类</label></span>
+                                    <span class="ls_ml25">价格:<label class="control-label ls_redfont" id="audioPrice">￥10.00</label></span>
+                                </h6>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" >关键词：</label><span id="auidoKeyWord">教育、教学、数学</span>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" >归属标签:</label>
+                        <span id="auidoLabel">新闻、教育、导游</span>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" >转载标签:</label>
+                        <span id="auidoPubLabel">本视频来源于新浪新闻视频内容</span>
+                    </div>
+                    <div class="form-group ls_bgG">
+                        <label class="control-label" >介绍:</label>
+                        <span id="auidoBref">3日下午，香港立法会被暴力冲击后首次开放，环球时报—环球网记者进入了立法会内部。大楼内部设施被严重破坏，现场一片狼藉：有议员的储物箱被撬开，立法院的服务器和内部监控器被破坏，二楼历届立法会议员的合影也被涂黑，立法会秘书室的监控系统也被破坏满地散落着文件，立法会大楼闭路电视被破坏、墙面被凿开、网线被剪断，手法十分专业。</span>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">是否审核通过:</label>
+                        <label class="checkbox-inline">
+                            <input type="radio" name="audioYes" value="y"> 是
+                        </label>
+                        <label class="checkbox-inline">
+                            <input type="radio" name="audioYes" value="n" checked> 否
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" >审核说明:</label>
+                        <textarea class="form-control maxlength" rows="3" id="audioReason" maxlength="64"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary"  onclick="closeaAdioModal()">关闭</button>
+                <button type="button"  id="auditSubmitAudio" class="btn btn-primary" onclick="submitAuditFile('audio')">确定 </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="fileModal" tabindex="-1" role="dialog" aria-labelledby="showFileModal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="showFileModal">文件审核</h4>
+            </div>
+
+            <div class="modal-body" style=" overflow-x:hidden; overflow-y: auto;">
+                <form>
+                    <input type="hidden" name="fileMediaId" id="fileMediaId"/>
+                    <div class="form-group ">
+                        <div class="clearfix media lsAudio_m">
+                            <div class="ls_fl lsAudio_poster">
+                                <img id="imageCover"/>&lt;!&ndash;这里是文件的封面&ndash;&gt;
+
+                            </div>
+                            <div class="ls_fl ls_ml25 lsAudio_intro">
+                                <h4 class="ls_bluefont" id="imageTitle"><span class="glyphicon glyphicon-paperclip"></span> 这里是文件名.pdf</h4>
+                                <div><span>文件大小:</span><label class="control-label" id="imageSize">600M</label>
+                                    <span class="ls_ml25">类型:<label class="control-label" id="imageCatalog">教育类</label></span>
+                                    <span class="ls_ml25">价格:<label class="control-label ls_redfont" id="imagePrice">￥10.00</label></span>
+                                </div>
+                                <div>
+                                    <a href="javascript:viod(0)" id="viewFile"><span class="glyphicon glyphicon-zoom-in"></span>查看</a>
+                                    <a href="javascript:viod(0)" class="ls_ml25" id="downFile"><span class="glyphicon glyphicon-download"></span>下载</a>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">关键词：</label><span id="imageKeyWord">教育、教学、数学</span>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" >归属标签:</label>
+                        <span id="imageLabel">新闻、教育、导游</span>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">文件图片：</label>
+                        <ul class="clearfix ls_fileImg" id="imgUl">
+                            <li>
+                                <img  />
+                            </li>
+                            <li>
+                                <img  />
+                            </li>
+                            <li>
+                                <img  />
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" >转载标签:</label>
+                        <span id="imagePubLabel">本视频来源于新浪新闻视频内容</span>
+                    </div>
+                    <div class="form-group ls_bgG">
+                        <label class="control-label" >介绍:</label>
+                        <span id="imageBref">3日下午，香港立法会被暴力冲击后首次开放，环球时报—环球网记者进入了立法会内部。大楼内部设施被严重破坏，现场一片狼藉：有议员的储物箱被撬开，立法院的服务器和内部监控器被破坏，二楼历届立法会议员的合影也被涂黑，立法会秘书室的监控系统也被破坏满地散落着文件，立法会大楼闭路电视被破坏、墙面被凿开、网线被剪断，手法十分专业。</span>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">是否审核通过:</label>
+                        <label class="checkbox-inline">
+                            <input type="radio" name="fileYes" value="y"> 是
+                        </label>
+                        <label class="checkbox-inline">
+                            <input type="radio" name="fileYes" value="n" checked> 否
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" >审核说明:</label>
+                        <textarea class="form-control maxlength" rows="3" id="fileReason" maxlength="64"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button"  id="auditSubmitFile" class="btn btn-primary" onclick="submitAuditFile('file')">确定 </button>
+            </div>
+        </div>
+    </div>
+</div>-->
+
+<script>
+
+    var $table = $('#table');
+    $("body").bind("keypress","#member",function(event){
+        if(event.keyCode == 13){
+            Search();
+            return false;
+        }
+        // return false;
+    });
+    $(function () {
+        //Date range picker
+        var beginTimeTake;
+        $('#reservation').daterangepicker({
+            "timePicker": false,
+            "timePicker24Hour": true,
+            "linkedCalendars": false,
+            "autoUpdateInput": false,
+            "locale": {
+                format: 'YYYY-MM-DD',
+                separator: ' ~ ',
+                applyLabel: "应用",
+                cancelLabel: "取消",
+                resetLabel: "重置",
+                daysOfWeek: ["日", "一", "二", "三", "四", "五", "六"],
+                monthNames: ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"],
+            }
+        }, function (start, end, label) {
+            if (!this.startDate) {
+                this.element.val('');
+            } else {
+                $('#startDate').val(this.startDate.format(this.locale.format));
+                $('#endDate').val(this.endDate.format(this.locale.format));
+                this.element.val(this.startDate.format(this.locale.format) + this.locale.separator + this.endDate.format(this.locale.format));
+            }
+        });
+        // bootstrap table初始化
+        // http://bootstrap-table.wenzhixin.net.cn/zh-cn/documentation/
+        $table.bootstrapTable({
+            url: CONTEXT_PATH + '/admin/auditfile/listAudit2',
+            pagination: true,
+            queryParams: function queryParams(params){
+                var param = {
+                    pageNumber: params.pageNumber,
+                    pageSize: params.pageSize,
+                    sortName: params.sortName,
+                    sortOrder: params.sortOrder,
+                    uname:$.trim($('#member').val()),
+                    mediaTypes:$('#mediaType').val(),
+                    catalogId:$('#catalogId').val(),
+                    auditStatus:$('#auditStatus').val()
+                };
+                return param;
+            },
+            //初始化加载第一页，默认第一页
+            pageNumber: 1,
+            //每页的记录行数
+            pageSize: 10,
+            //可供选择的每页的行数
+            pageList: [10,25,50,100],
+            idField: 'id',
+            sidePagination : "client",//使用客户端分页
+            searchOnEnterKey: false,
+            detailView : false,
+            cache: false,
+            detailFormatter :"detailFormatter",
+            columns: [
+                //{field: 'state', checkbox: true},
+                {field: 'id', title: '编号', sortable: false, halign: 'left',visible: false},
+                //{field: 'memberMedia.coverUrl', title: '资源封面', formatter: 'coverUrlShow',sortable: true, halign: 'left'},
+                {field: 'fileName', title: '文件名称', sortable: false, halign: 'left'},
+                {field: 'fileSize', title: '文件大小', formatter: 'renderSize',sortable: false, halign: 'left'},
+                {field: 'mediaType', title: '资源类型', formatter:'change2Text',sortable: false, halign: 'left'},
+                {field: 'uname', title: '归属用户', sortable: false, halign: 'left'},
+                //{field: 'isMediaInfo.text', title: '是否有详情',  sortable: true, halign: 'left'},
+                //{field: 'goodsStatus.text', title: '是否上下架', sortable: true, halign: 'left'},
+                {field: 'mediaStatus', title: '审核状态',  formatter:'change2Text',sortable: false, halign: 'left'},
+                //{field: 'isPublishMedia.text', title: '用户是否发布', sortable: true, halign: 'left'},
+                //{field: 'opDate', title: '修改日期', sortable: true, halign: 'left'},
+                {field: 'mediaBrief', title: '简介', sortable: false, halign: 'left',formatter:'formatMsg',visible: false},
+                {field: 'lastedAuditMsg', title: '审核说明', sortable: false, halign: 'left',formatter:'formatMsg'},
+                {field: 'uploadDate', title: '上传日期', sortable: false, halign: 'left'},
+                {
+                    field: 'action',
+                    title: '操作',
+                    halign: 'center',
+                    align: 'center',
+                    formatter: 'actionFormatter',
+                    events: 'actionEvents',
+                    clickToSelect: false
+                }
+            ],
+            sortName : 'f.upload_date',
+            sortOrder: 'desc'
+        });
+    });
+
+
+    window.actionEvents = {
+        'click .like': function (e, value, row, index) {
+             alert('You click like icon, row: ' + JSON.stringify(row));
+             console.log(value, row, index);
+         },
+        'click .audit': function (e, value, row, index) {
+
+            var typeName=row.mediaType;
+           // alert(typeName);
+            $("#uid").val(row.uid);
+            getStaticData(row.uid);
+            if(typeName=='VIDEO' || typeName=='video'){
+                 fillVideoForm(row, belongLabels, pricesLabels, publishLabels) ;
+                $('#videoModal').modal('show')
+            }else if(typeName=='AUDIO' || typeName=='audio'){
+                 fillAudioForm(row, belongLabels, pricesLabels, publishLabels) ;
+                $('#audioModal').modal('show')
+                //$("#back").attr("src",http+'/image?url='+encodeURIComponent(row.memberCert.companyBack));
+            }else if(typeName=='IMAGETEXT' || typeName=='imagetext' || typeName=='image_text' || typeName=='IMAGE_TEXT'){
+                 fillImageForm(row, belongLabels, pricesLabels, publishLabels) ;
+                $('#fileModal').modal('show')
+            }else{
+                alert(typeName);
+            }
+            // console.log(value, row, index);
+        }
+    };
+
+    var belongLabels = [];
+    var pricesLabels = [];
+    var publishLabels = [];
+
+    function getStaticData(uid) {
+        $.ajax({
+            type: "POST",
+            url: CONTEXT_PATH + '/admin/auditfile/getStaticData',
+            async:false,
+            data: {
+                uid: uid
+            },
+            dataType: "json",
+            success: function (data) {
+                if (data.success) {
+                    belongLabels.length = 0;
+                    pricesLabels.length = 0;
+                    publishLabels.length = 0;
+                    belongLabels = data.extra.belongLabels;
+                    pricesLabels = data.extra.pricesLabels;
+                    publishLabels = data.extra.publishLabels;
+                }else {
+                    console.log("请求静态数据错误,请稍后再试。")
+                }
+            },
+            error: function (e) {
+                console.log("请求静态数据错误,请稍后再试。")
+            }
+
+        })
+    }
+
+    function timeFormatter(value, row, index) {
+        return Utils.dateFormat.formatTimestamp(value, 'yyyy-MM-dd hh:mm:ss');
+    }
+
+    function execTimeFormatter(value, row, index) {
+        return value + ' ms';
+    }
+
+    function actionFormatter(value, row, index) {
+        var status= row.mediaStatus.toUpperCase();
+        // console.log('status = ' + status);
+        // console.log('row. = ' + status);
+        if(status=='AUDITING'){
+            return $('#actionButtons').html();
+       }else  {
+            return $('#actionViewButtons').html();
+       }
+
+
+    }
+    // 数据表格展开内容
+    function detailFormatter(value, row, index) {
+        /*var html = [];
+        $.each(row, function (key, value) {
+            html.push('<p><b>' + key + ':</b> ' + value + '</p>');
+        });
+        return html.join('');*/
+        var image = '<div class="photos">'
+            +'<a target="_blank" href="'+value+'"><img alt="image" class="feed-photo" src="'+value+'"></a>'
+            +'</div>';
+        return image;
+    }
+    function  renderSize(value) {
+        if (null == value || value == "") {
+            return "0 Bytes";
+        }
+        var unitArr = new Array("Bytes","KB","MB","GB","TB","PB","EB","ZB","YB");
+        var index = 0
+            , srcsize = parseFloat(value);
+        index = Math.floor(Math.log(srcsize) / Math.log(1024));
+        var size = srcsize / Math.pow(1024, index);
+        //  保留的小数位数
+        size = size.toFixed(2);
+        return size + unitArr[index];
+    }
+
+    function formatMsg(value) {
+        //此处对value值做判断，不然value为空就会报错
+        value=value?value:'';
+        var length=value.length;
+        if(length&&length>10){
+            lelngth=10;
+        }
+        return"<a data-container='body' data-toggle='popover' data-placement='right' data-content ='"+value+"'>"+value.substring(0,length)+"</a>";
+
+    }
+
+    function Search() {
+        var uname= $('#member').val();
+        var _mediaType= $('#mediaType').val();
+        var _catalogId=$('#catalogId').val();
+        var _auditStatus=$('#auditStatus').val();
+        // var _startDate=$('#startDate').val();
+        // var _endDate=$('#endDate').val();
+
+        var options = $('#table').bootstrapTable('refresh', {
+            silent: true,
+            query:
+                {
+                    uname:uname,
+                    mediaTypes:_mediaType,
+                    catalogId:_catalogId,
+                    auditStatus:_auditStatus
+                    // ,startDate: _startDate,
+                    // endDate:_endDate
+
+                }
+        });
+    }
+    
+    function coverUrlShow(value, row, index) {
+        return "<img style='width: 50px;height: 50px;' src='"+CONTEXT_PATH+value+"' alt=''>";
+    }
+
+    $(function(){
+        //音乐播放
+        // $(".lsAudio_click").click(function(){
+        //     var audio = document.getElementById('music');
+        //     if (audio.paused) {
+        //         $(this).addClass("lsAudio_playing");
+        //         audio.play();
+        //     } else {
+        //         $(this).removeClass("lsAudio_playing");
+        //         audio.pause();
+        //     }
+        // });
+
+        $('textarea.maxlength').maxlength({
+            alwaysShow: true,
+            threshold: 10,
+            warningClass: "label label-info",
+            limitReachedClass: "label label-warning",
+            placement: 'bottom-right',
+            message: '%charsTyped%/%charsTotal% 字符.'
+        });
+    })
+
+    $(function(){
+        var Wh=document.documentElement.clientHeight*0.85-120;
+        $(".modal-body").height(Wh+"px");
+        //alert("audioModal");
+        $('#videoModal').on('hide.bs.modal', function () {
+            // 执行一些动作...
+            //alert('hide.bs.modal');
+            var movie = document.getElementById('myMovie');
+            //if (audio.play) {
+               // $(this).removeClass("lsAudio_playing");
+            movie.pause();
+           // }
+        })
+        $('#audioModal').on('hide.bs.modal', function () {
+            // 执行一些动作...
+            //alert('hide.bs.modal');
+            var audio = document.getElementById('music');
+            //if (audio.play) {
+            $(this).removeClass("lsAudio_playing");
+            audio.pause();
+            // }
+        })
+    })
+
+    function closeaAdioModal() {
+        //alert('audioClose');
+        var audio = document.getElementById('music');
+        //if (audio.play) {
+            $(this).removeClass("lsAudio_playing");
+            audio.pause();
+       // }
+        $('#audioModal').modal('hide')
+
+    }
+    
+    function change2Text(value) {
+
+        if (null == value || value == "") {
+            return "";
+        }
+        if(value=='AUDITING' || value=='auditing' || value=='Auditing'){
+            return "审核中";
+        }else if(value=='AUDITED' || value=='audited'){
+            return "审核通过";
+        }else if(value=='UNAUDITED' || value=='unaudited'){
+            return "审核不通过";
+        }else if(value=='VIDEO' || value=='video'){
+            return "视频";
+        }else if(value=='AUDIO' || value=='audio'){
+            return "音频";
+        }else if(value=='IMAGETEXT' || value=='imagetext' || value=='image_text' || value=='IMAGE_TEXT'){
+            return "图文";
+        }else{
+            return "";
+        }
+
+    }
+
+</script>
+<script th:inline="javascript" th:src="@{/static/pface/js/mediafileAudit.js}"></script>
+</html>

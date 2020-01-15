@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<script type="text/javascript" src="https://libs.baidu.com/jquery/1.8.3/jquery.min.js"></script>
+<head>
+	<meta charset="UTF-8">
+	<meta name="context-path" th:content="@{/}"/>
+	<link rel="stylesheet" th:href="@{/static/pface/js/layui/css/layui.css}">
+	<link rel="stylesheet" th:href="@{/static/pface/css/common.css}">
+	<link rel="stylesheet" th:href="@{/static/pface/css/account.css}" />
+	<title>节目购——用户认证</title>
+	<script th:inline="javascript">
+        var CONTEXT_PATH = [[${#request.getContextPath()}]];
+	</script>
+</head>
+<body>
+<!--导航-->
+<div class="top clearfix" th:replace="~{front/header :: header}"></div>
+<!--内容管理-->
+<div class="container certifica">
+	<div class="wapper">
+		<div class="m_conter">
+			<div class="certifica_tit">
+				<div>
+					<img th:src="@{/static/pface/img/certifica_tit.png}" />
+				</div>
+				<p>请准确填写真实有效的信息，以加速审核进程</p>
+			</div>
+			<div class="certifica_main">
+				<div class="layui-tab upload_tab">
+					<ul class="layui-tab-title">
+						<li class="layui-this">个人用户</li>
+						<li>企业用户</li>
+					</ul>
+
+					<div class="layui-tab-content certifica_tabM">
+						<div class="layui-tab-item layui-show">
+							<form class="layui-form" action="">
+								<div class="clearfix certifi_conter">
+									<div class="accout_head fl"  id="people_head">
+										<div>
+											<img class="ahead_inco" th:src="@{/static/pface/img/people_Inco.png}"/>
+											<br />
+											用户头像<br />点击上传
+											<div class="certifiHead">
+												可使用个人头像、<br/>栏目包装或者企业标志
+											</div>
+											<img class="people_headShow" id="people_headShow" />
+										</div>
+									</div>
+									<div class="fl certifi_input">
+										<div class="cerInput_list">
+											<div class="certifi_Tit"><em>*</em>联系方式：</div>
+											<div class="layui-form">
+												<input name="title" class="layui-input" type="text"  autocomplete="off" lay-verify="required" lay-reqtext="联系方式不能为空" placeholder="请填写商户客服人员人员的电话或者微信号">
+											</div>
+										</div>
+										<div class="cerInput_list">
+											<div class="certifi_Tit"><em>*</em>个人身份证号码：</div>
+											<div class="layui-form">
+												<input name="title" class="layui-input" type="text"  autocomplete="off" lay-verify="required" lay-reqtext="身份证号码不能为空" placeholder="请填写身份证号码">
+											</div>
+										</div>
+									</div>
+									<div class="fl certifi_uploadO certifi_personal" id="certifi_personalzm">
+										身份证正面照<br />点击上传
+										<img class="people_headShow" id="person_zm" />
+									</div>
+									<div class="fr certifi_uploadO certifi_personal" id="certifi_personalfm">
+										身份证反面照<br />点击上传
+										<img class="people_headShow" id="person_fm" />
+									</div>
+								</div>
+								<div class="layui-form-item textCenter btline certifi_opera">
+									<button class="layui-btn layui-btn-warm btn-radius btn_min" lay-filter="demo1" id="formSub" lay-submit="">提交</button>
+								</div>
+							</form>
+						</div>
+						<div class="layui-tab-item">
+							<form class="layui-form" action="">
+								<div class="clearfix certifi_conter">
+									<div class="accout_head fl"  id="company_head">
+										<div>
+											<img class="ahead_inco" th:src="@{/static/pface/img/people_Inco.png}"/>
+											<br />
+											用户头像<br />点击上传
+											<div class="certifiHead">
+												可使用个人头像、<br/>栏目包装或者企业标志
+											</div>
+											<img class="people_headShow" id="company_headShow" />
+										</div>
+									</div>
+									<div class="fl certifi_input">
+										<div class="cerInput_list">
+											<div class="certifi_Tit"><em>*</em>联系方式：</div>
+											<div class="layui-form">
+												<input name="title" class="layui-input" type="text"  autocomplete="off" lay-verify="required" lay-reqtext="联系方式不能为空" placeholder="请填写商户客服人员人员的电话或者微信号">
+											</div>
+										</div>
+										<div class="cerInput_list">
+											<div class="certifi_Tit"><em>*</em>企业名称：</div>
+											<div class="layui-form">
+												<input name="title" class="layui-input" type="text"  autocomplete="off" lay-verify="required" lay-reqtext="企业名称不能为空" placeholder="请填写公司名称">
+											</div>
+										</div>
+										<div class="cerInput_list">
+											<div class="certifi_Tit"><em>*</em>企业证件代码：</div>
+											<div class="layui-form">
+												<input name="title" class="layui-input" type="text"  autocomplete="off" lay-verify="required" lay-reqtext="企业证件代码不能为空" placeholder="请填写企业证件代码">
+											</div>
+										</div>
+									</div>
+									<div class="fl certifi_uploadO certifi_personal" id="company_sf">
+										<span>上传企业证件代码文件</span><br />
+										点击上传
+										<img class="people_headShow" id="company_sfshow" />
+									</div>
+									<div class="fr certifi_uploadO company_ID" id="company_ID">
+											<span>企业证件扫描件<br/>
+												请上传统一社会信用代码证<br/>
+												未三证合一的请上传营业执照
+											</span>
+										<br />点击上传
+										<img class="people_headShow" id="company_IDImg" />
+									</div>
+								</div>
+								<div class="layui-form-item textCenter btline certifi_opera">
+									<button class="layui-btn layui-btn-warm btn-radius btn_min" lay-filter="demo1" id="formSub" lay-submit="">提交</button>
+								</div>
+							</form>
+						</div>
+					</div>
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!--footer-->
+<div class="footer" th:replace="~{front/footer :: footer}"> </div>
+<script th:src="@{/static/pface/js/layui/layui.js}"></script>
+<script>
+    layui.use(['element', 'upload','form'],function(){
+        var $ = layui.jquery,
+            element = layui.element //导航的hover效果、二级菜单等功能，需要依赖element模块
+            ,upload = layui.upload,
+            form = layui.form;
+        //监听导航点击
+        element.on('nav(demo)', function(elem){
+            console.log(elem)
+            layer.msg(elem.text());
+        });
+        //普通图片上传
+        var uploadInst = upload.render({
+            elem: '#people_head'
+            ,url: '/upload/'
+            ,before: function(obj){
+                //预读本地文件示例，不支持ie8
+                obj.preview(function(index, file, result){
+                    $('#people_headShow').attr('src', result); //图片链接（base64）
+                    $('#people_headShow').show();
+                });
+            }
+            ,done: function(res){
+
+            }
+            ,error: function(){
+                return layer.msg('上传失败');
+            }
+        });
+        //身份证正面图片上传
+        var uploadsfzm = upload.render({
+            elem: '#certifi_personalzm'
+            ,url: '/upload/'
+            ,before: function(obj){
+                //预读本地文件示例，不支持ie8
+                obj.preview(function(index, file, result){
+                    $('#person_zm').attr('src', result); //图片链接（base64）
+                    $('#person_zm').show();
+                });
+            }
+            ,done: function(res){
+
+            }
+            ,error: function(){
+                return layer.msg('上传失败');
+            }
+        });
+        //身份证反面图片上传
+        var uploadsfzfm = upload.render({
+            elem: '#certifi_personalfm'
+            ,url: '/upload/'
+            ,before: function(obj){
+                //预读本地文件示例，不支持ie8
+                obj.preview(function(index, file, result){
+                    $('#person_fm').attr('src', result); //图片链接（base64）
+                    $('#person_fm').show();
+                });
+            }
+            ,done: function(res){
+
+            }
+            ,error: function(){
+                return layer.msg('上传失败');
+            }
+        });
+
+    });
+</script>
+</body>
+</html>

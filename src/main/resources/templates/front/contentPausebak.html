@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+	<script type="text/javascript" src="https://libs.baidu.com/jquery/1.8.3/jquery.min.js"></script>
+	<script th:src="@{/static/pface/js/jquery.msgbox.min.js}"></script>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="context-path" th:content="@{/}"/>
+		<link rel="stylesheet" th:href="@{/static/pface/js/layui/css/layui.css}">
+		<link rel="stylesheet" th:href="@{/static/pface/css/common.css}">
+		<link rel="stylesheet" th:href="@{/static/pface/css/manage.css}" />
+		<title>节目购——视频暂存库管理</title>
+		<script th:inline="javascript">
+            var CONTEXT_PATH = [[${#request.getContextPath()}]];
+		</script>
+	</head>
+	<body>
+		<!--导航-->
+		<div class="top clearfix" th:replace="~{front/header :: header}"></div>
+		<!--内容管理-->
+		<div class="container">
+			<div class="wapper">
+				<div class="m_conter clearfix hav_line">
+					<div class="fl left_nav" th:replace="~{front/leftnav::leftnav}"></div>
+					<!--右边-->
+					<div class="fr right_conter">
+						<div class="right_title">
+							<div class="new_label fr conter_opera">
+
+								<div class="mtype"  style="display: inline-block;vertical-align: middle;">
+									<label class="checkbox-label" >视频</label>
+						    	</div>
+
+							</div>
+							<div class="colorblack manage_tit">
+								<img th:src="@{/static/pface/img/tit_inco.png}"/>
+								<span>视频暂存管理</span>
+							</div>
+						</div>
+
+						<div class="conter_list">
+							<form class="layui-form">
+							<ul>
+								<li th:each="mediaFile : ${mediaFileList}">
+									<div class="conter_check">
+										<input type="checkbox" name="conterList" lay-skin="primary" class="conterList" th:value="${mediaFile.id}+'@'+${mediaFile.mediaType.name}">
+									</div>
+									<div class="layui-clear conter_ListM">
+										<div class="layui-inline conter_Img">
+											<div class="conter_pic fl" th:if="${mediaFile.mediaType.name eq 'video'}">
+												<img th:src="@{/static/pface/img/conter_Img.jpg}" />
+												<div class="contePic_label contePic_video">视频</div>
+											</div>
+											<div class="conter_pic fl" th:if="${mediaFile.mediaType.name eq 'audio'}">
+												<img th:src="@{/static/pface/img/conter_Img.jpg}" />
+												<div class="contePic_label contePic_music">音频</div>
+											</div>
+											<div class="conter_pic fl" th:if="${mediaFile.mediaType.name eq 'imagetext'}">
+												<img th:src="@{/static/pface/img/conter_Img.jpg}" />
+												<div class="contePic_label contePic_file">图文</div>
+											</div>
+										</div>
+										<div class="fr conter_intro">
+											<div class="clearfix conter_introTit">
+
+												<div class="conter_tit">													
+													<span style="display:inline-block;" >无视频标题</span>
+													<span>（无归属标签）</span>
+												</div>
+											</div>
+											<div class="clearfix conter_Keyword">												
+												<div class="fl conterKw_txt">
+													无关键词，请点击修改完善信息
+												</div>
+												<div class="fr conterTit_price">
+													无价格标签，请点击修改完善信息
+												</div>
+											</div>
+											<div class="clearfix conter_IntroTxt">
+												无简介，请点击修改完善信息
+											</div>
+											<div class="clearfix conter_date">
+												<div class="fl conterDate_txt" th:text="${#dates.format(mediaFile.opDate,'yyyy-MM-dd HH:mm:ss')}">
+													2019-05-01 13：10：10
+												</div>
+												<div class="fr conterIntr_opera">
+													<a href="#" class="conterIntr_delet" th:onclick="'javascript:delLab('+${mediaFile.id}+');'"><i class="layui-icon layui-icon-delete"></i>  删除</a>
+													<a th:href="'/front/modifyContent?id='+${mediaFile.id}" class="layui-edit conterIntr_edit" data-method="setTop"><i class="layui-icon layui-icon-edit"></i>  修改</a>
+												</div>
+											</div>
+										</div>
+									</div>
+								</li>
+							</ul>
+							</form>
+							<div class="conterIntro_bottom">
+								<div class="fl conterBtm_check layui-form">
+									<input type="checkbox" id="choiceD" name="allchoice"  lay-skin="primary" lay-filter="choiceD" title="全选" >
+								</div>
+								<div class="fl conteropera">
+									<a href="javascript:void(0);" id="allDele" onclick="goodsDel()">删除</a>
+								</div>
+								<div id="pageNum" class="pageNum textRight"></div>
+							</div>
+							
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		
+		<!--footer-->
+<div class="footer" th:replace="~{front/footer :: footer}"> </div>
+<div>
+	<form name="listpage" id="listpage" method="post">
+		<input type="hidden" name="pageNumKey" id="pageNumKey" th:value="${pageNum}">
+		<input type="hidden" name="pageSizeKey" id="pageSizeKey" th:value="${pageSize}">
+	</form>
+</div>
+<script th:inline="javascript">
+            /*<![CDATA[*/
+
+            var totalRecords = [[${total}]];
+            var page = [[${pageNum}]];
+            var pageSize = [[${pageSize}]];
+
+
+            /*]]>*/
+</script>
+<script th:src="@{/static/pface/js/layui/layui.js}"></script>
+<script th:src="@{/static/pface/js/contentPause.js}"></script>
+<script type='text/javascript'>
+
+    layui.use('form', function () {
+        var form = layui.form;
+        //全选 全不选
+        form.on('checkbox(choiceD)', function (data) {
+
+            var item = $(".conterList");
+           var c= $("#choiceD").prop("checked");
+            item.each(function () {
+                $(this).prop("checked", c);
+               /* if ($(this).prop("checked")) {
+                    $(this).prop("checked", false);
+                } else {
+                    $(this).prop("checked", true);
+                }*/
+            })
+            form.render('checkbox');
+        })
+    })
+
+
+</script>
+</body>
+</html>

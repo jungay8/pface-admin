@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+	<!--<script type="text/javascript" src="https://libs.baidu.com/jquery/1.8.3/jquery.min.js"></script>-->
+	<script type="text/javascript" th:src="@{/static/js/jquery183.js}"></script>
+	<script th:src="@{/static/pface/js/jquery.msgbox.min.js}"></script>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="context-path" th:content="@{/}"/>
+		<link rel="stylesheet" th:href="@{/static/pface/js/layui/css/layui.css}">
+		<link rel="stylesheet" th:href="@{/static/pface/css/common.css}">
+		<link rel="stylesheet" th:href="@{/static/pface/css/login.css}">
+		<script th:inline="javascript">
+            var CONTEXT_PATH = [[${#request.getContextPath()}]];
+		</script>
+		<title>节目购——注册页</title>		
+	</head>
+	<body>
+		<!--导航-->
+		<div class="top clearfix" th:replace="~{front/header :: header}"></div>
+		<div class="loginImg">
+			<img class="WaImg rester_imgBg" th:src="@{/static/pface/img/loginImg.jpg}" />
+			<div class="loginContainer">
+				<div class="wapper">					
+					<div class="dzMain reInputTxt">
+						<div class="loginInputTit">
+							注册新用户
+						</div>
+						<div class="LoginMainFrom register_from">
+							<form  class="layui-form" >
+								<div class="layui-form-item">
+									<input type="radio"  name="memberType" value="PERSON" title="个人" >
+									<input type="radio" name="memberType" value="COMPANY" title="企业" checked>
+								</div>
+				            	<div class="LoginInput">
+				                	<input name="uname" id="uname" type="text" class="form-control is-invalid" required  lay-verify="required" placeholder="用户名">
+				                </div>
+				                <div class="LoginInput">
+				                	<input name="pwd" id="pwd" class="form-control is-invalid" type="password" required  lay-verify="required" placeholder="密码"/>
+				                </div>
+				                <div class="Login_Opera register_Opera">
+
+									<span class="fr" id="sendsms" onclick="javascript:sendSmsCode()" style="cursor: pointer">
+										获取注册码
+									</span>
+									<div class="LoginInput logincodeInput">
+					                	<input name="mobile" id="mobile" class="form-control is-invalid" type="tel"  autocomplete="off" lay-verify="required |phone" lay-reqtext="请输入正确的手机号码" placeholder="手机号">
+									</div>
+									<div>
+										<div class="tips" style="color: red; padding:5px 0px; display: block;"></div>
+									</div>
+				                </div>
+				                <div class="LoginInput">
+				                	<input name="smsCode" id="smsCode" class="form-control is-invalid" type="text" required  lay-verify="required" placeholder="验证码"/>
+				                </div>
+				                <div class="LoginInput">
+				                	<input name="email" id="email" class="form-control is-invalid" type="email" autocomplete="off" lay-verify="email" placeholder="邮箱地址"/>
+				                </div>
+				                <div class="cheched_forget clearfix">				                	
+				                	<div class="cheched">					                	
+								        <div class="custom-control custom-checkbox layui-form">
+										    <input type="checkbox" name="已阅读" title="我已仔细阅读并" lay-skin="primary" checked="checked" id="regree">
+										    <label class="custom-control-label colorblack" for="regree"><a href="#" class="gree_link">同意隐私协议</a>
+										    	和
+										    	<a href="#" class="gree_link">服务声明</a></label>									    
+										</div>
+					                </div>
+				                </div>
+				                
+				                <div class="LoginInput LoginInputBtn">
+				                	<button lay-submit lay-filter="formRester">注  &nbsp;&nbsp;册</button>                       
+				                </div>
+				            </form>
+				            <div class="link_register">
+				            	已有账号？<a href="./login" class="red_link">去登录</a>
+				            </div>
+						</div>
+					</div>
+					
+				</div>	
+			</div>							
+		</div>
+		<!--footer-->
+<div class="footer" th:replace="~{front/footer :: footer}"> </div>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script th:src="@{/static/pface/js/layui/layui.js}"></script>
+<script th:src="@{/static/pface/js/iput.js}"></script>
+<script>
+	layui.use(['form', 'layer','layedit'],function(){
+	  var form = layui.form
+	  ,layer = layui.layer,
+	  layedit=layui.layedit;
+	  //创建一个编辑器
+  var editIndex = layedit.build('LAY_demo_editor');
+ 
+	  //监听提交 
+	  form.on('submit(formRester)', function(data){
+	    //layer.msg(JSON.stringify(data.field));
+          reg();
+	    return false;
+	  });
+	});
+    function reg(){
+		var memberType  = $("input[name='memberType']:checked").val();
+        this.axios({
+            method: "POST",
+            url: CONTEXT_PATH+'/front/user/regUser',
+            data: {
+                uname: $("#uname").val(),
+                pwd: $("#pwd").val(),
+                mobile:$("#mobile").val(),
+                email: $("#email").val(),
+                smsCode:$("#smsCode").val(),
+                memberType:memberType
+            },
+            headers: {
+                //'Content-Type': 'application/x-www-form-urlencoded'
+                'Content-Type': 'application/json;charset=UTF-8'
+            }
+        }).then(function(res) {
+            console.log(res);
+            if(res.data.success){
+                //storageSessionObj("user",res.data.data);
+                $.alert(res.data.msg);
+                window.location.href = CONTEXT_PATH+res.data.extra.url;
+            }else{
+				$(".tips").text(res.data.msg);
+				$(".tips").show();
+
+                // $.alert(res.data.msg);
+            }
+        }).catch(function (error) {
+            console.log(error);
+            //layer.msg(JSON.stringify(error.msg));
+        });
+    }
+
+	function verifyMobile(phone){
+		if(/^1[3,4,5,7,8]\d{9}$/g.test(phone)||(/^15[8,9]\d{8}$/g.test(phone))) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	var k=0;
+	var interval = 60;
+	var b = $("#sendsms");
+    function sendSmsCode() {
+
+		$(".tips").text("");
+		$(".tips").show();
+
+       var mob= $("#mobile").val();
+        if(mob=="" || $.trim(mob).length == 0){
+            // $.alert("手机号不能为空");
+			$(".tips").text("手机号不能为空！");
+			$(".tips").show();
+			return ;
+		}
+
+		if(!verifyMobile(mob)){
+			$(".tips").text("手机号错误！");
+			$(".tips").show();
+			return ;
+		}
+
+		if(k==0){
+			k=1;
+			b.text(interval + "秒后可重发");
+			var m = setInterval(function(){
+				interval = interval - 1  ;
+				b.text(interval + "秒后可重发");
+				if(interval<0){
+
+					// interval = 60 ;
+					// b.attr('disabled', false);
+					// b.text("获取注册码")
+					// clearTimeout(m);
+					// k=0;
+
+					resetSendsmsBtn(m);
+				}
+			}, 1000);
+
+        this.axios({
+            method: "POST",
+            url: CONTEXT_PATH+'/front/user/sendSmsCode',
+            data: {
+                mobile:mob
+            },
+            headers: {
+               // 'Content-Type': 'application/x-www-form-urlencoded'
+               'Content-Type': 'application/json;charset=UTF-8'
+            }
+        }).then(function(res) {
+            console.log(res);
+            if(res.data.success){
+				$(".tips").text("验证码已发送到您的手机，请注意查收！");
+				$(".tips").show();
+                // $.alert(res.data.msg);
+            }else{
+				$(".tips").text(res.data.msg);
+				$(".tips").show();
+
+				resetSendsmsBtn(m);
+                // $.alert(res.data.msg);
+            }
+        }).catch(function (error) {
+			$(".tips").text("程序发生异常，请与系统管理员联系！");
+			$(".tips").show();
+
+			resetSendsmsBtn(m);
+            // console.log(error);
+        });
+		}
+    }
+
+    function resetSendsmsBtn(m) {
+		interval = 60 ;
+		b.attr('disabled', false);
+		b.text("获取注册码")
+		clearTimeout(m);
+		k=0;
+	}
+</script>
+	</body>
+</html>

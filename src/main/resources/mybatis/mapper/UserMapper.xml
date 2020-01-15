@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pface.admin.modules.system.mapper.UserMapper">
+
+    <resultMap id="BaseResultMap" type="com.pface.admin.modules.system.po.User" >
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <id column="id" property="id" jdbcType="BIGINT" />
+        <result column="organization_id" property="organizationId" jdbcType="BIGINT" />
+        <result column="username" property="username" jdbcType="VARCHAR" />
+        <result column="password" property="password" jdbcType="VARCHAR" />
+        <result column="mobile" property="mobile" jdbcType="VARCHAR" />
+        <result column="salt" property="salt" jdbcType="VARCHAR" />
+        <result column="role_ids" property="roleIds" jdbcType="VARCHAR" />
+        <result column="group_ids" property="groupIds" jdbcType="VARCHAR" />
+        <result column="locked" property="locked" jdbcType="BIT" />
+        <result column="op_date" property="opDate" jdbcType="TIMESTAMP" />
+    </resultMap>
+
+    <resultMap id="userListMap" type="com.pface.admin.modules.member.vo.UserListVo" >
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <id column="id" property="uid" jdbcType="BIGINT" />
+        <result column="username" property="uname" jdbcType="VARCHAR" />
+        <result column="userType" property="userType" jdbcType="VARCHAR" />
+        <result column="memType" property="memType" jdbcType="VARCHAR" />
+        <result column="mobile" property="mobile" jdbcType="VARCHAR" />
+        <result column="certType" property="certType" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <select id="queryBackUsers"  resultMap="userListMap">
+           SELECT
+	       u.id,
+	       u.username,
+	       'back' AS userType,
+	       '' AS memType,
+	       u.mobile AS mobile,
+           '' as certType
+           FROM
+	           jmgo_sys_user u
+           WHERE
+	           u.role_ids = '5'
+          <if test="uname!=null">
+            and u.username like '%${uname}%'
+           </if>
+    </select>
+
+    <select id="queryFrontUsers"  resultMap="userListMap">
+        SELECT
+        u.id,
+        u.uname as username,
+        'front' AS userType,
+        u.member_type AS memType,
+        u.mobile,
+        u.is_cert as certType
+        FROM
+        jmgo_member_user u WHERE 1=1
+        <if test="uname!=null">
+            and u.uname like '%${uname}%'
+        </if>
+    </select>
+
+    <select id="queryAllUsers"  resultMap="userListMap">
+        SELECT
+        u.id,
+        u.username,
+        'back' AS userType,
+        '' AS memType,
+        u.mobile AS mobile,
+        '' as certType
+        FROM
+        jmgo_sys_user u
+        WHERE
+        u.role_ids = '5'
+        <if test="uname!=null">
+            and u.username like '%${uname}%'
+        </if>
+
+        UNION ALL
+
+        SELECT
+        u.id,
+        u.uname as username,
+        'front' AS userType,
+        u.member_type AS memType,
+        u.mobile,
+        u.is_cert as certType
+        FROM
+        jmgo_member_user u WHERE 1=1
+        <if test="uname!=null">
+            and u.uname like '%${uname}%'
+        </if>
+    </select>
+</mapper>

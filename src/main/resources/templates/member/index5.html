@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<style type="text/css">
+    .webuploader-container {
+        position: relative;
+    }
+    .webuploader-element-invisible {
+        position: absolute !important;
+        clip: rect(1px 1px 1px 1px); /* IE6, IE7 */
+        clip: rect(1px,1px,1px,1px);
+    }
+    .webuploader-pick {
+        position: relative;
+        display: inline-block;
+        cursor: pointer;
+        background: #00b7ee;
+        padding: 10px 15px;
+        color: #fff;
+        text-align: center;
+        border-radius: 3px;
+        overflow: hidden;
+    }
+    .webuploader-pick-hover {
+        background: #00a2d4;
+    }
+
+    .webuploader-pick-disable {
+        opacity: 0.6;
+        pointer-events:none;
+    }
+
+    .progress {
+        height: 20px;
+        margin-bottom: 20px;
+        overflow: hidden;
+        background-color: #f5f5f5;
+        border-radius: 4px;
+        -webkit-box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+        box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+    }
+    .progress.active .progress-bar {
+        -webkit-animation: progress-bar-stripes 2s linear infinite;
+        animation: progress-bar-stripes 2s linear infinite;
+    }
+
+    .progress-striped .progress-bar {
+        background-image: linear-gradient(45deg,rgba(255,255,255,0.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,0.15) 50%,rgba(255,255,255,0.15) 75%,transparent 75%,transparent);
+        background-size: 40px 40px;
+    }
+    .progress-bar {
+        background-image: -webkit-linear-gradient(top,#428bca 0,#3071a9 100%);
+        background-image: linear-gradient(to bottom,#428bca 0,#3071a9 100%);
+        background-repeat: repeat-x;
+        filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff428bca',endColorstr='#ff3071a9',GradientType=0);
+    }
+    .progress-bar {
+        float: left;
+        height: 100%;
+        font-size: 12px;
+        line-height: 20px;
+        color: #fff;
+        text-align: center;
+        background-color: #428bca;
+        box-shadow: inset 0 -1px 0 rgba(0,0,0,0.15);
+        transition: width .6s ease;
+    }
+
+
+
+</style>
+<!-- Content Header (Page header) -->
+<section class="content-header" style="">
+    <h1>
+        内容管理
+        <small>媒体资源列表</small>
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> 主页</a></li>
+        <li><a href="#">内容管理</a></li>
+        <li class="active">媒体资源列表</li>
+    </ol>
+</section>
+
+<!-- Main content -->
+<section class="content">
+
+    <!-- Default box -->
+    <div class="box">
+        <div class="box-header with-border">
+            <h3 class="box-title">媒体资源列表</h3>
+
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip"
+                        title="Collapse">
+                    <i class="fa fa-minus"></i></button>
+                <button type="button" class="btn btn-box-tool" data-widget="remove" data-toggle="tooltip"
+                        title="Remove">
+                    <i class="fa fa-times"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div id="uploader" class="wu-example">
+                <!--用来存放文件信息-->
+                <div id="thelist" class="uploader-list"></div>
+                <div class="btns">
+                    <div id="picker">选择大文件</div>
+                    <button id="ctlBtn" class="btn btn-default">开始上传</button>
+                </div>
+            </div>
+        </div>
+        <!-- /.box-body -->
+        <div class="box-footer">
+
+        </div>
+        <!-- /.box-footer-->
+    </div>
+    <!-- /.box -->
+
+</section>
+<!-- /.content -->
+<script th:inline="javascript">
+    var $btn = $('#ctlBtn');
+    var $thelist = $('#thelist');
+    var chunkSize = 10485760;
+
+    // HOOK 这个必须要再uploader实例化前面
+    WebUploader.Uploader.register({
+        'before-send-file': 'beforeSendFile',
+        'before-send': 'beforeSend'
+    }, {
+        beforeSendFile: function (file) {
+            console.log("beforeSendFile");
+            // Deferred对象在钩子回掉函数中经常要用到，用来处理需要等待的异步操作。
+            var task = new $.Deferred();
+            // 根据文件内容来查询MD5
+            (new WebUploader.Uploader()).md5File(file).progress(function (percentage) {
+                // 及时显示进度
+                console.log('计算md5进度:', percentage);
+                getProgressBar(file, percentage, "MD5", "正在预处理文件");
+            }).then(function (val) { // 完成
+                console.log('md5 result:', val);
+                file.md5 = val;
+                fadeOutProgress(file, 'MD5');
+                // 模拟用户id
+                // file.uid = new Date().getTime() + "_" + Math.random() * 100;
+                file.uid = WebUploader.Base.guid();
+                // 进行md5判断
+                $.post(CONTEXT_PATH+"/admin/file/checkFileMd5", {uid: file.uid, md5: file.md5},
+                    function (data) {
+                        console.log(data.status);
+                        var status = data.status.value;
+                        task.resolve();
+                        if (status == 101) {
+                            // 文件不存在，那就正常流程
+                        } else if (status == 100) {
+                            // 忽略上传过程，直接标识上传成功；
+                            uploader.skipFile(file);
+                            file.pass = true;
+                        } else if (status == 102) {
+                            // 部分已经上传到服务器了，但是差几个模块。
+                            file.missChunks = data.data;
+                        }
+                    });
+            });
+            return $.when(task);
+        },
+        beforeSend: function (block) {
+            console.log("block")
+            var task = new $.Deferred();
+            var file = block.file;
+            var missChunks = file.missChunks;
+            var blockChunk = block.chunk;
+            console.log("当前分块：" + blockChunk);
+            console.log("missChunks:" + missChunks);
+            if (missChunks !== null && missChunks !== undefined && missChunks !== '') {
+                var flag = true;
+                for (var i = 0; i < missChunks.length; i++) {
+                    if (blockChunk == missChunks[i]) {
+                        console.log(file.name + ":" + blockChunk + ":还没上传，现在上传去吧。");
+                        flag = false;
+                        break;
+                    }
+                }
+                if (flag) {
+                    task.reject();
+                } else {
+                    task.resolve();
+                }
+            } else {
+                task.resolve();
+            }
+            return $.when(task);
+        }
+    });
+
+    // 实例化
+    var uploader = WebUploader.create({
+        pick: {
+            id: '#picker',
+            innerHTML: '点击选择文件',
+            multiple:true  //一次点击选择文件的按钮，是否开起同时选择多个文件能力,默认：true
+        },
+        formData: {
+            uid: 0,
+            md5: '',
+            chunkSize: chunkSize,
+            fieldone:"this is my field valeu"
+        },
+        //dnd: '#dndArea',
+        //paste: '#uploader',
+        swf: 'js/Uploader.swf',
+        chunked: true,
+        chunkSize: chunkSize, // 字节 1M分块
+        threads: 1, //pchj update， old:  threads: 3,
+        server: CONTEXT_PATH+'/admin/file/fileUpload',
+        auto: false,
+
+        // 禁掉全局的拖拽功能。这样不会出现图片拖进页面的时候，把图片打开。
+        disableGlobalDnd: true,
+        fileNumLimit: 1024,
+        fileSizeLimit: 1024 * 1024 * 1024 * 1024,    //  1G = 1024 * 1024 * 1024 总文件大小允许最大1T
+        fileSingleSizeLimit: 1024 * 1024 * 1024 * 10   // 10G  //单文件大小允许最大10G
+        // 只允许选择图片文件。
+        // ,accept: {
+        //     title: 'Images',
+        //     extensions: 'gif,jpg,jpeg,bmp,png',
+        //     mimeTypes: 'image/*'
+        // }
+    });
+
+    // 当有文件被添加进队列的时候
+    uploader.on('fileQueued', function (file) {
+        console.log("fileQueued");
+        $thelist.append('<div id="' + file.id + '" class="item">' +
+            '<h4 class="info">' + file.name + '</h4>' +
+            '<p class="state">等待上传...</p>' +
+            '</div>');
+
+        // previewImage(file);
+    });
+
+    /**
+     * 图片预览
+     **/
+    function previewImage(file){
+        var $li = $(
+            '<div id="' + file.id + '" class="file-item thumbnail">' +
+            '<img>' +
+            // '<div class="info">' + file.name + '</div>' +
+            '</div>'
+            ),
+            $img = $li.find('img');
+        // $thelist为容器jQuery实例
+        $thelist.append( $li );
+
+        // 创建缩略图
+        // 如果为非图片文件，可以不用调用此方法。
+        // thumbnailWidth x thumbnailHeight 为 100 x 100
+        var thumbnailWidth = 100;
+        var thumbnailHeight = 100;
+
+        uploader.makeThumb( file, function( error, src ) {
+            if ( error ) {
+                $img.replaceWith('<span>不能预览</span>');
+                return;
+            }
+
+            $img.attr( 'src', src );
+        }, thumbnailWidth, thumbnailHeight );
+    }
+    //当某个文件的分块在发送前触发，主要用来询问是否要添加附带参数，大文件在开起分片上传的前提下此事件可能会触发多次。
+    uploader.onUploadBeforeSend = function (obj, data) {
+        console.log("onUploadBeforeSend");
+        var file = obj.file;
+        data.md5 = file.md5 || '';
+        data.uid = file.uid;
+    };
+    // 上传中
+    uploader.on('uploadProgress', function (file, percentage) {
+        getProgressBar(file, percentage, "FILE", "文件上传中");
+    });
+    // 上传返回结果
+    uploader.on('uploadSuccess', function (file) {
+        var text = '已上传';
+        if (file.pass) {
+            text = "文件妙传功能，文件已上传。"
+        }
+        $('#' + file.id).find('p.state').text(text);
+    });
+    uploader.on('uploadError', function (file) {
+        $('#' + file.id).find('p.state').text('上传出错');
+    });
+    uploader.on('uploadComplete', function (file) {
+        // 隐藏进度条
+        // fadeOutProgress(file, 'MD5');
+        fadeOutProgress(file, 'FILE');
+    });
+    // 文件上传
+    $btn.on('click', function () {
+        console.log("上传...");
+        uploader.upload();
+        console.log("上传成功");
+    });
+
+    /**
+     *  生成进度条封装方法
+     * @param file 文件
+     * @param percentage 进度值
+     * @param id_Prefix id前缀
+     * @param titleName 标题名
+     */
+    function getProgressBar(file, percentage, id_Prefix, titleName) {
+        var $li = $('#' + file.id), $percent = $li.find('#' + id_Prefix + '-progress-bar');
+        // 避免重复创建
+        if (!$percent.length) {
+            $percent = $('<div id="' + id_Prefix + '-progress" class="progress progress-striped active">' +
+                '<div id="' + id_Prefix + '-progress-bar" class="progress-bar" role="progressbar" style="width: 0%">' +
+                '</div>' +
+                '</div>'
+            ).appendTo($li).find('#' + id_Prefix + '-progress-bar');
+        }
+        var progressPercentage = percentage * 100 + '%';
+        $percent.css('width', progressPercentage);
+        $percent.html(titleName + ':' + progressPercentage);
+    }
+
+    /**
+     * 隐藏进度条
+     * @param file 文件对象
+     * @param id_Prefix id前缀
+     */
+    function fadeOutProgress(file, id_Prefix) {
+        $('#' + file.id).find('#' + id_Prefix + '-progress').fadeOut();
+    }
+</script>
+</html>

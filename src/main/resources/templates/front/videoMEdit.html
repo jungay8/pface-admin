@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+	<script type="text/javascript" src="https://libs.baidu.com/jquery/1.8.3/jquery.min.js"></script>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="context-path" th:content="@{/}"/>
+		<link rel="stylesheet" href="js/layui/css/layui.css"  media="all">
+		<link rel="stylesheet" href="css/common.css" />
+		<link rel="stylesheet" href="css/upload.css" />
+		<title>节目购——视频暂存库</title>		
+	</head>
+	<body>
+		<!--导航-->
+		<div class="top clearfix" th:replace="~{front/header :: header}"></div>
+		<!--内容管理-->
+		<div class="container">
+			<div class="wapper">
+				<div class="m_conter clearfix hav_line">
+					<div class="fl left_nav" th:replace="~{front/leftnav::leftnav}"></div>
+					<!--右边-->
+					<div class="fr right_conter">
+						<div class="right_title">							
+							<div class="colorblack manage_tit">
+								<img src="img/tit_inco.png"/>
+								<span>视频暂存库<em>为暂存的视频内容进行编目</em></span>
+							</div>
+						</div>
+						<div class="videoM_List">
+							<form class="layui-form" action="">
+							<ul>
+								<li>
+									
+									<div class="videoML_m">
+										<div class="choicethis">
+											<input type="checkbox" name="videocheck" lay-skin="primary">	
+										</div>
+										<div class="videoML_top">
+											<div class="videoML_Pic fl">
+												<div class="layui-upload-drag">
+												  <i class="layui-icon">&#xe67c;</i>
+												  <p>点击上传封面</p>
+												</div>
+											</div>
+											<div class="videoML_form fl">
+												<div class="layui-form-item">
+													<div class="videoML_title">
+														<label class="layui-form-label"><em>*</em>标题</label>
+													    <div class="layui-input-block videoML_Iput">
+													      <input name="title" class="layui-input" type="text"  autocomplete="off" lay-verify="required" lay-reqtext="请输入标题">
+													    </div>
+													</div>	
+													<div class="videoML_title">
+														<div class="layui-inline">
+													      <label class="layui-form-label"><em>*</em>类型</label>
+													      <div class="layui-input-inline videoML_select">
+													         <select name="modules" lay-verify="required">
+													          <option value="">请选择</option>
+													          <option value="1">layer</option>								          
+													        </select>
+													      </div>
+													    </div>
+													    <div class="layui-inline margin0">
+													      <label class="layui-form-label"><em>*</em>关键词</label>
+													      <div class="layui-input-block videokey_Iput">
+														      <input name="title" class="layui-input" type="text"  autocomplete="off" lay-verify="required" lay-reqtext="请输入关键词">
+														    </div>
+													    </div>
+													</div>
+													<div class="videoML_title">
+														<div class="layui-inline">
+													      <label class="layui-form-label"><em>*</em>价格</label>
+													      <div class="layui-input-inline videoML_select">
+													         <select name="modules" lay-verify="required">
+													          <option value="">请选择</option>
+													          <option value="1">layer</option>								          
+													        </select>
+													      </div>
+													    </div>
+													    <div class="layui-inline">
+													      <label class="layui-form-label"><em>*</em>转载设置</label>
+													      <div class="layui-input-inline videoML_select">
+													         <select name="modules" lay-verify="required">
+													          <option value="">请选择</option>
+													          <option value="1">layer</option>								          
+													        </select>
+													      </div>
+													      <div class="layui-inline">
+													      	<div class="layui-form">
+													         <input type="checkbox" name="allthis" lay-skin="primary" title="全部套用该条类型、价格、转载信息">
+													    	</div>
+													      </div>
+													    </div>
+													</div>
+												  </div>
+											</div>	
+										</div>										
+									</div>
+									<div class="Videotextarea">
+										<div class="VideotextareaT"><em>*</em>简介</div>
+										<textarea placeholder="请输入内容" class="layui-textarea"></textarea>
+									</div>
+									<div class="clearfix Video_Opera">
+										<div class="fl Video_deleThis">
+											<i class="layui-icon">&#xe640;</i>  删除
+										</div>
+										<div class="fr">
+											<div class="layui-inline">
+												<div class="layui-form">
+										         <input type="checkbox" name="submitthis" lay-skin="primary" title="我已阅读并同意遵守 《版权服务规则协议》">
+										    	</div>
+									    	</div>
+									    	<div class="layui-inline">
+									    		<button class="layui-btn layui-btn-danger btn-radius">提交本条</button>
+									    	</div>
+										</div>
+									</div>					
+								</li>
+								<li>
+									
+									<div class="videoML_m">
+										<div class="choicethis">
+											<input type="checkbox" name="videocheck" lay-skin="primary">	
+										</div>
+										<div class="videoML_top">
+											<div class="videoML_Pic fl">
+												<div class="layui-upload-drag">
+												  <i class="layui-icon">&#xe67c;</i>
+												  <p>点击上传封面</p>
+												</div>
+											</div>
+											<div class="videoML_form fl">
+												<div class="layui-form-item">
+													<div class="videoML_title">
+														<label class="layui-form-label"><em>*</em>标题</label>
+													    <div class="layui-input-block videoML_Iput">
+													      <input name="title" class="layui-input" type="text"  autocomplete="off" lay-verify="required" lay-reqtext="请输入标题">
+													    </div>
+													</div>	
+													<div class="videoML_title">
+														<div class="layui-inline">
+													      <label class="layui-form-label"><em>*</em>类型</label>
+													      <div class="layui-input-inline videoML_select">
+													         <select name="modules" lay-verify="required">
+													          <option value="">请选择</option>
+													          <option value="1">layer</option>								          
+													        </select>
+													      </div>
+													    </div>
+													    <div class="layui-inline margin0">
+													      <label class="layui-form-label"><em>*</em>关键词</label>
+													      <div class="layui-input-block videokey_Iput">
+														      <input name="title" class="layui-input" type="text"  autocomplete="off" lay-verify="required" lay-reqtext="请输入关键词">
+														    </div>
+													    </div>
+													</div>
+													<div class="videoML_title">
+														<div class="layui-inline">
+													      <label class="layui-form-label"><em>*</em>价格</label>
+													      <div class="layui-input-inline videoML_select">
+													         <select name="modules" lay-verify="required">
+													          <option value="">请选择</option>
+													          <option value="1">layer</option>								          
+													        </select>
+													      </div>
+													    </div>
+													    <div class="layui-inline">
+													      <label class="layui-form-label"><em>*</em>转载设置</label>
+													      <div class="layui-input-inline videoML_select">
+													         <select name="modules" lay-verify="required">
+													          <option value="">请选择</option>
+													          <option value="1">layer</option>								          
+													        </select>
+													      </div>
+													      <div class="layui-inline">
+													      	<div class="layui-form">
+													         <input type="checkbox" name="allthis" lay-skin="primary" title="全部套用该条类型、价格、转载信息">
+													    	</div>
+													      </div>
+													    </div>
+													</div>
+												  </div>
+											</div>	
+										</div>										
+									</div>
+									<div class="Videotextarea">
+										<div class="VideotextareaT"><em>*</em>简介</div>
+										<textarea placeholder="请输入内容" class="layui-textarea"></textarea>
+									</div>
+									<div class="clearfix Video_Opera">
+										<div class="fl Video_deleThis">
+											<i class="layui-icon">&#xe640;</i>  删除
+										</div>
+										<div class="fr">
+											<div class="layui-inline">
+												<div class="layui-form">
+										         <input type="checkbox" name="submitthis" lay-skin="primary" title="我已阅读并同意遵守 《版权服务规则协议》">
+										    	</div>
+									    	</div>
+									    	<div class="layui-inline">
+									    		<button class="layui-btn layui-btn-danger btn-radius">提交本条</button>
+									    	</div>
+										</div>
+									</div>					
+								</li>
+							</ul>
+							<div class="textCenter upload_btnbt vidoe_upAll" >
+									<div class="layui-form upload_agree">
+							           <input type="checkbox" name="read" lay-skin="primary" title="我已阅读并同意遵守 《版权服务规则协议》" >						 
+							    	</div>
+							    	<div class=""> 
+							    		<button lay-submit lay-filter="upload_music" class="layui-btn layui-btn-warm btn-radius btn_min">提交所有</button>  
+							    	</div>
+								</div>
+							</form>
+							<div  id="pageNum" class="pageNum btline videoPg"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		
+		<!--footer-->
+<div class="footer" th:replace="~{front/footer :: footer}"> </div>
+		<script th:src="@{/static/pface/js/layui/layui.js}"></script>
+<script>
+//弹出窗口表单样式pageNum
+layui.use(['form','layer','laypage','upload'], function(){
+	var $ = layui.jquery,
+  form = layui.form,
+  layer=layui.layer,
+  laypage = layui.laypage
+  ,upload = layui.upload;
+//自定义首页、尾页、上一页、下一页文本
+  laypage.render({
+    elem: 'pageNum'
+    ,count: 100
+    ,first: '首页'
+    ,last: '尾页'
+    ,prev: '<em>上一页</em>'
+    ,next: '<em>下一页</em>'
+  });
+});
+</script>
+</body>
+</html>

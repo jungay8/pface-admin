@@ -1,0 +1,1412 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+	<!--<script type="text/javascript" src="https://cdn.bootcss.com/jquery/1.8.3/jquery.js"></script>-->
+	<script type="text/javascript" th:src="@{/static/js/jquery183.js}"></script>
+	<script th:src="@{/static/pface/js/jquery.msgbox.min.js}"></script>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="context-path" th:content="@{/}"/>
+		<link rel="stylesheet" th:href="@{/static/pface/js/layui/css/layui.css}">
+		<link rel="stylesheet" th:href="@{/static/pface/css/common.css}">
+		<link rel="stylesheet" th:href="@{/static/pface/css/manage.css}" />
+		<link rel="stylesheet" th:href="@{/static/pface/css/upload.css}" />
+<style>
+	/*图文预览*/
+	ul.ls_fileImg,.ls_fileImg li{list-style: none; margin:0;-webkit-margin-before: 0;-webkit-margin-after: 0;    -webkit-padding-start:0}
+	.ls_fileImg li{float: left; width: 144px; line-height: 134px; height: 134px;border: 1px solid #f7f7f7;
+		margin-right: 15px; margin-bottom: 15px; list-style: none;}
+	.ls_fileImg li img{width: 142px; max-height: 132px;}
+</style>
+		<title>节目购——内容管理</title>
+		<script th:inline="javascript">
+            var CONTEXT_PATH = [[${#request.getContextPath()}]];
+		</script>
+	</head>
+	<body>
+		<!--导航-->
+		<div class="top clearfix" th:replace="~{front/header :: header}"></div>
+		<!--内容管理-->
+		<div class="container">
+			<div class="wapper">
+				<div class="m_conter clearfix hav_line">
+					<div class="fl left_nav" th:replace="~{front/leftnav::leftnav}"></div>
+					<!--右边-->
+					<div class="fr right_conter">
+						<div class="right_title">
+							<!--<div class="new_label fr conter_opera">-->
+                                <!--<a href="/front/upload" class="layui-btn layui-btn-danger btn-radius layui-edit btn_min">-->
+                                    <!--新建-->
+                                <!--</a>-->
+							<!--</div>-->
+							<div class="colorblack manage_tit">
+								<img th:src="@{/static/pface/img/tit_inco.png}"/>
+								<span>内容管理</span>
+								<span class="fr layui-btn layui-btn-danger btn-radius layui-edit btn_min">
+											新建
+										</span>
+							</div>
+						</div>
+                        <div class="conter_label">
+                            <form class="layui-form frm">
+                                <label></label>
+								<div class="clearfix">
+									<div class="fr fontred clickmore" style="cursor: pointer">
+										显示更多...
+									</div>
+									<div class="mtype" th:each="type:${mediaType}" style="display: inline-block;vertical-align: middle;">
+										<input type="checkbox" name="mediaType" th:title="'只看'+${type.text}" th:value="${type.name}"/>
+										<!--<label class="checkbox-label" th:text="'只看'+${type.text}">只看视频</label>-->
+									</div>
+								</div>
+								<div class="search_all" style="display: none;">
+								<div  style="display: inline-block;vertical-align: middle;">
+                                    <label>状态：</label>
+                                    <div class="layui-input-inline">
+                                    <select id="goods" name="goods" lay-verify="required">
+                                        <option value="">全部</option>
+                                        <option  th:each="status:${goodsStatus}" th:value="${status.name}" th:text="${status.text}">已上架</option>
+                                    </select>
+                                    </div>
+                                </div>
+                                <div style="display: inline-block;vertical-align: middle;  margin-left: 20px">
+                                    <label style="display: inline-block;">类型：</label>
+                                    <div class="layui-input-inline">
+                                        <select  id="qcontentMCatalogueName" name="qcontentMCatalogueName">
+                                            <option value="">全部</option>
+                                            <option th:each="cata:${cataloguesLabels}" th:value="${cata.id}"
+                                                    th:text="${cata.name}"
+                                            ></option>
+                                        </select>
+                                    </div>
+                                </div>
+
+								<div style="display: inline-block;vertical-align: middle;  margin-left: 20px">
+									<label style="display: inline-block;">审核状态：</label>
+									<div class="layui-input-inline">
+										<select  id="qcontentMAuditStatus" name="qcontentMAuditStatus">
+											<option value="">全部</option>
+											<option value="AUDITING">审核中</option>
+											<option value="AUDITED">通过审核</option>
+											<option value="UNAUDITED">未通过</option>
+										</select>
+									</div>
+								</div>
+
+                                <div class="clearfix" style="display: inline-block;vertical-align: middle;">
+                                    <label>关键词：</label><input id="qKeywordId" name="qKeywordName" class="layui-input" th:value="${inputKeyword}" style="display: inline-block;vertical-align: middle; width:200px" type="text"/>
+                                </div>
+                                <div class="clearfix">
+                                    <!--<div class="" style="display: inline-block;vertical-align: middle;">-->
+                                        <!--<label>用户归属标签：</label>-->
+                                        <!--<input id="imageText_belongLabelid" type="checkbox"-->
+                                               <!--name="imageTextBelongLabelName"-->
+                                               <!--th:each="belong:${belongLabels}" th:title="${belong.label}"-->
+                                               <!--th:value="${belong.id}">-->
+                                    <!--</div>-->
+                                    <label>所属标签：</label>
+                                    <div class="mtype" th:each="belong:${belongLabels}" style="display: inline-block;vertical-align: middle;">
+                                        <input type="checkbox" name="contentBelongLabelName" th:title="${belong.label}" th:value="${belong.id}"/>
+                                        <!--<label class="checkbox-label" th:text="${belong.label}"></label>-->
+                                    </div>
+
+                                </div>
+								</div>
+								<div align="right">
+                                    <span onclick="javascript:qry2();" class="layui-btn layui-btn-danger btn-radius layui-edit btn_min">
+                                        查询
+                                    </span>
+								</div>
+								<div align="right">
+									<div class="fl conteropera">
+										<!--<input type="checkbox" id="choiceD" name="allchoice"  lay-skin="primary" lay-filter="choiceD" title="全选" >										-->
+										<!--<span id="allDele" class="layui-btn layui-btn-danger btn-radius layui-edit btn_min" onclick="goodsDel()">删除</span>-->
+										<!--<span id="allUp" class="layui-btn layui-btn-danger btn-radius layui-edit btn_min" onclick="goodsOn()">上架</span>-->
+										<!--<span id="allDown" class="layui-btn layui-btn-danger btn-radius layui-edit btn_min" onclick="goodsOff()">下架</span>-->
+									</div>
+								</div>
+
+
+                            </form>
+                        </div>
+						<!--<div class="conter_label">-->
+							<!--<a th:each="label:${belongLabList}" href="#" th:text="${label.label}" th:onclick="'javascript:qryByLabel('+${label.id}+');'">归属标签1</a>-->
+						<!--</div>-->
+						<div class="conter_list">
+							<form class="layui-form">
+							<ul>
+								<li th:each="mediaFile : ${mediaFileInfoVos}">
+									<div class="conter_check">
+										<input type="checkbox" name="conterList" lay-skin="primary" class="conterList" th:value="${mediaFile.mediaType}+'#'+${mediaFile.mediaId}+'#'+${mediaFile.id} +'#'+${mediaFile.mediaStatus} + '#' + ${mediaFile.goodsStatus}">
+									</div>
+									<div class="layui-clear conter_ListM">
+										<div class="layui-inline conter_Img">
+											<div class="conter_pic fl" th:if="${mediaFile.mediaType eq 'VIDEO'}">
+												<span th:if="${mediaFile.coverOrigin != null && mediaFile.coverOrigin == '0'}">
+													<span  th:if="${mediaFile.uploadCoverUrl != null}">
+															<img style="width: 194px;height: 118px;" th:src="${@imageFileBean.getImageFileUrl(mediaFile.uploadCoverUrl)}" />
+													</span>
+													<span  th:if="${mediaFile.uploadCoverUrl == null}">
+														<img style="width: 194px;height: 118px;"  th:src="@{/static/img/covernovideodefault.jpg}"  />
+													</span>
+												</span>
+
+												<span th:if="${mediaFile.coverOrigin != null && mediaFile.coverOrigin == '1'}">
+													<span  th:if="${mediaFile.coverUrl != null}">
+															<img style="width: 194px;height: 118px;" th:src="${@imageFileBean.getImageFileUrl(mediaFile.coverUrl)}" />
+													</span>
+													<span  th:if="${mediaFile.coverUrl == null}">
+														<img style="width: 194px;height: 118px;"  th:src="@{/static/img/covernovideodefault.jpg}"  />
+													</span>
+												</span>
+
+												<span th:if="${mediaFile.coverOrigin == null || mediaFile.coverOrigin=='' || mediaFile.coverOrigin=='null'}">
+													<img style="width: 194px;height: 118px;"  th:src="@{/static/img/covernovideodefault.jpg}"  />
+												</span>
+
+												<div class="contePic_label contePic_video">视频</div>
+											</div>
+											<div class="conter_pic fl" th:if="${mediaFile.mediaType eq 'AUDIO'}">
+												<span  th:if="${mediaFile.uploadCoverUrl != null}">
+														<img style="width: 194px;height: 118px;" th:src="${@imageFileBean.getImageFileUrl(mediaFile.uploadCoverUrl)}" />
+												</span>
+												<span  th:if="${mediaFile.uploadCoverUrl == null}">
+													<img style="width: 194px;height: 118px;"  th:src="@{/static/img/covernoaudiodefault.jpg}"  />
+												</span>
+												<div class="contePic_label contePic_music">音频</div>
+											</div>
+											<div class="conter_pic fl" th:if="${mediaFile.mediaType eq 'IMAGETEXT'}">
+												<span  th:if="${mediaFile.uploadCoverUrl != null}">
+													<img style="width: 194px;height: 118px;" th:src="${@imageFileBean.getImageFileUrl(mediaFile.uploadCoverUrl)}"  />
+												</span>
+												<span  th:if="${mediaFile.uploadCoverUrl == null}">
+													<img style="width: 194px;height: 118px;"  th:src="@{/static/img/covernodocdefault.jpg}"  />
+												</span>
+												<div class="contePic_label contePic_file">图文</div>
+											</div>
+										</div>
+										<div class="fr conter_intro">
+											<div class="clearfix conter_introTit">
+												<!--<div class="conterTit_Btn fr conterTit_sj" th:if="${mediaFile.goodsStatus == null || mediaFile.goodsStatus ==''||mediaFile.goodsStatus == 'null'}" th:text="${mediaFile.mediaStatus eq 'AUDITING'?'审核中' : (mediaFile.mediaStatus eq 'AUDITED'?'通过审核':'未通过审核,原因：'+mediaFile.lastedAuditMsg)}"></div>-->
+
+												<div class="conterTit_Btn fr conterTit_sj" th:if="${(mediaFile.goodsStatus == null || mediaFile.goodsStatus ==''||mediaFile.goodsStatus == 'null') && mediaFile.mediaStatus eq 'AUDITING'}"   th:text="审核中"></div>
+												<div class="conterTit_Btn fr conterTit_sj" th:if="${(mediaFile.goodsStatus == null || mediaFile.goodsStatus ==''||mediaFile.goodsStatus == 'null') && mediaFile.mediaStatus eq 'AUDITED'}"    th:text="通过审核"></div>
+												<div class="conterTit_Btn fr conterTit_sj" th:if="${(mediaFile.goodsStatus == null || mediaFile.goodsStatus ==''||mediaFile.goodsStatus == 'null') && mediaFile.mediaStatus eq 'UNAUDITED'}"  th:title="'未通过审核,原因：'+${mediaFile.lastedAuditMsg}" th:text="'未通过审核,原因：'+${mediaFile.lastedAuditMsg}"></div>
+
+												<div class="conterTit_Btn fr conterTit_sj" th:if="${mediaFile.goodsStatus != null && mediaFile.goodsStatus!=''  && mediaFile.goodsStatus!='null'}" th:text="${mediaFile.goodsStatus eq 'ON'?'已上架':'已下架'}"></div>
+												<div class="conter_tit">													
+													<span style="display:inline-block;" th:text="${mediaFile.mediaTitle}">视频标题视频标题</span>
+													<span th:text="'  ('+${mediaFile.belongLabelNames}+')'">（归属标签1，归属标签2，归属标签3）</span>
+												</div>
+											</div>
+											<div class="clearfix conter_Keyword">												
+												<div class="conterKw_txt" th:text="${mediaFile.mediaKeyword}">
+													关键词1
+												</div>
+
+											</div>
+											<div class="clearfix conter_Keyword">
+												<div class="fr conterTit_price" th:text="${mediaFile.price} +'元（'+${mediaFile.priceLabelName} + '）'">
+													￥20.00
+												</div>
+												<div  th:text="${mediaFile.catalogueName}"></div>
+											</div>
+											<div class="clearfix conter_IntroTxt" th:if="${mediaFile.mediaBrief !=null && mediaFile.mediaBrief!='null'}" th:text="${mediaFile.mediaBrief}">
+												简介
+											</div>
+											<div class="clearfix conter_date">
+												<div class="fl conterDate_txt" th:text="${#dates.format(mediaFile.uploadDate,'yyyy-MM-dd HH:mm:ss')}">
+													2019-05-01 13：10：10
+												</div>
+												<div class="fr conterIntr_opera">
+													<a class="conterIntr_delet" th:onclick="'javascript:delLab(\''+${mediaFile.mediaType}+'\','+${mediaFile.mediaId}+','+${mediaFile.id}+');'"><i class="layui-icon layui-icon-delete"></i>  删除</a>
+													<a class="layui-edit conterIntr_edit"
+													   th:data="${mediaFile.mediaType}+'#'
+													   	 +${mediaFile.mediaId}+'#'
+													   	 +${mediaFile.id}+'#'
+													   	 +${mediaFile.fileName}+'#'
+													   	 +${@imageFileBean.getImageFileUrl(mediaFile.coverUrl)} + '#'
+														 +${mediaFile.coverOrigin} + '#'
+														 +${mediaFile.catalogueId} + '#'
+														 +${mediaFile.priceLabelid} + '#'
+														 +${mediaFile.publishLabelid} + '#'
+														 +${mediaFile.belongLabelid} + '#'
+														 +${mediaFile.mediaBrief} +'#'
+														 +${mediaFile.mediaStatus} +'#'
+														 +${mediaFile.goodsStatus} +'#'
+														 +@{/static/img/covernodocdefault.jpg}+'#'
+														 +${mediaFile.fileUrl}+'#'
+														 +${mediaFile.fileViewUrl}+'#'
+														 +${mediaFile.imgfilePaths}+'#'
+														 +${@imageFileBean.getImageFileUrl(mediaFile.uploadCoverUrl)} + '#'
+														 +@{/static/img/covernoaudiodefault.jpg}+'#'
+														 +${mediaFile.mediaKeyword}+'#'
+														 +${mediaFile.mediaTitle}
+														">
+														<i class="layui-icon layui-icon-edit"></i>修改</a>
+													<!--<a th:href="'/front/modifyContent?id='+${mediaFile.id}" class="layui-edit conterIntr_edit" data-method="setTop"><i class="layui-icon layui-icon-edit"></i>  修改</a>-->
+												</div>
+											</div>
+										</div>
+									</div>
+								</li>
+							</ul>
+							</form>
+							<div class="conterIntro_bottom">
+								<div class="fl conterBtm_check layui-form">
+									<input type="checkbox" id="choiceD" name="allchoice"  lay-skin="primary" lay-filter="choiceD" title="全选" >
+								</div>
+								<div class="fl " style="margin-bottom: 15px">
+									<!--<a href="javascript:void(0);" id="allDele" onclick="goodsDel()">删除</a>-->
+									<!--<a href="javascript:void(0);" id="allUp" onclick="goodsOn()">上架</a>-->
+									<!--<a href="javascript:void(0);" id="allDown" onclick="goodsOff()">下架</a>-->
+									<span id="allDele" class="layui-btn layui-btn-danger btn-radius layui-edit btn_min" onclick="goodsDel()">删除</span>
+									<span id="allUp" class="layui-btn layui-btn-danger btn-radius layui-edit btn_min" onclick="goodsOn()">上架</span>
+									<span id="allDown" class="layui-btn layui-btn-danger btn-radius layui-edit btn_min" onclick="goodsOff()">下架</span>
+								</div>
+								<div id="pageNum" class="pageNum textRight"></div>
+							</div>
+							
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		
+		<!--footer-->
+<div class="footer" th:replace="~{front/footer :: footer}"> </div>
+<div>
+	<form name="listpage" id="listpage" method="post">
+		<input type="hidden" name="pageNumKey" id="pageNumKey" th:value="${pageNum}">
+		<input type="hidden" name="pageSizeKey" id="pageSizeKey" th:value="${pageSize}">
+		<input type="hidden" name="goodsStatus" id="goodsStatus" th:value="${selecGgoodsStatus}">
+		<input type="hidden" name="mediaTypes" id="mediaTypes" th:value="${selectMediaType}">
+        <input type="hidden" name="hKeyword" id="hKeyword" th:value="${inputKeyword}">  <!--关键词-->
+        <input type="hidden" name="hcontentMCatalogue" id="hcontentMCatalogue" th:value="${selectcontentMCatalogue}"> <!--分类-->
+        <input type="hidden" name="hcontentBelongLabel" id="hcontentBelongLabel" th:value="${selectCkBelongLabel}"> <!--所属-->
+		<input type="hidden" name="hqcontentMAuditStatus" id="hqcontentMAuditStatus" th:value="${selectAuditStatus}">
+
+	</form>
+</div>
+
+<div class="videoM_List" id="newsedit" style="display:none ;" >
+			<ul class="videoEdit layui-form" id="uploadVideoListDiv"></ul>
+			<!--<div class="textCenter upload_btnbt vidoe_upAll">-->
+				<!--<div class="">-->
+					<!--<a href="javascript:void(0)"-->
+					   <!--class="layui-btn layui-btn-warm btn-radius btn_min return_exq">取消</a>-->
+				<!--</div>-->
+			<!--</div>-->
+
+		</div>
+
+<!--内容关联，弹出窗口-->
+<div class="addCWindow" id="addCWindow" style="display:none ;">
+			<div class="addCW_search layui-form">
+				<div class="layui-form-item">
+					<div class="layui-inline">
+						<label class="layui-form-label">标题：</label>
+						<div class="layui-input-inline">
+							<input type="text" class="layui-input" id="relationQryTitle"/>
+						</div>
+					</div>
+					<div class="layui-inline">
+						<label class="layui-form-label">类别：</label>
+						<div class="layui-input-inline">
+							<select name="quiz" id="relationQryMediaType">
+								<option value="VIDEO">视频类</option>
+								<option value="AUDIO">音频类</option>
+								<option value="IMAGETEXT">图文</option>
+							</select>
+						</div>
+					</div>
+					<div class="layui-inline">
+						<span class="layui-btn layui-btn-danger btn-radius btn_min relationQry">查询</span>
+					</div>
+				</div>
+			</div>
+			<div class="layui-form">
+				<table class="layui-table" id="tableM">
+					<colgroup>
+						<col width="30">
+						<!--<col width="140">-->
+						<col>
+						<col width="100">
+					</colgroup>
+					<thead>
+					<tr>
+						<th>
+							<input type="checkbox" lay-skin="primary" title="选择" lay-filter="allChoice">
+						</th>
+						<!--<th>-->
+						<!--封面-->
+						<!--</th>-->
+						<th>
+							内容
+						</th>
+						<th>
+							操作
+						</th>
+					</tr>
+					</thead>
+					<tbody>
+					<!--<tr>-->
+					<!--<td>-->
+					<!--<input type="checkbox" lay-skin="primary" lay-filter="tableCheck">-->
+					<!--</td>-->
+					<!--<td>-->
+					<!--<img width="100" src="img/conter_Img.jpg" />-->
+					<!--</td>-->
+					<!--<td>-->
+					<!--<h3>标题标题1</h3>-->
+					<!--<p>标签</p >-->
+					<!--<p class="addCW_time"><span class="fr">价格：￥5.00</span>-->
+					<!--<span>时间：2019-7-17</span>-->
+					<!--</p >-->
+					<!--</td>-->
+					<!--<td>-->
+					<!--<a href="javascript:void(0)" class="addCW_choiceThis" data-title="标题标题1.mp3">选择</a>-->
+					<!--</td>-->
+					<!--</tr>-->
+					</tbody>
+				</table>
+			</div>
+		</div>
+<script th:inline="javascript">
+            /*<![CDATA[*/
+
+            var totalRecords = [[${total}]];
+            var page = [[${pageNum}]];
+            var pageSize = [[${pageSize}]];
+            var selectMediaType=[[${selectMediaType}]];
+            var selecGgoodsStatus=[[${selecGgoodsStatus}]];
+            //console.log(totalRecords);
+
+			var cataloguesLabels = [[${cataloguesLabels}]];
+			var belongLabels = [[${belongLabels}]];
+			var pricesLabels = [[${pricesLabels}]];
+			var publishLabels = [[${publishLabels}]];
+
+            /*]]>*/
+</script>
+<script th:src="@{/static/pface/js/layui/layui.js}"></script>
+<script th:src="@{/static/pface/js/content.js}"></script>
+<script type='text/javascript'>
+	window.onload = function() {
+        serachval();
+        layui.use('form', function () {
+            var form = layui.form;
+            //全选 全不选
+            form.on('checkbox(choiceD)', function (data) {
+                var item = $(".conterList");
+                // var c= $(this).prop("checked");
+                var c = $(this).prop("checked");
+                item.each(function () {
+                    $(this).prop("checked", c);
+                })
+                form.render('checkbox');
+            });
+			//切换更多查询条件
+			$(document).on('click', '.clickmore', function () {
+				$(".search_all").toggle();
+			});
+            //单个编目
+            $(document).on('click', '.conterIntr_edit', function () {
+                //这里单个编目
+                var item = $(this).attr("data");
+                // var item=[[item0]];
+                var data = [item];
+                // console.log('data = ' + data);
+
+                var dataArray = item.split("#");
+				var mediaStatus =  dataArray[11];
+				var goodsStatus =  dataArray[12];
+
+				if (mediaStatus == 'AUDITED') {
+
+					var promptmsg = "当前内容已通过审核，修改后，内容要重新审核，确定要修改吗?";
+					if (goodsStatus=='ON') {
+						promptmsg = "当前内容已通过审核，并且已经上架，修改后内容要重新审核，确定要修改吗?";
+					}
+					var pppp = layer.confirm(promptmsg,{btn: ['确定', '取消'], title: "系统提示"},
+						function (index) {
+							//console.log("点了【确定】");
+							layer.close(index);
+							active.drawContent(data);
+							active.setTop();
+						},
+						function (index) {
+							//console.log("点了【取消】");
+						});
+				}else {
+					active.drawContent(data);
+					active.setTop();
+				}
+            });
+            //选择封面
+            $(document).on("change", ".videoML_input", function () {
+                var $imgBg = $(this).siblings(".imgBg");
+                var name = $(this).attr("date-name");
+                var $img = $imgBg.find("img");
+                //$("#people_headShow").attr("src","");
+                $imgBg.hide();
+                console.log("选择前：$img.src= " + $img.attr("src"));
+                $img.attr("src", "")
+                var $file = $(this);
+                var fileObj = $file[0];
+                var windowURL = window.URL || window.webkitURL;
+
+                if (fileObj && fileObj.files && fileObj.files[0]) {
+                    // active.coverchange = true; //修改了封面？todo
+                    dataURL = windowURL.createObjectURL(fileObj.files[0]);
+                    $img.attr('src', dataURL);
+                } else {
+                    dataURL = $file.val();
+                    //var imgObj = document.getElementById("people_headShow");
+                    var imgObj = document.getElementById('' + name);
+                    imgObj.style.filter = "progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=scale)";
+                    imgObj.filters.item("DXImageTransform.Microsoft.AlphaImageLoader").src = dataURL;
+                }
+
+                console.log("选择后：$img.src=" + $img.attr("src"));
+                $imgBg.show();
+
+            });
+            //提交本条
+            $(document).on('click', '.locatclass', function () {
+
+                var pfileMediaId = $(this).attr("data-fileMediaId");
+                var mediaId = $(this).attr("data-mediaId");
+                var filename = $(this).attr("data-fileName");
+                var mediaType = $(this).attr("data-mediaType");
+                var coverUrl = $(this).attr("data-coverUrl");
+
+                console.log("mediaId = " + mediaId + ",pfileMediaId=" + pfileMediaId + ",filename=" + filename)
+                var isallcommit = false;
+                var bb = active.validateVideoPost(pfileMediaId, filename,isallcommit,mediaType);
+                if (!bb) {
+                	return false;
+                }
+                //封面来源，单选
+                var video_coverOrigin_value = '0';
+                if (mediaType == 'VIDEO') {
+                    var video_coverOrigin_value = active.getRadioCheckValue('uploadImg' + pfileMediaId); //0上传 1截取
+                }
+
+                console.log('coverUrl = ' + coverUrl);
+                var previewImg = $('#coverPreviewImgId_' + pfileMediaId).attr('src');
+                console.log('previewImg = ' + previewImg);
+                var isChangeCoverUrl = false;
+                if (video_coverOrigin_value == '0' && previewImg != coverUrl) {
+                    isChangeCoverUrl = true;
+                }
+
+				console.log('isChangeCoverUrl = ' + isChangeCoverUrl);
+
+                //勾选的归属ids，多选
+                var belongIds = active.getCheckboxCheckedValues('video_belongLabelname_' + pfileMediaId);
+                //视频基本字段
+                var mediaTitle = $("#video_mediaTitle" + pfileMediaId).val();
+                var catalogueId = $("#video_catalogueId" + pfileMediaId).find("option:selected").val();
+                var mediaKeyword = $("#video_mediaKeyword" + pfileMediaId).val();
+                var belongLabelid = belongIds;
+                var priceLabelid = $("#video_priceLabelid" + pfileMediaId).find("option:selected").val();
+                var publishLabelid = $("#video_publishLabelid" + pfileMediaId).find("option:selected").val();
+				var mediaBrief = $.trim($("#video_mediaBrief" + pfileMediaId).val());
+
+                if (video_coverOrigin_value == '0' && isChangeCoverUrl) {
+                    //带文件
+                    var corverfile = $('#videoML_' + pfileMediaId)[0].files[0];
+                    active.hasfileCommit(corverfile, pfileMediaId, mediaId,
+                        video_coverOrigin_value, mediaTitle, mediaType,
+                        catalogueId, mediaKeyword, belongLabelid, priceLabelid, publishLabelid, mediaBrief, this);
+                } else {
+                    //不带文件的视频编目提交
+                    active.normalCommit(pfileMediaId, mediaId,
+                        video_coverOrigin_value, mediaTitle, mediaType,
+                        catalogueId, mediaKeyword, belongLabelid, priceLabelid, publishLabelid, mediaBrief, this);
+                }
+
+				active.resetPreview();
+            });
+            //关闭弹窗
+            $(document).on('click', '.return_exq', function () {
+            	active.relationMediaIds.length = 0;
+				active.curRelationFileList.length = 0;
+				active.resetPreview();
+                layer.closeAll();
+            });
+
+			//内容关联
+			$(document).on('click', '.addConter', function (){
+				active.addSearch();
+			})
+			$(".relationQry").click(function () {
+				var title = $.trim($("#relationQryTitle").val());
+				var mediaType = $("#relationQryMediaType").find("option:selected").val();
+				// if (title == ''){
+				//     myalert('标题查询条件不要空。');
+				//     return false;
+				// }
+				$.ajax({
+					type: "POST",
+					url: CONTEXT_PATH+"/front/queryMedia",
+					data: {
+						title: title,
+						mediaType:mediaType
+					},
+					success: function (data) {
+						if (data.success) {
+							var tbody=$("#tableM").find('tbody');
+							tbody.html('');
+							var dataList = data.data;
+							var rows = '';
+							for (i=0,len=dataList.length; i<len; i++) {
+								var row = dataList[i];
+								rows = rows +
+										'<tr>\n' +
+										'                <td>\n' +
+										'                    <input type="checkbox" lay-skin="primary" lay-filter="tableCheck">\n' +
+										'                </td>\n' +
+										// '                <td>\n' +
+										// '                    <img width="100" src="img/conter_Img.jpg" />\n' +
+										// '                </td>\n' +
+										'                <td>\n' +
+										'                    <h3>标题：'+row.mediaTitle+'</h3>\n' +
+										'                    <p>类别：'+row.catalogueName+'</p >\n' +
+										'                    <p class="addCW_time"><span class="fr">价格：'+row.price+'('+row.priceLabelName+')</span>\n' +
+										'                        <span>时间：'+row.uploadDate+'</span>\n' +
+										'                    </p >\n' +
+										'                </td>\n' +
+										'                <td>\n' +
+										'                   <a href="javascript:void(0)" class="addCW_choiceThis" data-id="'+row.id+'" data-title="'+row.mediaTitle+'">选择</a>\n' +
+										'                </td>\n' +
+										'            </tr>';
+							}
+							tbody.append(rows);
+							layui.form.render();
+							return;
+						}else {
+							myalert('系统错误，请稍后再试。');
+							return;
+						}
+					},
+					error: function (e) {
+						myalert('系统错误，请稍后再试。');
+						return;
+					}
+
+				})
+
+			})
+			//addConterUl
+			$("body").on("click",".addCW_choiceThis",function(e){
+				var tit=$(this).attr("data-title");
+				var id = $(this).attr("data-id");
+				// layer.close(ct_window);
+				// var index = $.inArray(id,active.relationMediaIds);
+				console.log("单个选择前active.relationMediaIds = "+active.relationMediaIds);
+				var index = active.isInArray(active.relationMediaIds, id);
+				if (index<0){
+					addHtml='<li><div class="addConter_title"> <span> ◇ </span>'+tit+'</div>'+
+							'<div class="LQML_Close" data-id="'+id+'"><i class="layui-icon">&#x1006;</i></div>'+
+							'</li>';
+					$(".addConterUl").append(addHtml);
+					active.relationMediaIds.push(id);
+				}
+
+				layer.close(ct_window);
+				console.log("单个选择后active.relationMediaIds = "+active.relationMediaIds);
+
+			})
+			//删除关联内容
+			$("body").on("click",".LQML_Close",function(){
+				console.dir('删除前relationMediaIds：'+active.relationMediaIds);
+				if(confirm('确定要删除此项吗?'))
+				{
+					//从数组中删除这个元素
+					var id = $(this).attr('data-id');
+					var index = active.isInArray(active.relationMediaIds, id);
+					if (index>=0){
+						active.relationMediaIds.splice(index,1);
+					}
+
+					$(this).parent("li").remove();
+				}
+				console.dir('删除后relationMediaIds：'+active.relationMediaIds);
+
+				return false;
+			})
+			form.on('checkbox(allChoice)', function(data){
+				var child = $(data.elem).parents('table').find('tbody input[type="checkbox"]');
+				child.each(function(index, item){
+					item.checked = data.elem.checked;
+				});
+				form.render('checkbox');
+			});
+
+			var ct_window;
+			var addHtml='';
+            var active = {
+                setTop: function () {
+                    var that = this;
+                    //多窗口模式，层叠置顶
+                    layer.open({
+						maxmin: true,
+                        skin: 'Ldemo-class',
+                        type: 1
+                        , title: '修改'
+                        , btnAlign: 'l' //按钮居左
+                        , shade: 0.65
+                        , area: ['1050px', '550px']
+                        , content: $('#newsedit')
+                        , cancel: function () {
+                            console.log("cancel() in ");
+							active.resetPreview();
+                        }
+                        , zIndex: layer.zIndex //重点1
+                    });
+                },
+				isInArray:function(arr,value){
+					for(var i = 0; i < arr.length; i++){
+						if(value == arr[i]){
+							return i;
+						}
+					}
+					return -1;
+				},
+                data: [],
+				relationMediaIds : [],
+				curRelationFileList:[],
+				// curOldRelationFileList:[],
+                myalert: function (msg) {
+                    layer.msg(msg, {
+                        time: 3000, //3s后自动关闭
+                        icon: 5,
+                        anim: 6
+                    });
+                },
+				resetPreview:function(){
+					//var content_myMovie_id = $("#content_myMovie_id");
+					// var content_music = $("#content_music");
+					var content_music = document.getElementById('content_music');
+					var content_myMovie_id = document.getElementById('content_myMovie_id');
+					if (content_music) {
+						content_music.pause();
+					}
+
+					if (content_myMovie_id) {
+						content_myMovie_id.pause();
+					}
+
+				},
+                getCheckboxCheckedValues: function (ckname) {
+                    var type = '';
+                    $('input[type=checkbox][name="' + ckname + '"]').each(function () {
+                        if ($(this).prop("checked")) {
+                            type += $(this).val() + ',';
+                        }
+                    });
+                    if (type != '') {
+                        type = type.substring(0, type.length - 1);
+                    }
+                    return type;
+                },
+                getCheckboxCheckedvalue: function (ckname, value) {
+                    var r = false;
+                    $('input[type=checkbox][name="' + ckname + '"]').each(function () {
+                        if ($(this).val() == value) {
+                            r = $(this).prop("checked");
+                        }
+                    });
+
+                    return r;
+                },
+                getCheckboxAllValues: function (ckname) {
+                    var type = '';
+                    $('input[type=checkbox][name="' + ckname + '"]').each(function () {
+                        type += $(this).val() + ',';
+                    });
+                    if (type != '') {
+                        type = type.substring(0, type.length - 1);
+                    }
+                    return type;
+                },
+                getRadioCheckValue: function (raName) {
+                    return $("input[name='" + raName + "']:checked").val();
+                },
+                _deleteItem: function (pfileMediaId, obj) {
+                    //从数组中删除
+                    for (var i = 0; i < this.data.length; i++) {
+                        var item = this.data[i];
+                        var itemArray = item.split("#");
+                        var fileMediaId = itemArray[0];
+                        if (pfileMediaId == fileMediaId) {
+                            this.data.splice(i, 1);
+                            break;
+                        }
+                    }
+
+                    $(obj).parents("li").remove();
+                },
+                validateVideoPost: function (mediaFileId, filename, isallcommit, mediaType) {
+                    console.log('validateVideoPost() in ');
+                    var video_coverOrigin_value = this.getRadioCheckValue('uploadImg' + mediaFileId);
+                    // var coverfile = $('#videoML_' + mediaFileId)[0].files[0];
+                    var coverfile1 = $('#videoML_' + mediaFileId).get(0).files[0];
+
+                    if (video_coverOrigin_value == '0' && mediaType == 'VIDEO') { //0上传；1截取
+                        if (coverfile1) {
+                        } else {
+                            this.myalert('请为文件：[' + filename + ']选择封面文件');
+                            return false;
+                        }
+                    }
+                    var catalogumediaKeywordeId = $("#video_catalogueId" + mediaFileId).find("option:selected").val();
+					if (catalogumediaKeywordeId == '') {
+                        this.myalert('请为文件：[' + filename + ']选择类型');
+                        return false;
+                    }
+
+                    //标题
+                    var mediaTitle = $.trim($("#video_mediaTitle" + mediaFileId).val());
+                    if (mediaTitle == '') {
+                        this.myalert('请为文件：[' + filename + ']输入标题');
+                        return false;
+                    }
+                    //关键字
+                    var video_mediaKeyword = $.trim($("#video_mediaKeyword" + mediaFileId).val());
+                    if (video_mediaKeyword == '') {
+                        this.myalert('请为文件：[' + filename + ']输入关键字');
+                        return false;
+                    }
+
+                    //简介
+                    // var mediaBrief = $.trim($("#video_mediaBrief" + mediaFileId).val()) || $.trim($("#video_mediaBrief" + mediaFileId).text());
+                    // if (mediaBrief == '') {
+                    //     this.myalert('请为文件：[' + filename + ']输入简介');
+                    //     return false;
+                    // }
+
+                    //价格
+                    var priceLabelid = $("#video_priceLabelid" + mediaFileId).find("option:selected").val();
+                    if (priceLabelid == '') {
+                        this.myalert('请为文件：[' + filename + ']选择价格');
+                        return false;
+                    }
+                    if (!isallcommit) {
+                        // if (!$('#video_read' + mediaFileId).is(':checked')) {
+                        // 	this.myalert('提交文件：[' + filename + ']必须同意《版权服务规则协议》');
+                        // 	return false;
+                        // }
+                    }
+
+                    return true;
+                },
+                normalCommit: function (pfileMediaId, mediaId,
+                                        video_coverOrigin_value, mediaTitle, mediaType,
+                                        catalogueId, mediaKeyword, belongLabelid, priceLabelid, publishLabelid, mediaBrief, obj) {
+                    var fd = new FormData();
+                    fd.append("mediaFileId", pfileMediaId);
+					fd.append("relationMediaIds", active.relationMediaIds);
+					fd.append("mediaId", mediaId);
+                    fd.append("coverOrigin", video_coverOrigin_value);
+                    fd.append("mediaType", mediaType);
+                    // fd.append("coverfile", coverfile);
+                    fd.append("mediaTitle", mediaTitle);
+                    fd.append("catalogueId", catalogueId);
+                    fd.append("mediaKeyword", mediaKeyword);
+                    fd.append("belongLabelid", belongLabelid);
+                    fd.append("priceLabelid", priceLabelid);
+                    fd.append("publishLabelid", publishLabelid);
+                    fd.append("mediaBrief", mediaBrief);
+
+                    $.ajax({
+                        processData: false,
+                        contentType: false,
+                        type: "POST",
+                        url: CONTEXT_PATH + '/front/file/normalCommitUpdate',
+                        data: fd,
+                        success: function (response) {
+                            if (response.success) {
+								active._deleteItem(pfileMediaId, obj);
+								layer.closeAll();
+								layer.msg("操作成功", {
+									time: 2000,
+									icon: 5,
+									anim: 6
+								},function () {
+									window.location.href = '/front/content';
+								});
+
+                                // active.myalert("保存成功,请再次查询页面");
+                                // active._deleteItem(pfileMediaId, obj);
+                                // layer.closeAll();
+
+                            } else {
+                                active.myalert("保存失败,请稍后再试");
+                            }
+                        },
+                        error: function (error) {
+                            console.log(error);
+                        }
+                    });
+                },
+                hasfileCommit: function (coverfile, pfileMediaId, mediaId,
+                                         video_coverOrigin_value, mediaTitle, mediaType,
+                                         catalogueId, mediaKeyword, belongLabelid, priceLabelid, publishLabelid, mediaBrief, obj) {
+                    var fd = new FormData();
+                    fd.append("coverfile", coverfile);
+                    fd.append("mediaFileId", pfileMediaId);
+                    fd.append("relationMediaIds", active.relationMediaIds);
+                    fd.append("mediaId", mediaId);
+                    fd.append("coverOrigin", video_coverOrigin_value);
+                    fd.append("mediaType", mediaType);
+                    fd.append("mediaTitle", mediaTitle);
+                    fd.append("catalogueId", catalogueId);
+                    fd.append("mediaKeyword", mediaKeyword);
+                    fd.append("belongLabelid", belongLabelid);
+                    fd.append("priceLabelid", priceLabelid);
+                    fd.append("publishLabelid", publishLabelid);
+                    fd.append("mediaBrief", mediaBrief);
+
+                    $.ajax({
+                        processData: false,
+                        contentType: false,
+                        type: "POST",
+                        url: CONTEXT_PATH + '/front/file/hasfileCommitUpdate',
+                        data: fd,
+                        success: function (response) {
+                            if (response.success) {
+
+								active._deleteItem(pfileMediaId, obj);
+								layer.closeAll();
+								layer.msg("操作成功", {
+									time: 2000,
+									icon: 5,
+									anim: 6
+								},function () {
+									window.location.href = '/front/content';
+								});
+
+                                // active.myalert("保存成功,请再次查询页面");
+                                // active._deleteItem(pfileMediaId, obj);
+                                // layer.closeAll();
+                            } else {
+                                active.myalert("保存失败，请稍后再试");
+                            }
+                        },
+                        error: function (error) {
+                            console.log(error);
+                        }
+                    });
+                },
+				addSearch: function(){
+					console.log("a");
+					var wh=document.body.clientHeight*0.9;
+					layui.use(['layer'],function () {
+						ct_window=layer.open({
+							skin: 'Ldemo-class',
+							type: 1
+							,title: '关联内容'
+							,btnAlign: 'c' //按钮居左
+							,shade: 0.65
+							,area: ['1050px',wh+"px"]
+							,content:$('#addCWindow')
+							//,content:'滚滚滚'
+							,btn:["批量选择","关闭"]
+							,cancel:function(){
+								//layer.alert("您点击了取消")
+							},
+							btn1:function(){
+								//layer.alert("请选择条目")
+								//这里是批量编目
+								var dataChild=$("#tableM").find('tbody input[type="checkbox"]');
+								var data=[];
+								dataChild.each(function(index, item){
+									if(item.checked==true){
+										//过滤已添加的
+										data.push(index);
+									}
+								});
+								if (data.length == 0){
+									layer.alert("请选择需要增加的条目");
+								}else{
+									console.dir(" 批量添加前：relationMediaIds = " + active.relationMediaIds)
+									var conterUlObj =  $(".addConterUl");
+									// conterUlObj.html('');
+									// active.relationMediaIds.length = 0;
+									for(var i=0,len=data.length;i<len;i++){
+										var tit=$(".addCW_choiceThis").eq(data[i]).attr("data-title");
+										var id = $(".addCW_choiceThis").eq(data[i]).attr("data-id");
+										var isB = active.isInArray(active.relationMediaIds, id);
+										if (isB<0) {
+											active.relationMediaIds.push(id);
+											// addHtml='<li><div class="addConter_title"> <span> ◇ </span>'+tit+'</div>'+
+											// 		'<div class="LQML_Close"><i class="layui-icon">&#x1006;</i></div>'+
+											// 		'</li>';
+											addHtml='<li><div class="addConter_title"> <span> ◇ </span>'+tit+'</div>'+
+													'<div class="LQML_Close" data-id="'+id+'"><i class="layui-icon">&#x1006;</i></div>'+
+													'</li>';
+
+											conterUlObj.append(addHtml);
+										}
+									}
+									layer.close(ct_window);
+									console.dir(" 批量添加后：relationMediaIds = " + active.relationMediaIds)
+									//active.setTop();
+								}
+							}
+							,zIndex: layer.zIndex//重点1
+
+						});
+					});
+				},
+				getRelationFiles:function(fileMediaId){
+					$.ajax({
+						type: "POST",
+						url: CONTEXT_PATH + '/front/getRelationFiles',
+						async:false,
+						data: {
+							fileMediaId: fileMediaId
+						},
+						dataType: "json",
+						success: function (data) {
+							if (data.success) {
+								active.curRelationFileList = data.data;
+								if (active.curRelationFileList.length > 0){
+									for (var i = 0 , len=active.curRelationFileList.length; i<len; i++){
+										active.relationMediaIds.push(active.curRelationFileList[i].relationMediaFileId)
+									}
+								}
+								return;
+							}else {
+								active.curOldRelationFileList.length = 0;
+								active.curRelationFileList.length = 0;
+								return;
+							}
+						},
+						error: function (e) {
+							active.curRelationFileList =[];
+							return;
+						}
+
+					})
+				},
+                drawContent: function (dataarray) {
+                    if (this.data.length > 0) {
+                        this.data.length = 0;
+                    };
+
+					active.relationMediaIds.length = 0;
+					active.curRelationFileList.length = 0;
+
+                    $("#uploadVideoListDiv").html("");
+
+                    this.data = dataarray;
+                    var cataloguesLabelsString = "";
+                    var pricesLabelsString = "";
+                    var publishLabelsString = "";
+
+                    var htmlItem = '';
+
+                    for (var i = 0; i < dataarray.length; i++) {
+                        var fileItem = dataarray[0];
+                        var fileItemArray = fileItem.split('#');
+                        var mediaType = fileItemArray[0];
+                        var mediaId = fileItemArray[1];
+                        var fileMediaId = fileItemArray[2];
+                        var fileName = fileItemArray[3];
+                        var coverUrl = fileItemArray[4];
+                        var coverOrigin = fileItemArray[5];
+                        var catalogueId = fileItemArray[6];
+                        var priceId = fileItemArray[7];
+                        var publishId = fileItemArray[8];
+                        var belongLabelIds = fileItemArray[9];
+						var mediaBrief = fileItemArray[10];
+						mediaBrief = (mediaBrief==null || mediaBrief =='null') ? "" : mediaBrief;
+						var mediaStatus =  fileItemArray[11];
+						var covernodocdefault = goodsStatus =  fileItemArray[12];
+
+                        var fileUrl = fileItemArray[14];
+                        var fileViewUrl = fileItemArray[15];
+                        var imgfilePaths = fileItemArray[16];
+
+                        var uploadCoverUrl = fileItemArray[17];
+                        var covernoaudiodefault = fileItemArray[18];
+
+                        var mediaKeyword = fileItemArray[19];
+						var mediaTitle = fileItemArray[20];
+
+						if ((mediaType=='IMAGETEXT') && (coverUrl=='' || coverUrl == '/image?url=')) {
+							coverUrl = covernodocdefault;
+						}
+						if ((mediaType == 'AUDIO') && (coverUrl=='' || coverUrl == '/image?url=')) {
+							coverUrl = covernoaudiodefault;
+						}
+
+                        if (mediaType == 'VIDEO'){
+							if (coverOrigin == "0"){//手动上传
+								coverUrl = uploadCoverUrl;
+								if (uploadCoverUrl == '' || uploadCoverUrl == '/image?url=') {
+									coverUrl = '/static/img/covervideouploaddefault.jpg';
+								}
+							}else { //自动截取
+								coverUrl = coverUrl;
+								if (coverUrl == '' || coverUrl == '/image?url=') {//自动改成手动，但还没有上传过时 要显示的图片
+									coverUrl = '/static/img/covervideouploaddefault.jpg';
+								}
+							}
+						}else {
+
+							if ((mediaType=='IMAGETEXT') && (uploadCoverUrl=='' || uploadCoverUrl == '/image?url=')) {
+								uploadCoverUrl = covernodocdefault;
+							}
+							if ((mediaType == 'AUDIO') && (uploadCoverUrl=='' || uploadCoverUrl == '/image?url=')) {
+								uploadCoverUrl = covernoaudiodefault;
+							}
+
+							coverUrl = uploadCoverUrl;
+						}
+
+						var ck0 = "";
+						var ck1 = "";
+						if (coverOrigin == '0') {
+							ck0 = 'checked="checked"';
+						} else {
+							ck1 = 'checked="checked"';
+						}
+
+						var display0 = 'none';
+						var display1 = 'block'; //默认系统截取
+						if (coverOrigin == '0') {//手动上传
+							display0 = 'block';
+							display1 = 'none';
+						} else {
+							display0 = 'none';
+							display1 = 'block';
+						}
+						for (var j = 0; j < cataloguesLabels.length; j++) {
+							cataloguesLabelsString = cataloguesLabelsString + '		<option value="' + cataloguesLabels[j].id + '"  ' + (cataloguesLabels[j].id == catalogueId ? "selected" : "") + '>' + cataloguesLabels[j].name + '</option>'
+						}
+
+						for (var k = 0; k < pricesLabels.length; k++) {
+							pricesLabelsString = pricesLabelsString + '		<option value="' + pricesLabels[k].id + '"  ' + (pricesLabels[k].id == priceId ? "selected" : "") + '>' + pricesLabels[k].price + '元（' + pricesLabels[k].label + '）</option>'
+						}
+
+						for (var l = 0; l < publishLabels.length; l++) {
+							publishLabelsString = publishLabelsString + '		<option value="' + publishLabels[l].id + '" ' + (publishLabels[l].id == publishId ? "selected" : "") + '>' + publishLabels[l].label + '</option>'
+						}
+
+						var belongLabelsString = "";
+						for (var m = 0; m < belongLabels.length; m++) {
+							if (belongLabelIds != '') {
+
+								if (belongLabelIds.indexOf(belongLabels[m].id) >= 0) {
+									belongLabelsString = belongLabelsString
+											+ '<input type="checkbox" id="video_belongLabelname_' + fileMediaId + '_' + belongLabels[m].id + '" name="video_belongLabelname_' + fileMediaId + '" title="' + belongLabels[m].label
+											+ '" value="' + belongLabels[m].id + '" checked="true"/>';
+								} else {
+									belongLabelsString = belongLabelsString
+											+ '<input type="checkbox" id="video_belongLabelname_' + fileMediaId + '_' + belongLabels[m].id + '" name="video_belongLabelname_' + fileMediaId + '" title="' + belongLabels[m].label
+											+ '" value="' + belongLabels[m].id + '"/>';
+								}
+
+							} else {
+								belongLabelsString = belongLabelsString
+										+ '<input type="checkbox" id="video_belongLabelname_' + fileMediaId + '_' + belongLabels[m].id + '" name="video_belongLabelname_' + fileMediaId + '" title="' + belongLabels[m].label
+										+ '" value="' + belongLabels[m].id + '"/>';
+							}
+
+						}
+
+						var coverHtml = "";
+                        var previewHtml = "";
+						if (mediaType.toUpperCase() == 'VIDEO') {
+							coverHtml = '			<div class="videoML_Pic fl">'
+									+ '				<input type="radio" name="uploadImg' + fileMediaId + '" lay-filter="uploadImg" value="0" title="手动上传封面" ' + ck0 + '>' +
+									'				<input type="radio" name="uploadImg' + fileMediaId + '"  lay-filter="uploadImg" value="1" title="系统自动截取" ' + ck1 + '>'
+									+ ' 			<div class="layui-upload-drag viedo_picZD" style="display: ' + display1 + ';">' +
+									' 					<i class="layui-icon layui-iconup">&#xe64a;</i>' +
+									' 					<p>此封面图<br/>由系统自动截取</p>' +
+									'				</div>' +
+									'				<div class="layui-upload-drag viedo_pic" style="display: ' + display0 + ';"  onclick="getElementById(\'videoML_' + fileMediaId + '\').click()">\n' +
+									' 					<i class="layui-icon layui-iconup">&#xe67c;</i>' +
+									'					<p>点击上传封面</p>' +
+									' 					<input type="file"  class="videoML_input" style="display: none;" id="videoML_' + fileMediaId + '"/>' +
+									' 				<div class="imgBg" style="display:block;">' +
+									' 					<img id="coverPreviewImgId_' + fileMediaId + '" src="' + coverUrl + '"/>' +
+									' 				</div>' +
+									' 			</div>' +
+									'		</div>';
+							// $("#music").attr("src",CONTEXT_PATH+getUrlPath(row.fileUrl));
+							var previewCoverUrl = coverUrl;
+							if (coverOrigin == "0"){
+								previewCoverUrl = uploadCoverUrl;
+							}else{
+								if ( fileItemArray[4] == '' || fileItemArray[4] == '/image?url='){
+									previewCoverUrl = "/static/img/covernovideodefault.jpg";
+								}
+							}
+
+							previewHtml = '<video id="content_myMovie_id" name="content_myMovie" ' +
+                                // 'src="/image?url='+encodeURIComponent(fileViewUrl)+'" ' +
+									'src="'+CONTEXT_PATH+getUrlPath(fileViewUrl)+'" ' +
+                                'width="700" height="185" controls="" ' +
+                                'preload="auto" ' +
+                                'poster="'+previewCoverUrl+'"></video>';
+
+						} else if (mediaType.toUpperCase() == 'AUDIO' || mediaType.toUpperCase() == 'IMAGETEXT') {
+							coverHtml = '<p>点击更换封面</p>			' +
+									'<div class="videoML_Pic fl">' +
+									'				<div class="layui-upload-drag viedo_pic" style="display: block;"  onclick="getElementById(\'videoML_' + fileMediaId + '\').click()">\n' +
+									' 					<i class="layui-icon layui-iconup">&#xe67c;</i>' +
+									'					<p>点击更换封面</p>' +
+									' 					<input type="file"  class="videoML_input" style="display: none;" id="videoML_' + fileMediaId + '"/>' +
+									' 				<div class="imgBg" style="display:block;">' +
+									' 					<img id="coverPreviewImgId_' + fileMediaId + '" src="' + coverUrl + '"/>' +
+									' 				</div>' +
+								' 			</div>' +
+								'				</div>';
+
+							if (mediaType == 'AUDIO') {
+								previewHtml='<div class="clearfix media lsAudio_m">' +
+								'    <audio id="content_music" preload="auto"  controls="controls" style="margin-left: 15px;width: 685px;" ' +
+								// '   		src="/image?url='+encodeURIComponent(fileUrl)+'">您的浏览器不支持音频预览。</audio>' +
+								'   		src="'+CONTEXT_PATH+getUrlPath(fileUrl)+'">您的浏览器不支持音频预览。</audio>' +
+									'</div>';
+							}else{//图文
+								var imgfilePathsHtml = "";
+								if (imgfilePaths!=null && imgfilePaths!='' && imgfilePaths!='null') {
+									if (imgfilePaths.indexOf(',')>0){
+										var imgfilePathsArray = imgfilePaths.split(",");
+										for(var n=0, len=imgfilePathsArray.length; n<len; n++){
+											imgfilePathsHtml = imgfilePathsHtml +
+													'<li class="fl">' +
+													'<div class="imgBg"><img src="'+CONTEXT_PATH+'/image?url='+encodeURIComponent(imgfilePathsArray[n])+'" /></div>' +
+													'</li>';
+										}
+									} else {
+										imgfilePathsHtml = '<li>' +
+												'<div class="imgBg"><img src="'+CONTEXT_PATH+'/image?url='+encodeURIComponent(imgfilePaths)+'" /></div>' +
+												'</li>';
+
+									}
+								}
+
+								previewHtml = '<div style="margin-left: 15px">' +
+										'	<label>文档查看：</label>' +
+										'	<a href="'+CONTEXT_PATH+'/image?action=down&url='+encodeURIComponent(fileUrl)+'" id="viewFile"><span class="layui-icon layui-icon-search"></span>查看</a>' +
+										// '<a href="'+CONTEXT_PATH+'/image?action=down&url='+encodeURIComponent(fileUrl)+'" class="ls_ml25"  id="downFile"><span class="glyphicon glyphicon-download"></span>下载</a>\n' +
+										'</div>' +
+										'<div class="form-group" style="margin-left: 15px">' +
+										'<label class="control-label">文件图片：</label>' +
+										'<ul class="clearfix ls_fileImg">' +
+											imgfilePathsHtml+
+										'</ul>' +
+										'</div> ';
+							}
+
+						};
+
+						//获取当前的关联文件列表，set到active.curRelationFileList
+						active.getRelationFiles(fileMediaId);
+						var tempRow = "";
+						var len = active.curRelationFileList.length;
+						if (len > 0) {
+							for(var n=0; n<len; n++){
+								tempRow= tempRow +
+										'<li><div class="addConter_title"> <span> ◇ </span>'+active.curRelationFileList[n].relationMediaFileTitle+'</div>'+
+										'<div class="LQML_Close" data-id="'+active.curRelationFileList[n].relationMediaFileId+'"><i class="layui-icon">&#x1006;</i></div>'+
+										'</li>';
+							}
+						}else{
+							// tempRow = '<li>没有关联内容</li>';
+						}
+						var relationHtml = '<div class="uplInf_list">' +
+								' <h4 class="uplInf_tit">内容关联 </h4>' +
+								' <div class="layui-input-inline pt-1">' +
+								'<span class="layui-btn layui-btn-danger btn-radius addConter">增加</span>' +
+								'</div>' +
+								' <div class="addConter_list">' +
+								' <ul class="addConterUl">' +
+									tempRow
+								' </ul>' +
+								'  </div>' +
+								' </div>';
+
+						htmlItem = htmlItem + '<li>'
+								+ '<div class="videoML_m">' +
+								'		<div class="videoML_top">'
+								+ coverHtml
+								+ '<div class="videoML_form fl">'
+								+ '		<div class="layui-form-item">'
+                                + previewHtml
+								+ '		<div class="videoML_title">'
+								+ '			<label class="layui-form-label"><em>*</em>标题</label>'
+								+ '			<div class="layui-input-block videoML_Iput">'
+								+ '				<input name="title" id="video_mediaTitle' + fileMediaId + '" class="layui-input" value="' + mediaTitle + '"  type="text"  autocomplete="off" lay-verify="required" lay-reqtext="请输入标题">'
+								+ '			</div>'
+								+ '		</div>'
+								+ '		<div class="videoML_title">'
+								+ '			<div class="layui-inline">'
+								+ '				<label class="layui-form-label"><em>*</em>类型</label>'
+								+ '				<div class="layui-input-inline videoML_select">'
+								+ '					<select name="modules" id="video_catalogueId' + fileMediaId + '" lay-verify="required">'
+								+ '						<option value="">请选择</option>'
+								+ cataloguesLabelsString
+								+ '					</select>'
+								+ '				</div>'
+								+ '			</div>'
+								+ '			<div class="layui-inline margin0">'
+								+ '				<label class="layui-form-label"><em>*</em>关键词</label>'
+								+ '					<div class="layui-input-block videokey_Iput">'
+								+ '						<input name="title" id="video_mediaKeyword' + fileMediaId + '" class="layui-input" type="text" value="' + mediaKeyword + '"  autocomplete="off" lay-verify="required" lay-reqtext="请输入关键词">'
+								+ '					</div>'
+								+ '			</div>'
+								+ '		</div>'
+								+ '		<div class="videoML_title">'
+								+ '			<div class="layui-inline">'
+								+ '		<label class="layui-form-label"><em>*</em>价格</label>'
+								+ '		<div class="layui-input-inline videoML_select">'
+								+ '		<select name="modules" id="video_priceLabelid' + fileMediaId + '" lay-verify="required">'
+								+ '		<option value="">请选择</option>'
+								+ pricesLabelsString
+								+ '		</select>'
+								+ '		</div>'
+								+ '		</div>'
+								+ '		<div class="layui-inline">'
+								+ '		<label class="layui-form-label"><em>&nbsp;</em>转载</label>'
+								+ '<div class="layui-input-inline videoML_select">'
+								+ '		<select name="modules" id="video_publishLabelid' + fileMediaId + '" lay-verify="required">'
+								+ '		<option value="">请选择</option>'
+								+ publishLabelsString
+								+ '		</select>'
+								+ '		</div>'
+								+'<div class="layui-inline">'
+								+ '<p style="color:#888;">若为原创请勿选择</p>'
+								+'</div>'
+								+ '</div>'
+								+ '</div>'
+								+ '	<div class="videoML_title">'
+								+ '		<div class="layui-form">'
+								// + '		<input type="checkbox" name="allthis" lay-skin="primary" title="全部套用该条类型、价格、转载信息">'
+								+ '		<label class="layui-form-label"><em></em>归属标签</label>'
+								+ belongLabelsString
+								+ '		</div>'
+								+ '		</div>'
+								+ '		</div>'
+								+ '		</div>'
+								+ '		</div>'
+								+ '		</div>'
+								+ '		<div class="Videotextarea">'
+								+ '		<div class="VideotextareaT"><em></em>简介</div>'
+								+ '<textarea id="video_mediaBrief' + fileMediaId + '" placeholder="请输入内容" class="layui-textarea">' + mediaBrief + '</textarea>'
+								+ '		</div>'
+
+								+ '		<div class="Videotextarea">'
+								// + '		<div class="VideotextareaT"><em>*</em>简介</div>'
+								+ 			relationHtml
+								+ '		</div>'
+
+
+								+ '		<div class="clearfix Video_Opera">'
+								// + '			<div class="fl Video_deleThis" data-id="'+fileMediaId+'" >'
+								// + '		<i class="layui-icon">&#xe640;</i>  删除该视频'
+								// + '</div>'
+								+ '<div class="fr">'
+								// + '		<div class="layui-inline">'
+								// + '		<div class="layui-form">'
+								// + '		<input type="checkbox"id="video_read' + fileMediaId + '" name="submitthis" lay-skin="primary" title="我已阅读并同意遵守 《版权服务规则协议》">'
+								// + '		</div>'
+								// + '		</div>'
+								+ '		<div class="layui-inline">'
+								// + '		<button id="commitOneBtnId' + fileMediaId + '" data-id="'+fileMediaId+'" data-filename="'+fileName+'" class="layui-btn layui-btn-danger btn-radius locatclass" ' + 'onclick="commitFileItem(' + fileMediaId + ',\'' + fileName + '\',this,false)">提交本条</button>'
+								+ '		<button id="commitOneBtnId' + fileMediaId + '" data-fileMediaId="' + fileMediaId + '" data-fileName="' + fileName + '" data-mediaType="' + mediaType + '" data-mediaId="' + mediaId
+								+ '" data-coverUrl="' + coverUrl + '" class="layui-btn layui-btn-danger btn-radius locatclass">提交</button>'
+								+ '<a href="javascript:void(0)" class="layui-btn layui-btn-danger btn-radius return_exq">取消</a>'
+
+								+ '		</div>'
+								+ '		</div>'
+								+ '		</div>'
+								+ '		</li>'
+						;
+
+
+						$("#uploadVideoListDiv").append(htmlItem);
+
+						layui.use(['form'], function () {
+							form = layui.form;
+
+							//视频上传封面单选
+							form.on("radio(uploadImg)", function (data) {
+								if (this.value == '0') {
+									$(this).siblings(".viedo_pic").show();
+									$(this).siblings(".viedo_picZD").hide();
+									//这是选中了自动选择封面
+								} else if (this.value == '1') {
+									$(this).siblings(".viedo_picZD").show();
+									$(this).siblings(".viedo_pic").hide();
+									//$Inputfile.val("");
+									//修改时屏蔽下面代码
+									// $(this).siblings(".viedo_pic").find(".imgBg").hide();
+									// $(this).siblings(".viedo_pic").find("img").attr("src", "");
+								}
+							});
+							form.render();
+						})
+
+					}
+                }
+            }
+        })
+    }
+
+function serachval(){
+    var mediaTypes=$("#mediaTypes").val().split(",");
+   // mediaTypes.push(); //
+    console.log("mediaTypes"+mediaTypes);
+    var goods=$("#goodsStatus").val();
+    var hkeywords=$("#hKeyword").val();
+    var hcatalogue=$("#hcontentMCatalogue").val();
+
+	var hqcontentMAuditStatus=$("#hqcontentMAuditStatus").val();
+
+    var hbelongLabel=$("#hcontentBelongLabel").val().split(",");
+    $('input[name="mediaType"]').each(function(){
+        var valname=$(this).val();
+        console.log(valname);
+        for(var i=0,len=mediaTypes.length;i<len;i++){
+            if(valname==mediaTypes[i] ){
+                $(this).attr("checked",true);
+            }
+        }
+
+    });
+    $("#goods").val(goods);
+    $("#qcontentMCatalogueName").val(hcatalogue);
+
+	$("#qcontentMAuditStatus").val(hqcontentMAuditStatus);
+
+    $("#qKeywordId").val(hkeywords);
+    $('input[name="contentBelongLabelName"]').each(function(){
+        var valname=$(this).val();
+        console.log(valname);
+        for(var i=0,len=hbelongLabel.length;i<len;i++){
+            if(valname==hbelongLabel[i] ){
+                $(this).attr("checked",true);
+            }
+        }
+
+    });
+    layui.use('form', function(){
+        var form=layui.form;
+        form.render();
+    });
+}
+
+
+</script>
+</body>
+</html>

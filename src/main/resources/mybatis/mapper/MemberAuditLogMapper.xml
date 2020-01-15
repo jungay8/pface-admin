@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.pface.admin.modules.member.mapper.MemberAuditLogMapper" >
+  <resultMap id="BaseResultMap" type="com.pface.admin.modules.member.po.MemberAuditLog" >
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="audit_status" property="auditStatus" jdbcType="VARCHAR" />
+    <result column="audit_msg" property="auditMsg" jdbcType="VARCHAR" />
+    <result column="belong_uid" property="belongUid" jdbcType="BIGINT" />
+    <result column="audit_uid" property="auditUid" jdbcType="BIGINT" />
+    <result column="msg_origin_id" property="msgOriginId" jdbcType="BIGINT" />
+    <result column="audit_date" property="auditDate" jdbcType="TIMESTAMP" />
+    <result column="op_date" property="opDate" jdbcType="TIMESTAMP" />
+    <result column="del_flag" property="delFlag" jdbcType="INTEGER" />
+  </resultMap>
+  <!--<resultMap id="ResultMapWithBLOBs" type="com.pface.admin.modules.member.po.MemberAuditLog" extends="BaseResultMap" >-->
+    <!--<result column="audit_msg" property="auditMsg" jdbcType="LONGVARCHAR" />-->
+  <!--</resultMap>-->
+
+</mapper>

@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<!-- Content Header (Page header) -->
+<section class="content-header" style="">
+    <h1>
+        内容管理
+        <small>内容管理页面</small>
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> 主页</a></li>
+        <li><a href="#">内容管理</a></li>
+        <li class="active">内容管理</li>
+    </ol>
+</section>
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box">
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <div>
+                        <form class="form-inline" id="searchForm">
+
+                            <div class="form-group">
+                                <label for="member">会员</label>
+                                <select name="uid" id="member" class="form-control"
+                                        data-placeholder="请从列表选择一项" required>
+                                    <option th:each="members : ${memberList}" th:value="${members.id}" th:text="${members.uname}">
+                                        会员不存在
+                                    </option>
+                                </select>
+                                <label for="mediaType">媒体类型</label>
+                                <select name="mediaType" id="mediaType" class="form-control"
+                                        data-placeholder="请从列表选择一项" required>
+                                    <option th:each="type : ${mediaTypes}" th:value="${type.name}" th:text="${type.text}">
+                                        媒体类型不存在
+                                    </option>
+                                </select>
+                                <!-- Date range -->
+                                <label for="reservation">时间</label>
+                                <div class="input-group">
+                                    <div class="input-group-addon">
+                                        <i class="fa fa-calendar"></i>
+                                    </div>
+                                    <input type="text" class="form-control input-sm" id="reservation">
+                                    <input type="hidden" name="startDate" id="startDate">
+                                    <input type="hidden" name="endDate" id="endDate">
+                                </div>
+                            </div>
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-default btn-sm" onclick="javascript:Search();">
+                                    <i class="glyphicon glyphicon-search"></i>
+                                    查询
+                                </button>
+                                <button type="reset" class="btn btn-default btn-sm" id="reset"
+                                        onclick="javascript:document.querySelectorAll('#startDate, #endDate').forEach(d=> d.value='')">
+                                    <i class="glyphicon glyphicon-trash"></i>
+                                    清空
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    <div id="toolbar">
+
+                    </div>
+                    <table id="table"></table>
+                </div>
+                <!-- /.box-body -->
+            </div>
+            <!-- /.box -->
+
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+</section>
+<!-- /.content -->
+<!-- edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="editModalLabel">修改会员</h4>
+            </div>
+            <div class="modal-body">
+                <form id="editForm">
+                    <input type="hidden" name="id"/>
+                    <div class="form-group">
+                        <label class="control-label" for="editName"><span class="asterisk">*</span>会员名称:</label>
+                        <input id="editName" type="text" class="form-control" name="uname" placeholder="输入会员名称"
+                               minlength="3" required>
+                        <div class="help-block with-errors"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" for="editType"><span class="asterisk">*</span>会员类型:</label>
+                        <select name="memberType" id="editType" class="form-control"
+                                data-placeholder="请从列表选择一项" required>
+                            <option th:each="memberType : ${memberTypeList}" th:value="${memberType.name}" th:text="${memberType.text}">
+                                会员类型不存在
+                            </option>
+                        </select>
+                        <div class="help-block with-errors"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" for="editDescription">会员描述:</label>
+                        <input id="editDescription" type="text" class="form-control" name="description" placeholder="输入会员描述">
+                        <div class="help-block with-errors"></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="submit" form="editForm" class="btn btn-primary"
+                        data-action="{type:'submit',form:'#editForm',url:'@{/admin/pricelab/update}',after:'$.myAction.refreshTable'}">
+                    确定
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- delete modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteSmallModalLabel">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="deleteSmallModalLabel">删除价格标签</h4>
+            </div>
+            <div class="modal-body">
+                <form id="deleteForm"></form>
+                确定要删除选中的 <span class="records"></span> 条记录?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" form="deleteForm" class="btn btn-primary"
+                        data-action="{type:'submit',form:'#deleteForm',url:'@{/admin/pricelab/logic-delete-batch}',after:'$.myAction.refreshTable'}">
+                    确定
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="actionButtons" class="admin-hide">
+    <a style="display: none" class="like" href="javascript:void(0)" data-toggle="tooltip" title="Like"><i class="glyphicon glyphicon-heart"></i></a>　
+    <a shiro:hasPermission="mediafile:update" class="edit ml10" href="javascript:void(0)" data-toggle="tooltip" title="编辑"><i class="glyphicon glyphicon-edit"></i></a>　
+    <a shiro:hasPermission="mediafile:audit" class="remove ml10" href="javascript:void(0)" data-toggle="tooltip" title="审核"><i class="glyphicon glyphicon-user"></i></a>　
+    <a shiro:hasPermission="mediafile:delete" class="remove ml10" href="javascript:void(0)" data-toggle="tooltip" title="删除"><i class="glyphicon glyphicon-remove"></i></a>　
+</div>
+<script>
+
+    var $table = $('#table');
+
+    $(function () {
+        //Date range picker
+        var beginTimeTake;
+        $('#reservation').daterangepicker({
+            "timePicker": false,
+            "timePicker24Hour": true,
+            "linkedCalendars": false,
+            "autoUpdateInput": false,
+            "locale": {
+                format: 'YYYY-MM-DD',
+                separator: ' ~ ',
+                applyLabel: "应用",
+                cancelLabel: "取消",
+                resetLabel: "重置",
+                daysOfWeek: ["日", "一", "二", "三", "四", "五", "六"],
+                monthNames: ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"],
+            }
+        }, function (start, end, label) {
+            if (!this.startDate) {
+                this.element.val('');
+            } else {
+                $('#startDate').val(this.startDate.format(this.locale.format));
+                $('#endDate').val(this.endDate.format(this.locale.format));
+                this.element.val(this.startDate.format(this.locale.format) + this.locale.separator + this.endDate.format(this.locale.format));
+            }
+        });
+        // bootstrap table初始化
+        // http://bootstrap-table.wenzhixin.net.cn/zh-cn/documentation/
+        $table.bootstrapTable({
+            url: CONTEXT_PATH + '/admin/mediafile/list',
+            idField: 'id',
+            searchOnEnterKey: false,
+            detailView : true,
+            detailFormatter :"detailFormatter",
+            columns: [
+                {field: 'state', checkbox: true},
+               // {field: 'id', title: '编号', sortable: true, halign: 'left'},
+                //{field: 'memberMedia.coverUrl', title: '资源封面', formatter: 'coverUrlShow',sortable: true, halign: 'left'},
+                {field: 'fileName', title: '文件名称', sortable: true, halign: 'left'},
+                {field: 'fileSize', title: '文件大小', formatter: 'renderSize',sortable: true, halign: 'left'},
+                {field: 'mediaType.text', title: '资源类型', sortable: true, halign: 'left'},
+                {field: 'uid', title: '归属用户', sortable: true, halign: 'left'},
+                {field: 'isMediaInfo.text', title: '是否有详情',  sortable: true, halign: 'left'},
+                {field: 'goodsStatus.text', title: '是否上下架', sortable: true, halign: 'left'},
+                {field: 'mediaStatus.text', title: '系统审核状态',  sortable: true, halign: 'left'},
+                //{field: 'isPublishMedia.text', title: '用户是否发布', sortable: true, halign: 'left'},
+                {field: 'opDate', title: '修改日期', sortable: true, halign: 'left'},
+                {field: 'uploadDate', title: '上传日期', sortable: true, halign: 'left'},
+                {
+                    field: 'action',
+                    title: '操作',
+                    halign: 'center',
+                    align: 'center',
+                    formatter: 'actionFormatter',
+                    events: 'actionEvents',
+                    clickToSelect: false
+                }
+            ],
+            sortName : 'uploadDate',
+            sortOrder: 'desc'
+        });
+    });
+
+    window.actionEvents = {
+        /* 'click .like': function (e, value, row, index) {
+             alert('You click like icon, row: ' + JSON.stringify(row));
+             console.log(value, row, index);
+         },*/
+        'click .edit': function (e, value, row, index) {
+            $('#editModal').modal('show')
+            $('#editForm').fillForm(row);
+            console.log(value, row, index);
+        },
+        'click .remove': function (e, value, row, index) {
+            $('#deleteModal').modal('show');
+            $('.records').html('1');
+            var html = '';
+            for (var key in row) {
+                html += '<input type="hidden" name="' + key + '" value="' + row[key] + '">';
+            }
+            $('#deleteForm').html(html);
+        }
+    };
+
+    function timeFormatter(value, row, index) {
+        return Utils.dateFormat.formatTimestamp(value, 'yyyy-MM-dd hh:mm:ss');
+    }
+
+    function execTimeFormatter(value, row, index) {
+        return value + ' ms';
+    }
+
+    function actionFormatter(value, row, index) {
+        return $('#actionButtons').html();
+    }
+    // 数据表格展开内容
+    function detailFormatter(value, row, index) {
+        /*var html = [];
+        $.each(row, function (key, value) {
+            html.push('<p><b>' + key + ':</b> ' + value + '</p>');
+        });
+        return html.join('');*/
+        var image = '<div class="photos">'
+            +'<a target="_blank" href="'+value+'"><img alt="image" class="feed-photo" src="'+value+'"></a>'
+            +'</div>';
+        return image;
+    }
+    function  renderSize(value) {
+        if (null == value || value == "") {
+            return "0 Bytes";
+        }
+        var unitArr = new Array("Bytes","KB","MB","GB","TB","PB","EB","ZB","YB");
+        var index = 0
+            , srcsize = parseFloat(value);
+        index = Math.floor(Math.log(srcsize) / Math.log(1024));
+        var size = srcsize / Math.pow(1024, index);
+        //  保留的小数位数
+        size = size.toFixed(2);
+        return size + unitArr[index];
+    }
+
+    function Search() {
+        var _uid= $('#member').val();
+        var _mediaType= $('#mediaType').val();
+        var _startDate=$('#startDate').val();
+        var _endDate=$('#endDate').val();
+        var options = $('#table').bootstrapTable('refresh', {
+            silent: true,
+            query:
+                {
+                    uid:_uid,
+                    mediaType:_mediaType,
+                    startDate: _startDate,
+                    endDate:_endDate
+
+                }
+        });
+    }
+    
+    function coverUrlShow(value, row, index) {
+        return "<img style='width: 50px;height: 50px;' src='"+CONTEXT_PATH+value+"' alt=''>";
+    }
+
+</script>
+</html>

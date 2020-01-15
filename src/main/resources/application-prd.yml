@@ -1,0 +1,75 @@
+debug: false
+logging:
+  level:
+    root: info
+    com:
+      jmgo:
+        admin:
+          mapper: info
+server:
+  port: 8083
+  servlet:
+    context-path: /
+  session:
+      timeout: P2DT3M5S
+mybatis: # mybatis 配置
+  #mapper-locations: classpath:mybatis/mapper/*.xml
+  #type-aliases-package: com.pface.admin.modules.*.po
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+spring:
+  datasource:
+    master:
+      #jdbc-url: jdbc:mysql://132.232.134.30:3306/pface?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+      jdbc-url: jdbc:mysql://192.168.55.62:3306/pface?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+      username: appuser
+      password: app@123
+      # 使用druid数据源
+      type: com.alibaba.druid.pool.DruidDataSource
+      driver-class-name: com.mysql.jdbc.Driver
+    other:
+      jdbc-url: jdbc:sqlserver://192.168.55.71:1433;DatabaseName=TzMedia
+      #jdbc-url: jdbc:mysql://127.0.0.1:3306/pface?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+      username: appuser
+      password: app@123
+      #使用druid数据源
+      type: com.alibaba.druid.pool.DruidDataSource
+      driverClassName: com.microsoft.sqlserver.jdbc.SQLServerDriver
+      #driver-class-name: com.mysql.jdbc.Driver
+    druid:
+      initial-size: 1
+      max-active: 20
+      min-idle: 1
+      stat-view-servlet:
+        allow: true
+      test-on-borrow: true
+
+
+
+  thymeleaf:
+    cache: true
+  redis:
+      database: 0
+      host: 127.0.0.1 #132.232.134.30
+      port: 6379
+      password: test #gf123@     # 密码（默认为空）
+      timeout: 6000  # 连接超时时长（毫秒）
+      jedis:
+        pool:
+          max-active: 1000  # 连接池最大连接数（使用负值表示没有限制）
+          max-wait: -1     # 连接池最大阻塞等待时间（使用负值表示没有限制）
+          max-idle: 10      # 连接池中的最大空闲连接
+          min-idle: 5       # 连接池中的最小空闲连接
+  servlet:
+    multipart:
+      max-file-size: 3072MB
+      max-request-size: 3072MB
+
+#生产环境
+jmgo:
+  upload:
+  chunkSize: 10485760
+  debug : false
+  synchronizeUser: true

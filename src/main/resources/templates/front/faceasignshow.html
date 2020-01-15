@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+	<!--<script type="text/javascript" src="https://libs.baidu.com/jquery/1.8.3/jquery.min.js"></script>-->
+	<script type="text/javascript" th:src="@{/static/js/jquery183.js}"></script>
+	<script th:src="@{/static/pface/js/jquery.msgbox.min.js}"></script>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="context-path" th:content="@{/}"/>
+		<link rel="stylesheet" th:href="@{/static/pface/js/layui/css/layui.css}">
+		<link rel="stylesheet" th:href="@{/static/pface/css/common.css}">
+        <link rel="stylesheet" th:href="@{/static/pface/css/manage.css}" />
+        <link rel="stylesheet" th:href="@{/static/pface/css/upload.css}" />
+		<title>无感人脸——签到大屏</title>
+		<script th:inline="javascript">
+            var CONTEXT_PATH = [[${#request.getContextPath()}]];
+		</script>
+	</head>
+	<body>
+		<!--导航-->
+		<div class="top clearfix" th:replace="~{front/header :: header}"></div>
+		<!--内容管理-->
+		<div class="container">
+			<div class="wapper">
+				<div class="m_conter clearfix hav_line">
+					<div class="fl left_nav" th:replace="~{front/leftnav::leftnav}"></div>
+					<!--右边-->
+					<div class="fr right_conter">
+
+						<div class="right_title">
+							<div class="colorblack manage_tit">
+								<img th:src="@{/static/pface/img/tit_inco.png}"/>
+								<span>签到大屏</span>
+							</div>
+						</div>
+
+						<div class="layui-form videoListM">
+						<form  class="layui-form" lay-filter="choiceForm" id="search_form1" method="post" action="/front/asignshow">
+
+							<!--<input class="layui-input" type="text" name="personName" id="querypersonName"-->
+								   <!--style="display: inline-block;vertical-align: middle; width:200px;margin-top: 10px;margin-bottom: 10px;margin-right: 10px;margin-bottom: 10px"-->
+								   <!--placeholder="请输入姓名或证件号"  th:value="${personName}">-->
+
+							<!--<div style="display: inline-block;vertical-align: middle;  margin-left: 20px">-->
+								<!--<label style="display: inline-block;">会议名称：</label>-->
+								<!--<div class="layui-input-inline">-->
+									<!--<select  id="querysyssceneid" name="syssceneid">-->
+										<!--<option value="">全部</option>-->
+										<!--<option th:each="usescene:${faceAppUsesceneAllList}" th:value="${usescene.id}"-->
+												<!--th:text="${usescene.scenename}"-->
+												<!--th:selected="${usescene.id} eq ${syssceneid}"-->
+										<!--&gt;</option>-->
+									<!--</select>-->
+								<!--</div>-->
+							<!--</div>-->
+
+							<!--<div class="layui-inline">-->
+								<!--<span class="layui-btn layui-btn-warm btn-radius closeBlack" id="search">查询</span>-->
+							<!--</div>-->
+						</form>
+						<hr />
+							<center>
+								<div>
+									按需定制
+								</div>
+							</center>
+
+						<!--<table class="layui-table" lay-filter="demo" id="tableM">-->
+							<!--<thead>-->
+							<!--<tr>-->
+								<!--<th>会议名称</th>-->
+								<!--<th>头像</th>-->
+								<!--<th>抓拍头像</th>-->
+								<!--<th>相机名称</th>-->
+								<!--<th>抓拍时间</th>-->
+								<!--<th>姓名</th>-->
+								<!--<th>年龄</th>-->
+								<!--<th>性别</th>-->
+								<!--<th>证件号</th>-->
+								<!--<th>地址</th>-->
+							<!--</tr>-->
+							<!--</thead>-->
+							<!--<tbody>-->
+							<!--<tr th:each="appsnaplist : ${appSnapListPojoPage}">-->
+								<!--<td th:text="${appsnaplist.scenename}"></td>-->
+								<!--<td><img th:src="${appsnaplist.imgPath}"></td>-->
+								<!--<td><img th:src="${appsnaplist.snapPath}"></td>-->
+								<!--<td th:text="${appsnaplist.cameraName}"></td>-->
+								<!--<td th:text="${#dates.format(appsnaplist.triggerTime, 'yyyy-MM-dd HH:mm:ss')}"></td>-->
+								<!--<td th:text="${appsnaplist.personName}"></td>-->
+								<!--<td th:text="${appsnaplist.personAge}"></td>-->
+								<!--<td th:if="${appsnaplist.personGender == '1'}" th:text="男"></td>-->
+								<!--<td th:if="${appsnaplist.personGender == '0'}" th:text="女"></td>-->
+								<!--<td th:if="${appsnaplist.personGender == null || appsnaplist.personGender=='' || appsnaplist.personGender=='null'}" th:text="未知"></td>-->
+								<!--<td th:text="${appsnaplist.personIdcard}"></td>-->
+								<!--<td th:text="${appsnaplist.personAddr}"></td>-->
+							<!--</tr>-->
+							<!--</tbody>-->
+
+						<!--</table>-->
+							<!--<div class="conterIntro_bottom">-->
+								<!--<div id="pageNum" class="pageNum textRight"></div>-->
+							<!--</div>-->
+					</div>
+			</div>
+				</div>
+
+				</div>
+		</div>
+		
+<!--footer-->
+<div class="footer" th:replace="~{front/footer :: footer}"></div>
+<div>
+	<form name="listpage" id="listpage" method="post">
+		<!--<input type="hidden" name="pageNumKey" id="pageNumKey" th:value="${pageNum}">-->
+		<!--<input type="hidden" name="pageSizeKey" id="pageSizeKey" th:value="${pageSize}">-->
+		<!--<input type="hidden" name="personName" id="pagepersonName" th:value="${personName}">-->
+		<!--<input type="hidden" name="syssceneid" id="pagesyssceneid" th:value="${syssceneid}">-->
+	</form>
+</div>
+
+<script th:inline="javascript">
+            /*<![CDATA[*/
+
+			// var totalRecords = [[${total}]];
+			// var page = [[${pageNum}]];
+			// var pageSize = [[${pageSize}]];
+			// var personName = [[personName]];
+			// var sysSceneid = [[sysSceneid]];
+            /*]]>*/
+</script>
+<script th:src="@{/static/pface/js/layui/layui.js}"></script>
+<script th:src="@{/static/pface/js/layui/lay.modules/laydate.js}"></script>
+<!--<script th:src="@{/static/pface/js/faceappsnaplist.js}"></script>-->
+
+<script th:inline="javascript">
+	// var faceAppUsesceneAllList = [[${faceAppUsesceneAllList}]];
+</script>
+
+<script type='text/javascript' th:inline="javascript">
+	layui.use(['table','form', 'laydate'], function(){
+		var $ = layui.jquery
+				,table = layui.table
+				,form=layui.form
+				,laydate = layui.laydate;
+		//这里是查询操作
+		$(document).on('click','#search',function(){
+			$form = $("#search_form1");
+			$form.submit();
+		});
+
+	});
+</script>
+</body>
+</html>

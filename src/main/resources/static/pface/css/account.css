@@ -1,0 +1,34 @@
+.account_main{width:428px; margin:35px auto;}
+.accout_head{font-size:16px; margin:0 auto; position:relative; line-height:24px;color:#8a8a8a; width:200px; height: 200px; text-align: center; background: #f1f1f1; border:1px solid #dcdcdc;}
+.ahead_inco{margin-top:56px; margin-bottom: 10px;}
+.account_input{margin-top:25px;}
+.account_input span{display: inline-block; width:104px;}
+.account_input em{font-style: normal; padding-right: 5px; color:#f01818;}
+.account_input .layui-form-label{padding-right:0; padding-left: 0;}
+.imgBg{position:absolute; left: 0; top: 0; width:198px; line-height: 194px; height: 198px;  border: 0 none; background: #fff;}
+.imgBg img{width:198px;max-height:198px;margin-top: 20px}
+/*用户认证*/
+.certifica{background:url(../img/certifica_logo.png) no-repeat center bottom; min-height: 719px;}
+.certifica_tit{text-align: center;padding:35px 0;}
+.certifica_tit p{color:#8a8a8a;}
+.certifica_main{padding:0 64px 32px 64px;}
+.certifi_conter .ahead_inco{margin-top:14px;}
+.certifiHead{font-size:14px; line-height: 20px; padding-top: 15px;}
+.certifi_input{width: 440px; margin:0 44px; line-height: 30px;}
+.certifi_Tit em{font-style: normal;color:#ce0106;}
+.cerInput_list{margin:5px 0;}
+.certifi_uploadO{cursor: pointer; width: 200px;font-size:20px; height: 200px;border:1px solid #dcdcdc; position:relative; text-align: center; color:#8a8a8a;}
+.certifi_uploadO.width_3{width:320px}
+.certifi_personal{ padding-top:55px; line-height: 42px;}
+.certifica_tabM.layui-tab-content{padding:0;}
+.certifi_conter{padding:40px 0;}
+.certifi_opera{padding-top: 50px;}
+.certifi_personal span{font-size:16px;}
+.company_ID{padding-top:30px; }
+.company_ID span{line-height: 30px;font-size:14px;}
+.marginl-6{margin-left: 65px;}
+.marginT-3{margin-top:30px;}
+.marginL-4{margin-left:44px;}
+.width_3 .imgBg{width:318px;}
+.width_3 .imgBg img{width:318px;}
+label.error {color: red;}

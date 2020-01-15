@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.pface.admin.modules.member.mapper.FaceDeviceChannelResMapper" >
+  <resultMap id="BaseResultMap" type="com.pface.admin.modules.member.po.FaceDeviceChannelRes" >
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="device_id" property="deviceId" jdbcType="VARCHAR" />
+    <result column="channel" property="channel" jdbcType="TINYINT" />
+    <result column="issetup" property="issetup" jdbcType="VARCHAR" />
+    <result column="create_by" property="createBy" jdbcType="VARCHAR" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
+    <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="del_flag" property="delFlag" jdbcType="VARCHAR" />
+  </resultMap>
+
+  
+
+
+  <resultMap id="FaceDeviceChannelResResultMap" type="com.pface.admin.modules.member.vo.FaceDeviceChannelResVo">
+    <result column="id" jdbcType="BIGINT" property="id"/>
+    <result column="device_id" property="deviceId" jdbcType="VARCHAR" />
+    <result column="channel" property="channel" jdbcType="TINYINT" />
+    <result column="issetup" property="issetup" jdbcType="VARCHAR" />
+    <result column="camera_name" property="cameraName" jdbcType="TIMESTAMP" />
+    <result column="camera_status" property="cameraStatus" jdbcType="VARCHAR" />
+    <result column="auth_enddate" property="authEnddate" jdbcType="TIMESTAMP" />
+    <result column="camera_install_location" property="cameraInstallLocation" jdbcType="VARCHAR" />
+    <result column="authed_usernames" property="authedUsernames" jdbcType="VARCHAR" />
+    <result column="can_auth_startdate" property="canAuthStartdate" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="queryFaceDeviceChannelResColumns">
+    res.id,
+	res.device_id,
+	res.channel,
+	res.issetup,
+	ca.camera_name,
+	IFNULL(ca.`status`,'-1') AS camera_status,
+	ca.install_location AS camera_install_location,
+	authed_usernames,
+	IFNULL(
+		uc1.can_auth_startdate,
+		DATE_FORMAT(NOW(), '%Y-%m-%d')
+	) AS can_auth_startdate
+  </sql>
+  <select id="queryFaceUserChannelResList"  resultMap="FaceDeviceChannelResResultMap">
+    SELECT
+    <include refid="queryFaceDeviceChannelResColumns"/>
+    FROM
+    face_device_channel_res res
+    LEFT JOIN face_camera ca ON res.device_id = ca.device_id AND res.channel = ca.channel
+    LEFT JOIN (
+    SELECT uc.device_id, uc.channel,
+    DATE_ADD(DATE_FORMAT(max(uc.auth_enddate),'%Y-%m-%d'),INTERVAL 1 DAY) AS can_auth_startdate,
+    GROUP_CONCAT(DISTINCT us.username ORDER BY uc.auth_enddate DESC) AS authed_usernames
+    FROM face_user_channel_res uc
+    INNER JOIN face_user us ON uc.sys_userid = us.id
+    WHERE  uc.del_flag = '1'
+    GROUP BY uc.device_id, uc.channel
+    ) uc1 ON res.device_id = uc1.device_id AND res.channel = uc1.channel
+    <where>
+      1=1 and res.del_flag = '1'
+      <if test="deviceId!=null and deviceId!=''">
+        and res.device_id =#{deviceId}
+      </if>
+      <if test="issetup!=null and issetup!=''">
+        and res.issetup  =#{issetup}
+      </if>
+    </where>
+  </select>
+  
+</mapper>

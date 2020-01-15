@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.pface.admin.otherdb.mapper.MtAuthMapper" >
+  <resultMap id="BaseResultMap" type="com.pface.admin.otherdb.po.MtAuth" >
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="UserId" property="userid" jdbcType="INTEGER" />
+    <result column="Admin" property="admin" jdbcType="NVARCHAR" />
+    <result column="AuthType" property="authtype" jdbcType="INTEGER" />
+    <result column="CardBack" property="cardback" jdbcType="NVARCHAR" />
+    <result column="CardFront" property="cardfront" jdbcType="NVARCHAR" />
+    <result column="CardNO" property="cardno" jdbcType="NVARCHAR" />
+    <result column="CheckDate" property="checkdate" jdbcType="TIMESTAMP" />
+    <result column="CheckOk" property="checkok" jdbcType="INTEGER" />
+    <result column="ComImage" property="comimage" jdbcType="NVARCHAR" />
+    <result column="ComNO" property="comno" jdbcType="NVARCHAR" />
+    <result column="Company" property="company" jdbcType="NVARCHAR" />
+    <result column="UserLogin" property="userlogin" jdbcType="NVARCHAR" />
+    <result column="ComLogo" property="comlogo" jdbcType="NVARCHAR" />
+    <result column="Money" property="money" jdbcType="DECIMAL" />
+    <result column="EnableShop" property="enableshop" jdbcType="BIT" />
+    <result column="TimeValue" property="timevalue" jdbcType="INTEGER" />
+    <result column="Service" property="service" jdbcType="NVARCHAR" />
+    <result column="WantBuy" property="wantbuy" jdbcType="BIT" />
+    <result column="WantSell" property="wantsell" jdbcType="BIT" />
+    <result column="Fee" property="fee" jdbcType="DECIMAL" />
+    <result column="CheckMemo" property="checkmemo" jdbcType="NVARCHAR" />
+    <result column="YiYuan" property="yiyuan" jdbcType="INTEGER" />
+  </resultMap>
+</mapper>

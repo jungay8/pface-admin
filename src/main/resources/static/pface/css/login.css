@@ -1,0 +1,26 @@
+/*登录*/
+.loginImg{width:100%; position:relative;}
+.loginimgBg{min-height:480px;}
+.loginContainer{position:absolute; left:0; top:0; width:100%; height:100%;}
+.loginContainer .wapper{height:100%; position: relative;}
+.dzMain{position:absolute; width:390px; right:0; top:50%; background: #fff; padding:25px;  moz-box-shadow:2px 2px 5px #7a7a7a; -webkit-box-shadow:2px 2px 5px #7a7a7a; box-shadow:2px 2px 5px #7a7a7a;}
+.loginInputTxt{ height:420px; margin-top:-210px; }
+.loginInputTit{width:100%; text-align: center; padding-bottom:10px;letter-spacing:2px; border-bottom: 1px solid #dde1e7; font-size:24px; color:#CE0106; line-height: 30px;}
+.LoginMainFrom{width:320px; margin:0 auto; padding-top: 10px;}
+.LoginInput{ margin-top:15px; height:45px; position:relative;}
+.form-control.is-invalid{ background:none; border:1px solid #d6dae1; height:45px; display: block; vertical-align:middle;font-size:14px; border-radius: 10px; line-height:45px;width:100%; box-sizing:border-box;padding-left:40px; font-family:"微软雅黑";}
+.LoginInput_Inco{position:absolute; left:10px; top:7px; height:31px;width:26px;z-index:2;}
+.Login_Opera{margin-top:15px;}
+.Login_Opera input.form-control{width:200px; }
+.LoginInputBtn button{width: 100%; border-radius: 5px; height: 45px; background:#d2181c;color:#fff; padding-left:0; text-align:center; font-size:22px;  border:0 none;}
+.link_register{padding-top:10px;}
+.cheched_forget{padding-top:16px;}
+.placeholder{ position: absolute; color:#a7a7a7;left: 0;    line-height: 45px;    padding-left: 40px;}
+.logincodeInput{width: 200px;}
+/*注册*/
+.rester_imgBg{min-height:698px;}
+.reInputTxt{height:560px; margin-top:-270px;}
+.register_from .LoginInput input{padding-left:20px;}
+.register_Opera span{background: #58c88d; color:#fff; font-size:14px; text-align: center; display: block; height:45px; border-radius: 5px; width: 100px; line-height: 45px;}
+.cheched .custom-control .custom-control-label.colorblack{color:#000}
+.register_from .placeholder{padding-left:20px;}

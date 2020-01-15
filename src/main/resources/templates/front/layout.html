@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+	  xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+	<!--<script type="text/javascript" src="https://libs.baidu.com/jquery/1.8.3/jquery.min.js"></script>-->
+	<script type="text/javascript" th:src="@{/static/js/jquery183.js}"></script>
+	<script th:src="@{/static/pface/js/jquery.msgbox.min.js}"></script>
+	<head>
+		<meta charset="utf-8">
+		<meta name="context-path" th:content="@{/}"/>
+		<title>无感人脸——登录页</title>
+		<link rel="stylesheet" th:href="@{/static/pface/js/layui/css/layui.css}">
+		<link rel="stylesheet" th:href="@{/static/pface/css/common.css}">
+		<script th:inline="javascript">
+            var CONTEXT_PATH = [[${#request.getContextPath()}]];
+		</script>
+	</head>
+	<body>
+		<!--导航-->
+		<div class="top clearfix">
+			<div class="wapper">
+				<div class="fl logo">
+					<img class="WaImg" th:src="@{/static/pface/img/logo.jpg}"/>
+				</div>
+				<div class="fl nav">
+					<a href="#"><img  th:src="@{/static/pface/img/nav_index.jpg}"/>首页</a><span>|</span>
+					<!--<a href="#">素材专区</a><span>|</span>-->
+					<!--<a href="#">节目专区</a><span>|</span>-->
+					<!--<a href="#">电视剧专区</a><span>|</span>-->
+					<!--<a href="#">融媒体专区</a>-->
+				</div>
+				<div class="fr top_right">					
+					<a href="#"><img th:src="@{/static/pface/img/top_login.jpg}"/> 登录</a>
+					<!--<a href="./reg"><img th:src="@{/static/pface/img/top_register.jpg}"/> 注册</a>-->
+					<!--<a href="#" class="update_btn btn">上传</a>-->
+				</div>
+			</div>			
+		</div>
+		<-- head end -->
+		<div layout:fragment="content">
+
+		</div>
+		<!--footer-->
+		<div class="footer">       
+			<div class="footer-bottom ">
+			    <div class="wapper">
+			        <ul>
+			            <li class="title">关于无感人脸</li>
+			            <li><a href="#">我们是谁</a></li>
+			            <li><a href="#">隐私政策</a></li>
+			            <li><a href="#">版权信息</a></li>
+			            <li><a href="#">联系方式</a></li>
+			            <li><a href="#">帮助信息</a></li>
+			        </ul>
+			        <!--<ul>-->
+			            <!--<li class="title">品牌栏目</li>-->
+			            <!--<li><a href="#">真人秀</a></li>-->
+			            <!--<li><a href="#">纪实</a></li>-->
+			            <!--<li><a href="#">情感故事</a></li>-->
+			            <!--<li><a href="#">脱口秀</a></li>-->
+			            <!--<li><a href="#">栏目剧</a></li>-->
+			            <!--<li><a href="#">综艺娱乐</a></li>-->
+			            <!--<li><a href="#">生活服务</a></li>-->
+			        <!--</ul>-->
+			        <!--<ul>-->
+			            <!--<li class="title">素材专区</li>-->
+			            <!--<li><a href="#">成品素材</a></li>-->
+			            <!--<li><a href="#">精品素材</a></li>-->
+			            <!--<li><a href="#">分享素材</a></li>-->
+			        <!--</ul>-->
+			        <ul>
+			            <li class="title">联系我们</li>
+			            <li><a href="#">0731-88745259</a></li>
+			            <li><a href="#">商务合作：BD@jiemugo.com</a></li>
+			            <li><a href="#">版权合作：CR@jiemugo.com</a></li>
+			        </ul>
+			        <div class="qr">
+			            <ul class="nav">
+			                <li class="pt-2">
+			                    <p>关注无感人脸官方订阅号</p>
+			                    <p>及时获取最新业内资讯</p>
+			                </li>
+			                <li>
+			                    <img th:src="@{/static/pface/img/wxpic.jpg}">
+			                </li>
+			            </ul>
+			        </div>
+			
+			    </div>
+			
+			</div>
+			     <div class="footer-text">			 
+			         COPYRIGHT @ 2004-2019 无感人脸  长沙智慧政务技术有限公司 版权所有 湘ICP备18889311号-1
+			     <div class="footer-link">
+			         <a target="_blank" href="http://www.beian.miit.gov.cn?recordcode=43010308899906" style="display:inline-block;text-decoration:none;height:20px;line-height:20px;">
+			         	<img th:src="@{/static/pface/img/ba.png}" style="float:left;">
+			         	<p>湘公网安备 43010302889906号</p>
+			         </a>
+			     </div>
+			</div>
+ 
+</div>
+       <-- footer end-->
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script th:src="@{/static/pface/js/layui/layui.js}"></script>
+<script th:src="@{/static/pface/js/iput.js}"></script>
+</body>
+</html>

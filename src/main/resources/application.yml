@@ -1,0 +1,52 @@
+spring:
+  mvc:
+    view: # 视图相关
+      prefix: /templates/
+      suffix: .html
+  thymeleaf:
+    cache: false
+  output:
+    ansi:
+      enabled: ALWAYS # 输出带颜色的日志信息
+  profiles:
+    active: dev # 设置激活的环境
+
+mybatis: # mybatis 配置
+  #mapper-locations: classpath:mybatis/mapper/*.xml
+  #type-aliases-package: com.pface.admin.modules.*.po
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+#mapper: # 通用 Mapper 配置
+ # identity: MYSQL
+#  mappers: com.pface.admin.core.utils.MyMapper
+ # not-empty: false
+
+#pagehelper: # 分页插件配置
+  #helperDialect: mysql
+  #params: count=countSql
+  #reasonable: true
+  #supportMethodsArguments: true
+
+password: #shiro
+  algorithmName: md5
+  hashIterations: 2
+
+jmgo:
+   cluster: false  #集群配置  true集群环境   false单机环境，还需打开pom.xml里的spring-session-data-redis注释
+   globalSessionTimeout: 3600   #单机环境，session过期时间为60分钟
+   redis:
+       open: true  #是否开启redis缓存  true开启   false关闭
+devtools:
+  livereload:
+    enabled: false #是否支持livereload
+    port: 35729
+  restart:
+    enabled: false #是否支持热部署
+jmgosms:
+  url: https://api.mysubmail.com/message/send.json
+  api: https://www.mysubmail.com/chs/documents/developer/index
+  appid: 36718
+  appkey: 38da5caa4e8542709bcb3c73dbd5bf39
+  signature: 【节目购】

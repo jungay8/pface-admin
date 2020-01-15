@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.pface.admin.modules.member.mapper.FaceAppSnapListMapper">
+    <resultMap id="BaseResultMap" type="com.pface.admin.modules.member.po.FaceAppSnapList">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="sys_userid" property="sysUserid" jdbcType="INTEGER"/>
+        <result column="device_id" property="deviceId" jdbcType="VARCHAR"/>
+        <result column="lib_id" property="libId" jdbcType="TINYINT"/>
+        <result column="lib_name" property="libName" jdbcType="VARCHAR"/>
+        <result column="lib_type" property="libType" jdbcType="TINYINT"/>
+        <result column="camera_name" property="cameraName" jdbcType="VARCHAR"/>
+        <result column="channel" property="channel" jdbcType="TINYINT"/>
+        <result column="position" property="position" jdbcType="VARCHAR"/>
+        <result column="img_id" property="imgId" jdbcType="VARCHAR"/>
+        <result column="img_path" property="imgPath" jdbcType="VARCHAR"/>
+        <result column="person_addr" property="personAddr" jdbcType="VARCHAR"/>
+        <result column="person_age" property="personAge" jdbcType="VARCHAR"/>
+        <result column="person_gender" property="personGender" jdbcType="VARCHAR"/>
+        <result column="person_idcard" property="personIdcard" jdbcType="VARCHAR"/>
+        <result column="person_name" property="personName" jdbcType="VARCHAR"/>
+        <result column="pos_top" property="posTop" jdbcType="INTEGER"/>
+        <result column="pos_left" property="posLeft" jdbcType="INTEGER"/>
+        <result column="pos_bottom" property="posBottom" jdbcType="INTEGER"/>
+        <result column="pos_right" property="posRight" jdbcType="INTEGER"/>
+        <result column="quality" property="quality" jdbcType="INTEGER"/>
+        <result column="similarity" property="similarity" jdbcType="INTEGER"/>
+        <result column="snap_id" property="snapId" jdbcType="VARCHAR"/>
+        <result column="snap_path" property="snapPath" jdbcType="VARCHAR"/>
+        <result column="trigger_time" property="triggerTime" jdbcType="TIMESTAMP"/>
+        <result column="snap_mask" property="snapMask" jdbcType="VARCHAR"/>
+        <result column="snap_race" property="snapRace" jdbcType="VARCHAR"/>
+        <result column="snap_zangjiang" property="snapZangjiang" jdbcType="VARCHAR"/>
+        <result column="threshold" property="threshold" jdbcType="VARCHAR"/>
+        <result column="snap_age" property="snapAge" jdbcType="INTEGER"/>
+        <result column="snap_glasses" property="snapGlasses" jdbcType="INTEGER"/>
+        <result column="snap_gender" property="snapGender" jdbcType="INTEGER"/>
+        <result column="snap_beard" property="snapBeard" jdbcType="INTEGER"/>
+        <result column="create_by" property="createBy" jdbcType="VARCHAR"/>
+        <result column="create_date" property="createDate" jdbcType="TIMESTAMP"/>
+        <result column="update_by" property="updateBy" jdbcType="VARCHAR"/>
+        <result column="update_date" property="updateDate" jdbcType="TIMESTAMP"/>
+        <result column="remark" property="remark" jdbcType="VARCHAR"/>
+        <result column="del_flag" property="delFlag" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--抓拍列表-->
+    <sql id="queryAppSnapListColumns">
+        snap.sys_userid,
+        snap.device_id,
+        snap.lib_id,
+        snap.img_id,
+        snap.img_path,
+        snap.snap_id,
+        snap.snap_path,
+        snap.person_name,
+        snap.person_idcard,
+        snap.person_gender,
+        snap.person_age,
+        snap.person_addr,
+        snap.position,
+        snap.camera_name,
+        snap.channel,
+        snap.trigger_time,
+        libs.sys_sceneid,
+        scene.scenename,
+        scene.start_date,
+        scene.end_date,
+        scene.asign_starttime,
+        scene.asign_endtime,
+        scene.theme,
+        scene.address
+    </sql>
+    <resultMap id="FaceAppSnapListPojoResultMap" type="com.pface.admin.modules.front.vo.FaceAppSnapListPojo">
+
+        <result column="sys_userid" jdbcType="BIGINT" property="sysUserid"/>
+        <result column="device_id" jdbcType="VARCHAR" property="deviceId"/>
+        <result column="lib_id" jdbcType="BIGINT" property="libId"/>
+        <result column="img_id" jdbcType="VARCHAR" property="imgId"/>
+        <result column="img_path" jdbcType="VARCHAR" property="imgPath"/>
+        <result column="snap_id" jdbcType="VARCHAR" property="snapId"/>
+        <result column="snap_path" jdbcType="VARCHAR" property="snapPath"/>
+        <result column="person_name" jdbcType="VARCHAR" property="personName"/>
+        <result column="person_idcard" jdbcType="VARCHAR" property="personIdcard"/>
+        <result column="person_gender" jdbcType="VARCHAR" property="personGender"/>
+        <result column="person_age" jdbcType="VARCHAR" property="personAge"/>
+        <result column="person_addr" jdbcType="VARCHAR" property="personAddr"/>
+        <result column="camera_name" jdbcType="VARCHAR" property="cameraName"/>
+        <result column="channel" jdbcType="BIGINT" property="channel"/>
+        <result column="trigger_time" jdbcType="TIMESTAMP" property="triggerTime"/>
+        <result column="sys_sceneid" jdbcType="BIGINT" property="sysSceneid"/>
+        <result column="scenename" jdbcType="VARCHAR" property="scenename"/>
+        <result column="start_date" jdbcType="TIMESTAMP" property="startDate"/>
+        <result column="start_end" jdbcType="TIMESTAMP" property="endDate"/>
+        <result column="asign_start_date" jdbcType="TIMESTAMP" property="asignStartDate"/>
+        <result column="asign_start_end" jdbcType="TIMESTAMP" property="asignEndDate"/>
+        <result column="theme" jdbcType="VARCHAR" property="theme"/>
+        <result column="address" jdbcType="VARCHAR" property="address"/>
+
+    </resultMap>
+    <select id="queryAppSnapList" resultMap="FaceAppSnapListPojoResultMap">
+        SELECT
+          <include refid="queryAppSnapListColumns"/>
+        FROM
+        face_app_snap_list snap
+        INNER JOIN face_app_images images
+                on snap.sys_userid = images.sys_userid
+                and snap.device_id = images.device_id
+                and snap.lib_id = images.lib_id
+                and snap.img_id = images.img_id
+        INNER JOIN face_app_image_libs libs
+                on images.sys_userid = libs.sys_userid
+                and images.device_id = libs.device_id
+                and images.lib_id = libs.lib_id
+        INNER JOIN face_app_usescene scene on libs.sys_sceneid = scene.id
+        <where>
+            1=1
+            and snap.trigger_time BETWEEN libs.auth_begindate and libs.auth_enddate
+            <if test="sysUserid!=null">
+                and snap.sys_userid = #{sysUserid}
+            </if>
+            <if test="sysSceneid!=null">
+                and scene.id = #{sysSceneid}
+            </if>
+            <if test="personFlexParam!=null and personFlexParam!=''">
+                and (snap.person_name like '%${personFlexParam}%' OR snap.person_idcard LIKE '%${personFlexParam}%')
+            </if>
+        </where>
+        ORDER BY libs.sys_sceneid,snap.img_id,snap.trigger_time DESC
+    </select>
+
+    <!--查询统计-->
+    <sql id="assembleAppSnapListColumns">
+        	A.id AS sysSceneid,
+            A.scenename,
+            A.totalcnt,
+            A.partcnt,
+            scene2.start_date,
+            scene2.end_date,
+            scene2.asign_starttime,
+            scene2.asign_endtime,
+            scene2.theme,
+            scene2.address
+    </sql>
+    <resultMap id="FaceAppSnapListAssemblePojoResultMap" type="com.pface.admin.modules.front.vo.FaceAppSnapListAssemblePojo">
+
+        <result column="sysSceneid" jdbcType="BIGINT" property="sysSceneid"/>
+        <result column="scenename" jdbcType="VARCHAR" property="scenename"/>
+        <result column="totalcnt" jdbcType="BIGINT" property="totalcnt"/>
+        <result column="partcnt" jdbcType="BIGINT" property="partcnt"/>
+        <result column="start_date" jdbcType="TIMESTAMP" property="startDate"/>
+        <result column="start_end" jdbcType="TIMESTAMP" property="endDate"/>
+        <result column="asign_starttime" jdbcType="TIMESTAMP" property="asignStarttime"/>
+        <result column="asign_endtime" jdbcType="TIMESTAMP" property="asignEndtime"/>
+        <result column="theme" jdbcType="VARCHAR" property="theme"/>
+        <result column="address" jdbcType="VARCHAR" property="address"/>
+
+    </resultMap>
+    <select id="assembleAppSnapList" resultMap="FaceAppSnapListAssemblePojoResultMap">
+        SELECT
+        <include refid="assembleAppSnapListColumns"/>
+        FROM
+        (
+        SELECT
+        scene.id,
+        scene.scenename,
+        count(DISTINCT images.img_id) totalcnt,
+        count(DISTINCT snap.img_id) partcnt
+        FROM
+        face_app_usescene scene
+        LEFT JOIN face_app_image_libs libs ON scene.id = libs.sys_sceneid
+        LEFT JOIN face_app_images images ON libs.sys_userid = images.sys_userid
+        AND libs.device_id = images.device_id
+        AND libs.lib_id = images.lib_id
+        LEFT JOIN face_app_snap_list snap ON images.img_id = snap.img_id
+                      and snap.trigger_time BETWEEN scene.asign_starttime and scene.asign_endtime
+        <where>
+            scene.del_flag = '1'
+            <if test="sysUserid!=null">
+                and scene.sys_userid = #{sysUserid}
+            </if>
+            <if test="sysSceneid!=null">
+                and scene.id = #{sysSceneid}
+            </if>
+        </where>
+        GROUP BY scene.id,scene.scenename
+        ) A
+        INNER JOIN face_app_usescene scene2 ON scene2.id = A.id
+        ORDER BY scene2.start_date DESC
+    </select>
+
+</mapper>

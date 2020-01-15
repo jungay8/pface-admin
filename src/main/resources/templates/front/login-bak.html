@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+	  layout:decorator="front/layout"
+	  xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+	<script type="text/javascript" src="https://libs.baidu.com/jquery/1.8.3/jquery.min.js"></script>
+	<script th:src="@{/static/pface/js/jquery.msgbox.min.js}"></script>
+	<head>
+		<meta charset="utf-8">
+		<meta name="context-path" th:content="@{/}"/>
+		<title>节目购——登录页</title>
+		<link rel="stylesheet" th:href="@{/static/pface/js/layui/css/layui.css}">
+		<link rel="stylesheet" th:href="@{/static/pface/css/common.css}">
+		<link rel="stylesheet" th:href="@{/static/pface/css/login.css}">
+		<script th:inline="javascript">
+            var CONTEXT_PATH = [[${#request.getContextPath()}]];
+		</script>
+	</head>
+	<body>
+		<!--导航-->
+		<div class="top clearfix">
+			<div class="wapper">
+				<div class="fl logo">
+					<img class="WaImg" th:src="@{/static/pface/img/logo.jpg}"/>
+				</div>
+				<div class="fl nav">
+					<a href="#"><img  th:src="@{/static/pface/img/nav_index.jpg}"/>首页</a><span>|</span>
+					<a href="#">素材专区</a><span>|</span>
+					<a href="#">节目专区</a><span>|</span>
+					<a href="#">电视剧专区</a><span>|</span>
+					<a href="#">融媒体专区</a>
+				</div>
+				<div class="fr top_right">					
+					<a href="#"><img th:src="@{/static/pface/img/top_login.jpg}"/> 登录</a>
+					<a href="./reg"><img th:src="@{/static/pface/img/top_register.jpg}"/> 注册</a>
+					<a href="#" class="update_btn btn">上传</a>
+				</div>
+			</div>			
+		</div>
+		<div class="loginImg">
+			<img class="WaImg loginimgBg"  th:src="@{/static/pface/img/loginImg.jpg}"/>
+			<div class="loginContainer">
+				<div class="wapper">					
+					<div class="dzMain loginInputTxt">
+						<div class="loginInputTit">
+							欢迎登录
+						</div>
+						<div class="LoginMainFrom">
+							<form  class="layui-form" >
+				            	<div class="LoginInput">
+				                	<input type="text" class="form-control is-invalid" required  lay-verify="required" name="name" id="name" placeholder="请输入您的账号" >
+				                    <div class="LoginInput_Inco"><img class="WaImg" th:src="@{/static/pface/img/username.png}"/></div>
+				                </div>
+				                <div class="LoginInput">
+				                	<input class="form-control is-invalid" type="password" required  lay-verify="required" name="password" id="password" placeholder="请输入您的密码"/>
+				                    <div class="LoginInput_Inco"><img class="WaImg" th:src="@{/static/pface/img/password.png}"/></div>
+				                </div>
+				                <div class="Login_Opera">	
+				                	<span class="fr">
+				                		<img id="imgcaptcha" th:src="@{/captcha/kaptcha.jpg}" onclick="random()"/>
+				                	</span>				                   
+				                    <div class="LoginInput" >
+					                	<input type="text" class="form-control is-invalid" required  lay-verify="required" name="captcha" id="captcha" placeholder="请输入验证码">
+					                    <div class="LoginInput_Inco"><img class="WaImg" th:src="@{/static/pface/img/register.png}"/></div>
+					                </div>
+				                </div>
+				                <div class="cheched_forget clearfix">
+				                	<div class="fr">
+				                		<a href="#" class="red_link">忘记密码？</a>
+				                	</div>
+				                	<div class="cheched">					                	
+										<div class="layui-form">											
+											<input type="checkbox" name="记住我" lay-skin="primary" title="记住我" checked="checked">
+										</div>
+					                </div>
+				                </div>				                
+				                <div class="LoginInput LoginInputBtn">
+				                	<button lay-submit lay-filter="formLogin" id="loginBtn">登  &nbsp;&nbsp;录</button>                  
+				                </div>
+				            </form>
+				            <div class="link_register">
+				            	还没有账号？<a href="./register.html" class="red_link">去注册</a>
+				            </div>
+						</div>
+					</div>
+					
+				</div>	
+			</div>							
+		</div>
+		<!--footer-->
+		<div class="footer">       
+			<div class="footer-bottom ">
+			    <div class="wapper">
+			        <ul>
+			            <li class="title">关于节目购</li>
+			            <li><a href="#">我们是谁</a></li>
+			            <li><a href="#">隐私政策</a></li>
+			            <li><a href="#">版权信息</a></li>
+			            <li><a href="#">联系方式</a></li>
+			            <li><a href="#">帮助信息</a></li>
+			        </ul>
+			        <ul>
+			            <li class="title">品牌栏目</li>
+			            <li><a href="#">真人秀</a></li>
+			            <li><a href="#">纪实</a></li>
+			            <li><a href="#">情感故事</a></li>
+			            <li><a href="#">脱口秀</a></li>
+			            <li><a href="#">栏目剧</a></li>
+			            <li><a href="#">综艺娱乐</a></li>
+			            <li><a href="#">生活服务</a></li>
+			        </ul>
+			        <ul>
+			            <li class="title">素材专区</li>
+			            <li><a href="#">成品素材</a></li>
+			            <li><a href="#">精品素材</a></li>
+			            <li><a href="#">分享素材</a></li>
+			        </ul>
+			        <ul>
+			            <li class="title">联系我们</li>
+			            <li><a href="#">0731-88745259</a></li>
+			            <li><a href="#">商务合作：BD@jiemugo.com</a></li>
+			            <li><a href="#">版权合作：CR@jiemugo.com</a></li>
+			        </ul>
+			        <div class="qr">
+			            <ul class="nav">
+			                <li class="pt-2">
+			                    <p>关注节目购官方订阅号</p>
+			                    <p>及时获取最新业内资讯</p>
+			                </li>
+			                <li>
+			                    <img th:src="@{/static/pface/img/wxpic.jpg}">
+			                </li>
+			            </ul>
+			        </div>
+			
+			    </div>
+			
+			</div>
+			     <div class="footer-text">			 
+			         COPYRIGHT @ 2004-2019 节目购  长沙中天择购信息技术有限公司 版权所有 湘ICP备18017311号-1 			 
+			     <div class="footer-link">
+			         <a target="_blank" href="http://www.beian.miit.gov.cn?recordcode=43010302000906" style="display:inline-block;text-decoration:none;height:20px;line-height:20px;">
+			         	<img th:src="@{/static/pface/img/ba.png}" style="float:left;">
+			         	<p>湘公网安备 43010302000906号</p>
+			         </a>
+			     </div>
+			</div>
+ 
+</div>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script th:src="@{/static/pface/js/layui/layui.js}"></script>
+<script th:src="@{/static/pface/js/iput.js}"></script>
+<script>
+	layui.use(['form', 'layer','layedit'],function(){
+		  var form = layui.form
+		  ,layer = layui.layer,
+		  layedit=layui.layedit;
+		  //创建一个编辑器
+			var editIndex = layedit.build('LAY_demo_editor');
+	 
+		  //监听提交 
+		  form.on('submit(formLogin)', function(data){
+			//layer.msg(JSON.stringify(data.field));
+			//登录
+			login();
+			return false;
+		  });
+	});
+	
+function random() {
+    var pathName = window.document.location.pathname;
+    $("#imgcaptcha").attr('src',CONTEXT_PATH+"/captcha/kaptcha.jpg?rnd=" + Math.random());
+
+}
+
+	
+	
+function login(){
+	
+	this.axios({
+        method: "POST",
+        url: CONTEXT_PATH+'/front/user/login',
+        data: {
+               name: $("#name").val(),
+               password: $("#password").val(),
+			   captcha:$("#captcha").val()
+          },
+        headers: {
+            //'Content-Type': 'application/x-www-form-urlencoded'
+			'Content-Type': 'application/json;charset=UTF-8'			
+        }
+    }).then(function(res) {
+        console.log(res);
+        if(res.data.success){
+            //storageSessionObj("user",res.data.data);
+            window.location.href = CONTEXT_PATH+res.data.extra.url;
+		}else{
+            $.alert(res.data.msg);
+		}
+
+    }).catch(function (error) {
+             console.log(error);
+			 layer.msg(JSON.stringify(error.msg));
+    });
+	  
+	
+}
+	
+
+</script>
+
+</body>
+</html>

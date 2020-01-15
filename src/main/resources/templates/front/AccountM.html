@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<!--<script type="text/javascript" src="https://libs.baidu.com/jquery/1.8.3/jquery.min.js"></script>-->
+<script type="text/javascript" th:src="@{/static/js/jquery183.js}"></script>
+<script th:src="@{/static/pface/js/jquery.msgbox.min.js}"></script>
+<head>
+	<meta charset="UTF-8">
+	<meta name="context-path" th:content="@{/}"/>
+	<link rel="stylesheet" th:href="@{/static/pface/js/layui/css/layui.css}">
+	<link rel="stylesheet" th:href="@{/static/pface/css/common.css}">
+	<link rel="stylesheet" th:href="@{/static/pface/css/account.css}"/>
+	<title>节目购——账户管理</title>
+	<script th:inline="javascript">
+        var RequestURL = [[${#httpServletRequest.getRequestURL()}]];
+        var CONTEXT_PATH = [[${#request.getContextPath()}]];
+        // var CONTEXT_PATH = [[${#request.getContextPath()}]];
+	</script>
+</head>
+<body>
+<!--导航-->
+<div class="top clearfix" th:replace="~{front/header :: header}"></div>
+<!--内容管理-->
+<div class="container">
+	<div class="wapper">
+		<div class="m_conter clearfix hav_line">
+			<div class="fl left_nav" th:replace="~{front/leftnav::leftnav}"></div>
+			<!--右边-->
+			<div class="fr right_conter">
+				<div class="account_main">
+
+					<!--<div class="accout_head"  id="people_head">-->
+						<!--<div>-->
+							<!--<img    class="ahead_inco" th:src="@{/static/pface/img/people_Inco.png}"/>-->
+							<!--<br />-->
+							<!--用户头像<br />点击上传-->
+							<!--<div class="imgBg" id="peopleDiv" th:style="${lastedUserInfo.headUrl!=null && lastedUserInfo.headUrl!='' && lastedUserInfo.headUrl!='null' ? 'display:block;':'display:none;'}">-->
+								<!--<img id="people_headShow" style="border-radius: 15px;" class="people_headShow"  th:src="${@imageFileBean.getImageFileUrl(lastedUserInfo.headUrl)}"/>-->
+							<!---->
+							<!--</div>-->
+						<!--</div>-->
+					<!--</div>-->
+					<div class="account_input">
+						<div>
+						<label class="layui-form-label"><em></em>头像（点击可更改）:</label>
+					</div>
+					</div>
+					<div class="accout_head"  id="people_head" onclick="document.getElementById('headUrlFileId').click()">
+
+						<div style="font-size:20px; line-height: 30px;">
+							<input type="file" style="display: none;" id="headUrlFileId" accept="image/jpeg,image/png,image/gif"/>
+							<br />
+							用户头像<br />点击上传
+							<br />
+							<img style="width:80px; height: 80px;"  th:src="@{/static/pface/img/people_Inco.png}"/>
+							<div class="imgBg" id="peopleDiv" style="left: 1px; top: 1px; width: 197px; height: 196px; line-height: 196px" th:if="${lastedUserInfo.headUrl!=null && lastedUserInfo.headUrl!='' && lastedUserInfo.headUrl!='null'}">
+								<img  id="people_headShow"  class="people_headShow"  style="margin-top: 0" th:src="${@imageFileBean.getImageFileUrl(lastedUserInfo.headUrl)}"/>
+							</div>
+							<div class="imgBg" id="peopleDiv2" style="left: 1px; top: 1px; width: 197px; height: 196px; line-height: 196px;display: none;" th:if="${lastedUserInfo.headUrl==null || lastedUserInfo.headUrl=='' || lastedUserInfo.headUrl=='null'}">
+								<img  class="people_headShow"  style="margin-top: 0"  th:src="@{/static/pface/img/people_Inco.png}"/>
+							</div>
+						</div>
+					</div>
+
+					<form class="layui-form" id="accoutnForm" method="post">
+						<!--<input type="hidden" name="fileName" id="fileName"  lay-verify="required" lay-reqtext="请上传头像"/>-->
+						<div class="account_input">
+							<div class="layui-form-item">
+								<label class="layui-form-label"><em></em>用户名:</label>
+								<div class="layui-input-block">
+									<input name="uname" id="uname" style="background-color: #f1f1f5" class="layui-input" type="text"  disabled="true"  th:if="${lastedUserInfo!=null && lastedUserInfo.uname!='null'}" th:value="${lastedUserInfo.uname}"
+										   autocomplete="off">
+								</div>
+							</div>
+							<div class="layui-form-item">
+								<label class="layui-form-label"><em></em>手机号:</label>
+								<div class="layui-input-block">
+									<input name="mobile" id="mobile" class="layui-input" style="background-color: #f1f1f5" type="tel"  disabled="true" th:if="${lastedUserInfo!=null && lastedUserInfo.mobile!='null'}" th:value="${lastedUserInfo.mobile}"
+										   autocomplete="off">
+								</div>
+							</div>
+							<div class="layui-form-item">
+								<label class="layui-form-label"><em></em>旧密码:</label>
+								<div class="layui-input-block">
+									<input name="pwd" id="pwd" class="layui-input" type="password"   autocomplete="off">
+								</div>
+							</div>
+							<div class="layui-form-item">
+								<label class="layui-form-label"><em></em>新密码:</label>
+								<div class="layui-input-block">
+									<input name="newPwd" id="newPwd" class="layui-input"  type="password"  placeholder="修改密码请输入,至少6位字符" autocomplete="off">
+								</div>
+							</div>
+							<div class="layui-form-item">
+								<label class="layui-form-label"><em></em>确认密码:</label>
+								<div class="layui-input-block">
+									<input name="newPwd2" id="newPwd2" class="layui-input" type="password"   autocomplete="off">
+								</div>
+							</div>
+							<div class="layui-form-item">
+								<div class="layui-input-block">
+									<button class="layui-btn layui-btn-warm btn-radius btn_min" lay-submit lay-filter="formSub" id="formSub" >提交</button>
+								</div>
+							</div>
+							<!--<input type="hidden" name="id" id="id" th:if="${lastedUserInfo!=null}" th:value="${lastedUserInfo.id}"/>-->
+						</div>
+					</form>
+					<button style="display: none" class="layui-btn layui-btn-warm btn-radius btn_min"  id="formSub2" ></button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<!--footer-->
+<div class="footer" th:replace="~{front/footer :: footer}"> </div>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script th:src="@{/static/pface/js/layui/layui.js}"></script>
+<script th:src="@{/static/pface/js/iput.js}"></script>
+<script th:inline="javascript">
+	var oldHeadUrl = [[${lastedUserInfo.headUrl}]];
+	var uid = [[${lastedUserInfo.id}]];
+</script>
+<script>
+    layui.use(['form', 'layer','layedit','upload'],function(){
+        var $ = layui.jquery
+            ,form = layui.form
+            ,layer = layui.layer,
+            layedit=layui.layedit
+            ,upload = layui.upload;
+
+		$(document).on('click', '#formSub', function () {
+			var newHeadUrl = $('.people_headShow').attr('src');
+			console.log("oldHeadUrl = "+oldHeadUrl);
+			console.log("newHeadUrl = " + newHeadUrl);
+			var headUrl = "";
+			var isChangeHeadUrl = "0";
+			if (newHeadUrl.indexOf("people_Inco.png") >=0){
+				isChangeHeadUrl = "0";
+			} else {
+				if (newHeadUrl == null || newHeadUrl =='' || newHeadUrl == '/image?url='){
+					newHeadUrl == '';
+					isChangeHeadUrl = "0";
+				}
+				if(newHeadUrl!='' && newHeadUrl.indexOf("blob") >=0){
+					headUrl = $('#headUrlFileId')[0].files[0];
+					if (headUrl) {
+						isChangeHeadUrl = "1";
+					}
+				}
+			}
+
+			console.log("isChangeHeadUrl = "+isChangeHeadUrl);
+			console.log("当前文件对象：" + headUrl);
+
+			var nPwd= $.trim($("#newPwd").val());
+			var newPwd2 = $.trim($("#newPwd2").val());
+			var oldPwd= $.trim($("#pwd").val());
+			var isChangePassword = "0";
+			if(nPwd !=''){
+				   if(oldPwd==''|| oldPwd ==null || oldPwd=='undefined' || oldPwd==undefined){
+					   layer.msg('旧密码没输入');
+					   return false;
+				   }
+				   if (nPwd.length <6){
+					   layer.msg('新密码必须至少6位字符。');
+					   return false;
+				   }
+
+				   if(nPwd!=newPwd2){
+					   layer.msg('新密码不一致');
+					   return false;
+				   }
+
+				   isChangePassword = "1";
+			}
+
+			console.log("isChangePassword = "+isChangePassword);
+
+			if (isChangeHeadUrl == "1"){
+
+				var fd = new FormData();
+				fd.append("headUrl", headUrl);
+				fd.append("isChangePassword", isChangePassword);
+				fd.append("nPwd", nPwd);
+				fd.append("uid", uid);
+				fd.append("oldPwd", oldPwd);
+
+				$.ajax({
+					processData: false,
+					contentType: false,
+					type: "POST",
+					url: CONTEXT_PATH + '/front/user/updateInfoHasHeadUrl',
+					data: fd,
+					success: function (response) {
+						if (response.success) {
+							//layer.msg(response.msg);
+							layer.msg(response.msg, {
+								time: 5000,
+								icon: 5,
+								anim: 6
+							},function () {
+								window.location.href = '/front/myinfo';
+							});
+
+						} else {
+							layer.msg(response.msg, {
+								time: 5000,
+								icon: 5,
+								anim: 6
+							},function () {
+
+							});
+						}
+					},
+					error: function (error) {
+						console.log(error);
+					}
+				});
+
+			} else {
+				if (isChangePassword == "1"){ //只改密
+					var fd = new FormData();
+					fd.append("isChangePassword", isChangePassword);
+					fd.append("nPwd", nPwd);
+					fd.append("uid", uid);
+					fd.append("oldPwd", oldPwd);
+					$.ajax({
+						processData: false,
+						contentType: false,
+						type: "POST",
+						url: CONTEXT_PATH + '/front/user/updateInfoNoHeadUrl',
+						data: fd,
+						success: function (response) {
+							if (response.success) {
+								layer.msg(response.msg, {
+									time: 5000,
+									icon: 5,
+									anim: 6
+								},function () {
+									//window.location.href = '/front/myinfo';
+								});
+
+							} else {
+								layer.msg(response.msg, {
+									time: 5000,
+									icon: 5,
+									anim: 6
+								},function () {
+								
+								});
+							}
+						},
+						error: function (error) {
+							console.log(error);
+						}
+					});
+				}else {
+					layer.msg("没有更新，不需要提交", {
+						time: 5000,
+						icon: 5,
+						anim: 6
+					},function () {
+						console.log("---")
+					});
+					return false;
+				}
+			}
+			return false;
+		})
+
+		$(document).on("change", "#headUrlFileId", function () {
+			console.log("aa")
+			var $imgBg = $(this).siblings(".imgBg");
+			// var name = $(this).attr("date-name");
+			var $img = $imgBg.find("img");
+			//$("#people_headShow").attr("src","");
+			$imgBg.hide();
+			console.log("选择前：$img.src= " + $img.attr("src"));
+			$img.attr("src", "")
+			var $file = $(this);
+			var fileObj = $file[0];
+			var windowURL = window.URL || window.webkitURL;
+
+			if (fileObj && fileObj.files && fileObj.files[0]) {
+				dataURL = windowURL.createObjectURL(fileObj.files[0]);
+				$img.attr('src', dataURL);
+			} else {
+				dataURL = $file.val();
+				var imgObj = document.getElementsByClassName("people_headShow");
+				// var imgObj = document.getElementById('' + name);
+				imgObj.style.filter = "progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=scale)";
+				imgObj.filters.item("DXImageTransform.Microsoft.AlphaImageLoader").src = dataURL;
+			}
+
+			console.log("选择后：$img.src=" + $img.attr("src"));
+			$imgBg.show();
+
+		});
+
+
+        //监听提交
+        // form.on('submit(formSub)', function(data){
+		//
+		// 	var newHeadUrl = $('#people_headShow').attr('src');
+		// 	console.log("oldHeadUrl = "+oldHeadUrl);
+		// 	console.log("newHeadUrl = " + newHeadUrl)
+		// 	var isChangeCoverUrl = false;
+		// 	if(newHeadUrl != oldHeadUrl){
+		// 		isChangeCoverUrl = true;
+		// 	}
+		// 	if (isChangeCoverUrl){
+		// 		var headUrl = $('#videoML_' + pfileMediaId)[0].files[0];
+		// 	}
+		// 	return false;
+		//
+		// 	//layer.msg(JSON.stringify(data.field));
+        //    var nPwd= $("#newPwd").val();
+        //    if(nPwd !=''){
+        //        if($("#pwd").val()==''|| $("#pwd").val()==null ){
+        //            layer.msg('旧密码没输入');
+        //            return false;
+        //        }
+        //        if($("#newPwd").val()!=$("#newPwd2").val()){
+        //            layer.msg('新密码不一致');
+        //            return false;
+        //        }
+        //        // if($('#fileName').val()==''){
+        //        //     $("#formSub2").click();
+		// 	   // }
+		//    }
+		//
+        //     // if($('#fileName').val()!=''){
+        //     //     //layer.msg('头像没上传');
+        //     //     $("#formSub2").click();
+        //     //    // return false;
+        //     // }//展示文件名
+		//
+		//
+        //     return false;
+        // });
+
+		//普通图片上传
+        // var uploadInst = upload.render({
+        //     elem: '#people_head'
+        //     ,url: CONTEXT_PATH+'/front/user/updateInfo/'
+        //     //*********************传输限制
+        //     , size: 1000                   //传输大小100k
+        //     , exts: 'jpg|png|gif|jpeg|JPG|PNG|GIF|JPEG'        //可传输文件的后缀
+        //     , accept: 'file'              //video audio images
+        //     //****************传输操作相关设置
+        //     , data: {
+        //         id:function () {
+        //             return $("#id").val();
+        //         },
+        //         uname:function () {
+        //             return $("#uname").val();
+        //         },
+        //         mobile:function () {
+        //             return $("#mobile").val();
+        //         },
+        //         pwd:function () {
+        //             return $("#pwd").val();
+        //         },
+        //         newPwd:function () {
+        //             return $("#newPwd").val();
+        //         },
+        //         newPwd2:function () {
+        //             return $("#newPwd2").val();
+        //         }
+        //     }   //额外传输的参数
+        //     //, headers{token:'sasasasa'}                   //额外添加的请求头
+        //     , auto: false                                 //自动上传,默认是打开的
+        //     , bindAction: '#formSub2'                    //auto为false时，点击触发上传
+        //     , multiple: false                             //多文件上传
+        //     ,choose: function (obj){
+        //         //预读本地文件
+        //         obj.preview(function (index, file, result) {
+        //             $('#fileName').val(file.name); //展示文件名
+        //             $("#peopleDiv").hide();
+        //             if(file){
+        //                 var windowURL = window.URL || window.webkitURL;
+        //                 var dataURL = windowURL.createObjectURL(file);
+        //                 $('#people_headShow').attr('src',dataURL);
+        //             }else{
+        //                 var dataURL = $file.val();
+        //                 var imgObj = document.getElementById("people_headShow");
+        //                 imgObj.style.filter = "progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=scale)";
+        //                 imgObj.filters.item("DXImageTransform.Microsoft.AlphaImageLoader").src = dataURL;
+        //             }
+        //             $("#peopleDiv").show();
+        //             //$('#people_headShow').attr('src', result); //图片链接（base64）
+        //             //$('#people_headShow').show();
+        //         })
+        //     }
+        //     ,before: function(obj){
+		//
+		// 	}
+        //     ,done: function(res){   //传输完成的回调
+        //         //console.log(res.IsSuccess)
+        //         //console.log(res.Msg)
+        //         if(res.success){
+        //             $('#people_headShow').attr("src", CONTEXT_PATH+'/image?url='+encodeURIComponent(res.extra.headUrl));
+        //             layer.msg(res.msg);
+        //         }
+		//
+        //     }
+        //     ,error: function(){     //传输失败的回调
+        //         return layer.msg('上传失败');
+        //     }
+        // });
+
+
+
+    });
+</script>
+</body>
+</html>

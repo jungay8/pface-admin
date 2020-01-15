@@ -1,0 +1,1790 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<!--<script type="text/javascript" src="https://cdn.bootcss.com/jquery/1.8.3/jquery.js"></script>-->
+<script type="text/javascript" th:src="@{/static/js/jquery183.js}"></script>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="context-path" th:content="@{/}"/>
+    <link rel="stylesheet" th:href="@{/static/pface/js/layui/css/layui.css}">
+    <link rel="stylesheet" th:href="@{/static/pface/css/common.css}">
+    <link rel="stylesheet" th:href="@{/static/pface/css/upload.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/static/webuploader/css/webuploader.css}"/>
+    <!--<link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css"-->
+          <!--integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">-->
+    <link rel="stylesheet" th:href="@{/static/css/bootstrap337.min.css}" />
+    <script th:inline="javascript">
+        var CONTEXT_PATH = [[${#request.getContextPath()}]];
+        // console.log("CONTEXT_PATH = " + CONTEXT_PATH);
+    </script>
+    <title>节目购——文件上传</title>
+</head>
+<body>
+<!--导航-->
+<div class="top clearfix" th:replace="~{front/header :: header}"></div>
+<!--<script src="http://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>-->
+<script type="text/javascript" th:src="@{/static/webuploader/js/webuploader.js}"></script>
+<div class="container">
+    <div class="wapper">
+        <div class="m_conter clearfix hav_line">
+            <div class="fl left_nav" th:replace="~{front/leftnav :: leftnav}"></div>
+            <!--右边-->
+            <div class="fr right_conter">
+                <div class="layui-tab upload_tab" lay-filter="upMedia">
+                    <ul class="layui-tab-title">
+                        <li class="layui-this">视频内容</li>
+                        <li>音频内容</li>
+                        <li>图文内容</li>
+                    </ul>
+                    <div class="layui-tab-content upload_main layui-form">
+                        <div class="layui-tab-item layui-show">
+                            <!--<form class="layui-form formUp" action="" id="videoForm">-->
+                            <p class="fontred"><img th:src="@{/static/pface/img/tips.png}"/> 禁止发布的视频内容 ： 严禁上传未经授权的他人作品，以及违规违法/反动/色情色诱/低俗/广告等内容</p>
+                            <div class="upload_list">
+                                <div class="colorblack upload_Tit">
+                                    <img th:src="@{/static/pface/img/tit_inco.png}"/>
+                                    <span>文件上传</span>
+                                    <label>（单次允许上传10分钟以内的短视频，请使用mp4格式h.264编码，可有效缩短上传审核耗时）</label>
+                                </div>
+                                <div class="clearfix upload_btnPr">
+                                    <div class="fl">
+                                        <div id="videoUp">选择视频</div>
+                                    </div>
+                                    <div id="thelistVideo" class="upload_filename fl"></div>
+                                </div>
+                            </div>
+                            <div class="upload_list">
+                                <div class="colorblack upload_Tit">
+                                    <img th:src="@{/static/pface/img/tit_inco.png}"/>
+                                    <span>基本信息</span>
+                                </div>
+                                <div class="upload_inform">
+                                    <div class="uplInf_list">
+                                        <h4 class="uplInf_tit"><em>*</em> 视频封面设置<span>（请上传一张最具吸引力的图片，或者制作符合作品品质的图片。图片格式JPG且大于50KB小于5MB，16:9的画幅比例，也可以选择系统自动从视频截取。）</span>
+                                        </h4>
+                                        <div class="pl-1 clearfix upload_img layui-form">
+                                            <input type="radio" name="video_coverOrigin" lay-filter="uploadImg" value="0" title="上传封面">
+                                            <input type="radio" name="video_coverOrigin" lay-filter="uploadImg" value="1" title="系统自动截取" checked>
+                                            <div id="videoUpCover" class="pt-1" style="display: none">选择封面</div>
+                                        </div>
+                                        <div id="thelistVideoCover" class="coverImgMain"></div>
+                                    </div>
+                                    <div class="uplInf_list">
+                                        <h4 class="layui-inline uplInf_tit"><em>*</em> 类型 </h4>
+                                        <div class="layui-input-inline">
+                                            <select id="video_catalogueId" name="modules">
+                                                <option value="">请选择</option>
+                                                <option th:each="cata:${cataloguesLabels}" th:value="${cata.id}"
+                                                        th:text="${cata.name}"></option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="uplInf_list">
+                                        <h4 class="uplInf_tit"><em>*</em> 归属标签 <span> （可自行进行定义，<a th:href="@{/front/attribution}" class="red_link">现在去自定义</a>） </span>
+                                        </h4>
+                                        <div class="ptd-1 pl-1 upload_checked">
+                                            <div class="layui-form">
+                                                <input id="video_belongLabelid" type="checkbox"
+                                                       name="video_belongLabelname"
+                                                       th:each="belong:${belongLabels}" th:title="${belong.label}"
+                                                       th:value="${belong.id}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="uplInf_list">
+                                        <h4 class="layui-inline uplInf_tit"><em>*</em> 标题 </h4>
+                                        <div class="ptd-1 pl-1">
+                                            <input id="video_mediaTitle" name="title" class="layui-input" type="text"
+                                                   placeholder="请填写内容的标题" autocomplete="off">
+                                        </div>
+                                    </div>
+                                    <div class="uplInf_list">
+                                        <h4 class="layui-inline uplInf_tit"><em>*</em> 关键词 </h4>
+                                        <div class="ptd-1 pl-1">
+                                            <input id="video_mediaKeyword" name="title" class="layui-input" type="text"
+                                                   placeholder="请填写内容的关键词" autocomplete="off">
+                                        </div>
+                                    </div>
+                                    <div class="uplInf_list">
+                                        <h4 class="layui-inline uplInf_tit"><em></em> 简介 </h4>
+                                        <div class="ptd-1 pl-1">
+                                            <textarea id="video_mediaBrief" class="layui-textarea"
+                                                      placeholder="请填写内容的简介"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="uplInf_list">
+                                        <h4 class="layui-inline  uplInf_tit"><em>*</em> 价格 <span> （请先进行定义，<a th:href="@{/front/price}" class="red_link">现在去自定义</a>） </span>
+                                        </h4>
+                                        <div class="layui-input-inline">
+                                            <select id="video_priceLabelid" name="modules" lay-search="">
+                                                <option value="">请选择</option>
+                                                <option th:each="price:${pricesLabels}" th:value="${price.id}"
+                                                        th:text="${price.price}+'元（'+${price.label} + '）'"></option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="uplInf_list">
+                                        <h4 class="uplInf_tit"><em></em> 转载内容设置 <span> （转载内容将限制通过审核，请知晓！若为转载内容请先定义出自，<a
+                                                th:href="@{/front/publab}" class="red_link">现在去自定义</a>） </span></h4>
+                                        <div class="layui-input-inline pt-1">
+                                            <select id="video_publishLabelid" name="modules" lay-search="">
+                                                <option value="">请选择</option>
+                                                <option th:each="publish:${publishLabels}" th:value="${publish.id}"
+                                                        th:text="${publish.label}">layer
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="uplInf_list">
+                                        <h4 class="uplInf_tit">内容关联</h4>
+                                        <div class="layui-input-inline pt-1">
+                                            <span class="layui-btn layui-btn-danger btn-radius addConter">增加</span>
+                                        </div>
+                                        <div class="addConter_list">
+                                            <ul id="addConterUl0" class="addConterUl">
+
+                                            </ul>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="textCenter upload_btnbt">
+                                <div class="layui-form upload_agree">
+                                    <input type="checkbox" id="video_read" lay-skin="primary"
+                                           title="我已阅读并同意遵守 《版权服务规则协议》">
+                                </div>
+                                <div class="">
+                                    <button  lay-filter="upload_save" id="saveVideo" class="layui-btn layui-btn-warm btn-radius btn_min">保存
+                                    </button>
+                                </div>
+                            </div>
+                            <!--</form>-->
+                        </div>
+                        <div class="layui-tab-item">
+                            <!--<form class="layui-form formUp" action="">-->
+                                <p class="fontred"><img th:src="@{/static/pface/img/tips.png}"/> 禁止发布的音频内容 ：严禁上传未经授权的他人作品，以及违规违法/反动/色情色诱/低俗/广告等内容</p>
+                                <div class="upload_list">
+                                    <div class="colorblack upload_Tit">
+                                        <img th:src="@{/static/pface/img/tit_inco.png}"/>
+                                        <span>音频上传</span>
+                                        <label>（推荐采用MP3格式，码率56KB-320KB之间）</label>
+                                    </div>
+                                    <div class="clearfix upload_btnPr">
+                                        <!--<div class="fl">
+                                            <button id="audioUp" type="button"
+                                                    class="layui-btn layui-btn-danger btn-radius"
+                                                    onclick="getElementById('audioId').click()">选择音频
+                                            </button>
+                                            <input type="file" name="image" class="fileInput" data-type="video"
+                                                   id="audioId" style="display:none ;" lay-verify="required"
+                                                   lay-reqtext="请上传音频"/>-->
+                                            <div class="clearfix layui-form">
+
+                                                <div class="fl">
+                                                    <div id="audioUp">选择音频</div>
+                                                </div>
+                                            </div>
+                                            <div id="thelistAudio" class="upload_filename fl"></div>
+                                        <!--</div>-->
+                                        <!--<div class="upload_filename fl"></div>-->
+                                    </div>
+                                </div>
+                                <div class="upload_list">
+                                    <div class="colorblack upload_Tit">
+                                        <img th:src="@{/static/pface/img/tit_inco.png}"/>
+                                        <span>基本信息</span>
+                                    </div>
+                                    <div class="upload_inform">
+                                        <div class="uplInf_list">
+                                            <div class="clearfix layui-form">
+                                                <h4 class="uplInf_tit"><em></em> 音频封面设置<span>（请上传一张与音频内容的相关的图片作为封面，（图片格式JPG且大于50KB小于5MB，16:9的画幅比例，非必选项目，若不上传将使用系统默认的空白封面）</span>
+                                                </h4>
+                                                <div id="audioUpCover" class="pt-1">选择封面</div>
+
+                                            </div>
+                                            <div id="thelistAudioCover" class="coverImgMain"></div>
+                                        </div>
+                                        <div class="uplInf_list">
+                                            <h4 class="layui-inline uplInf_tit"><em>*</em> 类型 </h4>
+                                            <div class="layui-input-inline">
+                                                <select id="audio_catalogueId" name="modules">
+                                                    <option value="">请选择</option>
+                                                    <option th:each="cata:${cataloguesLabels}" th:value="${cata.id}"
+                                                            th:text="${cata.name}"></option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="uplInf_list">
+                                            <h4 class="uplInf_tit"><em>*</em> 归属标签 <span> （可自行进行定义，<a th:href="@{/front/attribution}" class="red_link">现在去自定义</a>） </span>
+                                            </h4>
+                                            <div class="ptd-1 pl-1 upload_checked">
+                                                <div class="layui-form">
+                                                    <input id="audio_belongLabelid" type="checkbox"
+                                                           name="audio_belongLabelname"
+                                                           th:each="belong:${belongLabels}" th:title="${belong.label}"
+                                                           th:value="${belong.id}">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="uplInf_list">
+                                            <h4 class="layui-inline uplInf_tit"><em>*</em> 标题 </h4>
+                                            <div class="ptd-1 pl-1">
+                                                <input id="audio_mediaTitle" name="title" class="layui-input" type="text"
+                                                       placeholder="请填写内容的标题" autocomplete="off">
+                                            </div>
+                                        </div>
+                                        <div class="uplInf_list">
+                                            <h4 class="layui-inline uplInf_tit"><em>*</em> 关键词 </h4>
+                                            <div class="ptd-1 pl-1">
+                                                <input id="audio_mediaKeyword" name="title" class="layui-input" type="text"
+                                                       placeholder="请填写内容的关键词" autocomplete="off">
+                                            </div>
+                                        </div>
+                                        <div class="uplInf_list">
+                                            <h4 class="layui-inline uplInf_tit"><em></em> 简介 </h4>
+                                            <div class="ptd-1 pl-1">
+                                                <textarea id="audio_mediaBrief" class="layui-textarea" placeholder="请填写内容的简介"></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="uplInf_list">
+                                            <h4 class="layui-inline  uplInf_tit"><em>*</em> 价格 <span> （请先进行定义，<a
+                                                    th:href="@{/front/price}" class="red_link">现在去自定义</a>） </span></h4>
+                                            <div class="layui-input-inline">
+                                                <select id="audio_priceLabelid" name="modules" lay-search="">
+                                                    <option value="">请选择</option>
+                                                    <option th:each="price:${pricesLabels}" th:value="${price.id}"
+                                                            th:text="${price.price}+'元（'+${price.label} + '）'"></option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="uplInf_list">
+                                            <h4 class="uplInf_tit"><em></em> 转载内容设置 <span> （转载内容将限制通过审核，请知晓！若为转载内容请先定义出自，<a
+                                                    th:href="@{/front/publab}" class="red_link">现在去自定义</a>） </span></h4>
+                                            <div class="layui-input-inline pt-1">
+                                                <select id="audio_publishLabelid" name="modules" lay-search="">
+                                                    <option value="">请选择</option>
+                                                    <option th:each="publish:${publishLabels}" th:value="${publish.id}"
+                                                            th:text="${publish.label}">layer
+                                                    </option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="uplInf_list">
+                                            <h4 class="uplInf_tit">内容关联</h4>
+                                            <div class="layui-input-inline pt-1">
+                                                <span class="layui-btn layui-btn-danger btn-radius addConter">增加</span>
+                                            </div>
+                                            <div class="addConter_list">
+                                                <ul id="addConterUl1" class="addConterUl">
+
+                                                </ul>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="textCenter upload_btnbt">
+                                    <div class="layui-form upload_agree">
+                                        <input type="checkbox" id="audio_read" lay-skin="primary"
+                                               title="我已阅读并同意遵守 《版权服务规则协议》">
+                                    </div>
+                                    <div class="">
+                                        <button  lay-filter="upload_save" id="saveAudio" class="layui-btn layui-btn-warm btn-radius btn_min">保存
+                                        </button>
+                                    </div>
+                                </div>
+                            <!--</form>-->
+                        </div>
+                        <div class="layui-tab-item">
+                            <!--form class="layui-form formUp" action="" enctype="multipart/form-data"-->
+                                <p class="fontred"><img th:src="@{/static/pface/img/tips.png}"/> 禁止发布的文件内容 ：严禁上传未经授权的他人作品，以及违规违法/反动/色情色诱/低俗/广告等内容 </p>
+                                <div class="upload_list">
+                                    <div class="colorblack upload_Tit">
+                                        <img th:src="@{/static/pface/img/tit_inco.png}"/>
+                                        <span>文档上传</span>
+                                        <label>（上传图文内容的文档，请使用WORD文档进行格式排版，仅支持doc和docx格式。）</label>
+                                    </div>
+                                    <div class="clearfix upload_btnPr">
+                                        <div class="fl">
+                                            <button id="imageTextUp" type="button" class="layui-btn layui-btn-danger btn-radius" onclick="getElementById('imageTextFile').click()">选择文件</button>
+                                            <input type="file" name="imageTextFile" class="fileInput" data-type="VIDEO" id="imageTextFile" style="display:none ;" accept="application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" lay-verify="required" lay-reqtext="请上传文件"/>
+                                        </div>
+                                        <div id="thelistImageText" class="upload_filename fl"></div>
+                                    </div>
+                                </div>
+                                <div class="upload_list">
+                                    <div class="colorblack upload_Tit">
+                                        <img th:src="@{/static/pface/img/tit_inco.png}"/>
+                                        <span>图片上传</span>
+                                        <h4 class="uplInf_tit"><em>*</em> （请上传图文内容文档中的所有图片，单张图片不小于50KB）
+                                        </h4>
+                                    </div>
+                                    <div class="clearfix upload_ImgMain manyPic">
+                                        <ul class="fl manyPicList">
+                                        </ul>
+                                        <div class="fl layui-upload-drag manyPicBtn" onclick="getElementById('manyPicInput').click()">
+                                            <i class="layui-icon">&#xe654;</i>
+                                            <p>点击上传图片</p>
+                                            <input type="file" id="manyPicInput" name="imageTextPicList" accept="image/*" style="display: none;" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="upload_list">
+                                    <div class="colorblack upload_Tit">
+                                        <img th:src="@{/static/pface/img/tit_inco.png}"/>
+                                        <span>基本信息</span>
+                                    </div>
+                                    <div class="upload_inform">
+                                        <div class="uplInf_list">
+                                            <h4 class="uplInf_tit"><em></em> 文件封面设置<span>（请上传一张与该内容的相关的图片作为封面，图片格式JPG且大于50KB小于5MB，16:9的画幅比例，若不上传系统将默认图文上传中的某张图片作为封面）</span>
+                                            </h4>
+
+                                            <div class="pl-1 upload_img">
+                                                <button id="upload_muPic" onclick="getElementById('filePic').click()"
+                                                        type="button" class="layui-btn layui-btn-danger btn-radius">上传封面
+                                                </button>
+                                                <input type="file" id="filePic" name="imageTextCover" class="coverImg" accept="image/jpeg,image/jpg" data-name="file"
+                                                       style="display: none;"/>
+                                            </div>
+                                            <div class="coverImgMain" style="display: none;">
+                                                <img id="filePicShow"/>
+                                            </div>
+
+                                        </div>
+                                        <div class="uplInf_list">
+                                            <h4 class="layui-inline uplInf_tit"><em>*</em> 类型 </h4>
+                                            <div class="layui-input-inline">
+                                                <select id="imageText_catalogueId" name="imageTextCataId">
+                                                    <option value="">请选择</option>
+                                                    <option th:each="cata:${cataloguesLabels}" th:value="${cata.id}"
+                                                            th:text="${cata.name}"></option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="uplInf_list">
+                                            <h4 class="uplInf_tit"><em>*</em> 归属标签 <span> （可自行进行定义，<a th:href="@{/front/attribution}" class="red_link">现在去自定义</a>） </span>
+                                            </h4>
+                                            <div class="ptd-1 pl-1 upload_checked">
+                                                <div class="layui-form">
+                                                    <input id="imageText_belongLabelid" type="checkbox"
+                                                           name="imageTextBelongLabelName"
+                                                           th:each="belong:${belongLabels}" th:title="${belong.label}"
+                                                           th:value="${belong.id}">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="uplInf_list">
+                                            <h4 class="layui-inline uplInf_tit"><em>*</em> 标题 </h4>
+                                            <div class="ptd-1 pl-1">
+                                                <input id="imageText_mediaTitle" name="imageTextTitle" class="layui-input" type="text" placeholder="请填写内容的标题"
+                                                       autocomplete="off" lay-verify="required">
+                                            </div>
+                                        </div>
+                                        <div class="uplInf_list">
+                                            <h4 class="layui-inline uplInf_tit"><em>*</em> 关键词 </h4>
+                                            <div class="ptd-1 pl-1">
+                                                <input id="imageText_mediaKeyword" name="imageTextKeyword" class="layui-input" type="text" placeholder="请填写内容的关键词"
+                                                       autocomplete="off" lay-verify="required">
+                                            </div>
+                                        </div>
+                                        <div class="uplInf_list">
+                                            <h4 class="layui-inline uplInf_tit"><em></em> 简介 </h4>
+                                            <div class="ptd-1 pl-1">
+                                                <textarea id="imageText_mediaBrief" name="imageTextBrief" class="layui-textarea" placeholder="请填写内容的简介"></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="uplInf_list">
+                                            <h4 class="layui-inline  uplInf_tit"><em>*</em> 价格 <span> （请先进行定义，<a th:href="@{/front/price}" class="red_link">现在去自定义</a>） </span></h4>
+                                            <div class="layui-input-inline">
+                                                <select id="imageText_priceLabelid" name="imageTextPriceId" lay-search="">
+                                                    <option value="">请选择</option>
+                                                    <option th:each="price:${pricesLabels}" th:value="${price.id}"
+                                                            th:text="${price.price}+'元（'+${price.label} + '）'"></option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="uplInf_list">
+                                            <h4 class="uplInf_tit"><em></em> 转载内容设置 <span> （转载内容将限制通过审核，请知晓！若为转载内容请先定义出自，<a
+                                                    th:href="@{/front/publab}" class="red_link">现在去自定义</a>） </span></h4>
+                                            <div class="layui-input-inline pt-1">
+                                                <select id="imageText_publishLabelid" name="imageTextPublishId" lay-search="">
+                                                    <option value="">请选择</option>
+                                                    <option th:each="publish:${publishLabels}" th:value="${publish.id}"
+                                                            th:text="${publish.label}">layer
+                                                    </option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="uplInf_list">
+                                            <h4 class="uplInf_tit">内容关联</h4>
+                                            <div class="layui-input-inline pt-1">
+                                                <span class="layui-btn layui-btn-danger btn-radius addConter">增加</span>
+                                            </div>
+                                            <div class="addConter_list">
+                                                <ul id="addConterUl2" class="addConterUl">
+
+                                                </ul>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="textCenter upload_btnbt">
+                                    <div class="layui-form upload_agree">
+                                        <input id="imageText_read" type="checkbox" name="read" lay-skin="primary"
+                                               title="我已阅读并同意遵守 《版权服务规则协议》">
+                                    </div>
+                                    <div class="">
+                                        <button id="saveImageText" class="layui-btn layui-btn-warm btn-radius btn_min btnSave" data-type="file">保存</button>
+                                    </div>
+                                </div>
+                            <!--/form-->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--footer-->
+<div class="footer" th:replace="~{front/footer :: footer}"></div>
+<!--弹出窗口，弹出文件正在上传-->
+<div class="blackBgfixed" style="display: none">
+    <div class="theHeadUp textCenter whiteBg">
+        <img class="uplogo" th:src="@{/static/pface/img/certifica_logo.png}"/>
+        <form class="layui-form">
+            <div class="upW_process">
+                <div class="layui-progress layui-progress-big" lay-showpercent="true">
+                    <div class="layui-progress-bar" lay-percent="50%"></div>
+                </div>
+            </div>
+        </form>
+        <div class="pt-3 textCenter tipsUp">
+            请勿关闭<br/>
+            正在上传文件.......
+        </div>
+    </div>
+</div>
+<!--弹出窗口，弹出文件正在上传-->
+<div id="videoProgress" class="blackBgfixed videoAudioBg" style="display: none;">
+    <div class="theHeadUp textCenter whiteBg bigFileW">
+        <img class="uplogo maxlogo" th:src="@{/static/pface/img/certifica_logo.png}"/>
+        <form class="layui-form">
+            <div class="pt-1 textCenter tipsUp tipsLoading" id="videoLoading">
+                正在上传文件，请勿关闭网页...
+            </div>
+            <div id="upW_processtest"></div>
+            <div class="pt-1 textCenter tipsUp tipsfinish" id="videoFinish" style="display: none;">
+                上传完成... <br/>
+                <button class="layui-btn layui-btn-warm btn-radius btn_min closeBlack">关闭</button>
+            </div>
+
+        </form>
+    </div>
+</div>
+<!--弹出窗口，弹出文件正在上传-->
+<!--
+<div class="blackBgfixed fileUpBg" style="display: none;">
+    <div class="theHeadUp textCenter whiteBg">
+        <img class="uplogo" th:src="@{/static/pface/img/certifica_logo.png}"/>
+        <form class="layui-form">
+            <div class="upW_process">
+                <div class="layui-progress layui-progress-big" lay-showpercent="true">
+                    <div class="layui-progress-bar" lay-percent="50%"></div>
+                </div>
+            </div>
+        </form>
+        <div class="pt-3 textCenter tipsUp filebegin">
+            请勿关闭<br/>正在上传文件.......
+        </div>
+        <div class="pt-1 textCenter tipsUp filefinish" style="display: none;">
+            上传完成... <br/>
+            <button class="layui-btn layui-btn-warm btn-radius btn_min closeBlack">关闭</button>
+        </div>
+    </div>
+</div>
+-->
+<!--内容关联弹出窗口-->
+<div class="addCWindow" id="addCWindow" style="display:none ;">
+    <div class="addCW_search layui-form">
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">标题：</label>
+                <div class="layui-input-inline">
+                    <input type="text" class="layui-input" id="relationQryTitle"/>
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">类别：</label>
+                <div class="layui-input-inline">
+                    <select name="quiz" id="relationQryMediaType">
+                        <option value="VIDEO">视频类</option>
+                        <option value="AUDIO">音频类</option>
+                        <option value="IMAGETEXT">图文</option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-inline">
+                <span class="layui-btn layui-btn-danger btn-radius btn_min relationQry">查询</span>
+            </div>
+        </div>
+    </div>
+    <div class="layui-form">
+        <table class="layui-table" id="tableM">
+            <colgroup>
+                <col width="30">
+                <col>
+                <col width="100">
+            </colgroup>
+            <thead>
+            <tr>
+                <th>
+                    <input type="checkbox" lay-skin="primary" title="选择" lay-filter="allChoice">
+                </th>
+                <th>
+                    内容
+                </th>
+                <th>
+                    操作
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script th:src="@{/static/pface/js/layui/layui.js}"></script>
+
+<script>
+    var ct_window;
+    var addHtml='';
+    var wh=document.body.clientHeight*0.9;
+    var relationMediaIds = [];
+    var tabTypeIndex = 0;//tab类型索引，0视频；1音频；2图文
+    $(function(){
+        //上传文件js
+        $('.fileInput').change(function(e){
+            var $file = $(this);
+            var fileObj = $file[0];
+            var fileType=$file.attr("date-type");
+            //console.log(e.currentTarget.files[0].name);
+            var emText=$(this).parents(".upload_btnPr").children(".upload_filename");
+            if(fileObj && fileObj.files && fileObj.files[0]){
+                emText.text("已选择文件，文件名："+e.currentTarget.files[0].name);
+            }else{
+                var filename=$file.val();
+                var pos=filename.lastIndexOf("\\");
+                var strFileName=filename.substring(pos+1);
+                emText.text("已选择文件，文件名："+strFileName);
+            };
+
+        });
+        var dataURL;
+        //多图上传
+        $("#manyPicInput").change(function() {
+            var $file = $(this);
+            var fileObj = $file[0];
+            uploadPic(fileObj.files[0]);
+            debugger
+            var windowURL = window.URL || window.webkitURL;
+            if(fileObj && fileObj.files && fileObj.files[0]){
+                dataURL = windowURL.createObjectURL(fileObj.files[0]);
+                var html='<li class="fl manyPicadd">'+
+                    '<img src="'+dataURL+'"/>'+
+                    '<div class="manyPicDele"><i class="layui-icon layui-icon-delete"></i></div>'+
+                    '</li>';
+                $(".manyPicList").append(html)
+            }else{
+                dataURL = $file.val();
+                var html='<li class="fl manyPicadd">'+
+                    '<img style="filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='+dataURL+',sizingMethod=scale)"/>'+
+                    '<div class="manyPicDele"><i class="layui-icon layui-icon-delete"></i></div>'+
+                    '</li>';
+                $(".manyPicList").append(html)
+                //imgObj.filters.item("DXImageTransform.Microsoft.AlphaImageLoader").src = dataURL;
+            }
+        });
+        //删除上传多图的单张
+        $("body").on("click",".manyPicDele",function(){
+            if(confirm('确定要删除此项吗?'))
+            {
+                $(this).parents("li").remove();
+            }
+            return false;
+        })
+        //上传封面js
+        $(".coverImg").change(function() {
+            var $imgbody=$(this).parents(".upload_img").siblings(".coverImgMain");
+            var imgsrc=$imgbody.children("img");
+            var name=$(this).attr("data-name");
+            $imgbody.hide();
+            imgsrc.attr("src","");
+            var $file = $(this);
+            var fileObj = $file[0];
+            var windowURL = window.URL || window.webkitURL;
+            if(fileObj && fileObj.files && fileObj.files[0]){
+                dataURL = windowURL.createObjectURL(fileObj.files[0]);
+                imgsrc.attr('src',dataURL);
+            }else{
+                dataURL = $file.val();
+                var imgObj;
+                if(name=="VIDEO"){
+                    imgObj=document.getElementById("videoPicShow");
+                }else if(name=="AUDIO"){
+                    imgObj=document.getElementById("audioPicShow");
+                }else{
+                    imgObj=document.getElementById("filePicShow");
+                }
+                imgObj.style.filter = "progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=scale)";
+                imgObj.filters.item("DXImageTransform.Microsoft.AlphaImageLoader").src = dataURL;
+            }
+            $imgbody.show();
+            // $(".phone_tipsTxt").html("已选择图片");
+        });
+        //点击完成按钮
+        $('.btnSave').click(function () {
+            var type=$(this).attr("data-type");
+            if(type=="VIDEO"){ //视频
+                $(".videoAudioBg").show();
+                $(".upcl").html("视频处理：");
+                $(".uptext").html("视频上传：");
+            }else if(type=="AUDIO"){ //音频
+                $(".videoAudioBg").show();
+                $(".upcl").html("音频处理：");
+                $(".uptext").html("音频上传：");
+            }else{
+                //文件上传
+                //$(".fileUpBg").show();
+            }
+        });
+        var active;
+        $('#saveImageText').click(function () {
+            // console.log('imageText submit')
+
+            if (!validateImageTextPost()) {
+                return;
+            }
+
+            var submitUrl = "";
+            var fd = new FormData();
+            fd.append("imageTextFile", $('#imageTextFile')[0].files[0]);
+
+            var coverfileOfDoc = $('#filePic')[0].files[0];
+            if (coverfileOfDoc){
+                // console.log('有封面:'+coverfileOfDoc);
+                fd.append("imageTextCover", coverfileOfDoc);
+                submitUrl = CONTEXT_PATH + '/front/imageText/submit';
+            } else {
+                // console.log('无封面');
+                submitUrl = CONTEXT_PATH + '/front/imageText/submitNoCover';
+            }
+            fd.append("relationMediaIds", relationMediaIds);
+            fd.append("imageTextPicList", uploadPicNameList);
+            fd.append("imageTextCataId", $("#imageText_catalogueId").val());
+            fd.append("imageTextBelongLabelId", $("#imageText_belongLabelid").val());
+            fd.append("imageTextTitle", $("#imageText_mediaTitle").val());
+            fd.append("imageTextKeyword", $("#imageText_mediaKeyword").val());
+            fd.append("imageTextBrief", $("#imageText_mediaBrief").val());
+            fd.append("imageTextPriceId", $("#imageText_priceLabelid").val());
+            fd.append("imageTextPublishId", $("#imageText_publishLabelid").val());
+
+            $.ajax({
+                url: submitUrl,
+                type: 'post',
+                processData: false,
+                contentType: false,
+                data: fd,
+                beforeSend:function(){
+                    loading('系统正在处理... ....');
+                },
+                success: function (response) {
+                    if(response.success) {
+
+                        layer.msg("保存成功", {
+                            icon:1,
+                            btnAlign: 'c', //按钮居左
+                            time: 20000, //20s后自动关闭
+                            btn: [ '知道了']
+                        });
+                        closeall();
+                        resetImageTextForm();
+
+                    } else {
+                        //layer.closeAll();
+
+                        layer.msg("保存失败：" + response.msg,{
+                            time: 20000, //20s后自动关闭
+                            btn: [ '知道了']
+                        });
+                        closeall()
+                    }
+                },
+                error:function (res) {
+
+                    layer.msg("保存失败，请稍后试。",{
+                        time: 20000, //20s后自动关闭
+                        btn: [ '知道了']
+                    });
+                    closeall();
+                },
+                complete:function (res) {
+                    closeall();
+                }
+            })
+        });
+
+//////////////////内容关联开始///////////////////////
+        //添加内容关联--弹出窗口
+        $(".addConter").click(function(){
+            addSearch();
+        })
+        //弹出窗口中的【查询】
+        $(".relationQry").click(function () {
+            var title = $.trim($("#relationQryTitle").val());
+            var mediaType = $("#relationQryMediaType").find("option:selected").val();
+            // if (title == ''){
+            //     myalert('标题查询条件不要空。');
+            //     return false;
+            // }
+            $.ajax({
+                type: "POST",
+                url: CONTEXT_PATH+"/front/queryMedia",
+                data: {
+                    title: title,
+                    mediaType:mediaType
+                },
+                success: function (data) {
+                    if (data.success) {
+                        var tbody=$("#tableM").find('tbody');
+                        tbody.html('');
+                        var dataList = data.data;
+                        var rows = '';
+                        for (i=0,len=dataList.length; i<len; i++) {
+                            var row = dataList[i];
+                            rows = rows +
+                                    '<tr>\n' +
+                                '                <td>\n' +
+                                '                    <input type="checkbox" lay-skin="primary" lay-filter="tableCheck">\n' +
+                                '                </td>\n' +
+                                // '                <td>\n' +
+                                // '                    <img width="100" src="img/conter_Img.jpg" />\n' +
+                                // '                </td>\n' +
+                                '                <td>\n' +
+                                '                    <h3>标题：'+row.mediaTitle+'</h3>\n' +
+                                '                    <p>类型：'+row.catalogueName+'</p >\n' +
+                                '                    <p class="addCW_time"><span class="fr">价格：'+row.price+'('+row.priceLabelName+')</span>\n' +
+                                '                        <span>时间：'+row.uploadDate+'</span>\n' +
+                                '                    </p >\n' +
+                                '                </td>\n' +
+                                '                <td>\n' +
+                                '                   <a href="javascript:void(0)" class="addCW_choiceThis" data-id="'+row.id+'" data-title="'+row.mediaTitle+'">选择</a>\n' +
+                                '                </td>\n' +
+                                '            </tr>';
+                        }
+                        tbody.append(rows);
+                        layui.form.render();
+                        return;
+                    }else {
+                       myalert('系统错误，请稍后再试。');
+                       return;
+                    }
+                },
+                error: function (e) {
+                    myalert('系统错误，请稍后再试。');
+                    return;
+                }
+
+            })
+
+        })
+        //弹出窗口中的单个【选择】
+        $("body").on("click",".addCW_choiceThis",function(e){
+            var tit=$(this).attr("data-title");
+            var id = $(this).attr("data-id");
+            var index = isInArray(relationMediaIds, id);
+            // console.log("单个选择前relationMediaIds = "+relationMediaIds);
+            if (index < 0){
+                relationMediaIds.push(id);
+                addHtml='<li><div class="addConter_title"> <span> ◇ </span>'+tit+'</div>'+
+                    '<div class="LQML_Close" data-id="'+id+'"><i class="layui-icon">&#x1006;</i></div>'+
+                    '</li>';
+                // $(".addConterUl").append(addHtml);
+                $("#addConterUl" + tabTypeIndex).append(addHtml);
+            }
+            layer.close(ct_window);
+            // console.log("单个选择后relationMediaIds = "+relationMediaIds);
+
+        })
+        //关联内容的删除
+        $("body").on("click",".LQML_Close",function(){
+            if(confirm('确定要删除此项吗?'))
+            {
+                // console.dir("删除前relationMediaIds="+relationMediaIds);
+                //从数组中删除这个元素
+                var id = $(this).attr('data-id');
+                var index = isInArray(relationMediaIds, id);
+                if (index>=0){
+                    relationMediaIds.splice(index,1);
+                }
+                $(this).parents("li").remove();
+                // console.dir("删除后relationMediaIds="+relationMediaIds);
+            }
+
+            return false;
+        })
+
+//////////////////内容关联结束///////////////////////
+    })
+
+    function isInArray(arr,value){
+        for(var i = 0; i < arr.length; i++){
+            if(value == arr[i]){
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    //内容关联弹出窗口
+    function addSearch(){
+        // console.log("a");
+        layui.use(['layer'],function () {
+            ct_window=layer.open({
+                skin: 'Ldemo-class',
+                type: 1
+                ,title: '关联内容'
+                ,btnAlign: 'c' //按钮居左
+                ,shade: 0.65
+                ,area: ['1050px',wh+"px"]
+                ,content:$('#addCWindow')
+                //,content:'滚滚滚'
+                ,btn:["批量选择","关闭"]
+                ,cancel:function(){
+                    //layer.alert("您点击了取消")
+                },
+                btn1:function(){
+                    //layer.alert("请选择条目")
+                    //这里是批量编目
+                    var dataChild=$("#tableM").find('tbody input[type="checkbox"]');
+                    var data=[];
+                    dataChild.each(function(index, item){
+                        if(item.checked==true){
+                            data.push(index);
+                        }
+                    });
+                    if (data.length == 0){
+                        layer.alert("请选择需要增加的条目");
+                    }else{
+                        console.dir(" 批量添加前：relationMediaIds = " + relationMediaIds)
+                        // var conterUlObj =  $(".addConterUl");
+                        var conterUlObj =  $("#addConterUl" + tabTypeIndex);
+                        // conterUlObj.html('');
+                        // relationMediaIds.length = 0;
+                        for(var i=0,len=data.length;i<len;i++){
+                            var tit=$(".addCW_choiceThis").eq(data[i]).attr("data-title");
+                            var id = $(".addCW_choiceThis").eq(data[i]).attr("data-id");
+                            var isB = isInArray(relationMediaIds, id);
+                            if (isB < 0) {
+                                relationMediaIds.push(id);
+                                addHtml='<li><div class="addConter_title"> <span> ◇ </span>'+tit+'</div>'+
+                                    '<div class="LQML_Close" data-id="'+id+'"><i class="layui-icon">&#x1006;</i></div>'+
+                                    '</li>';
+                                conterUlObj.append(addHtml);
+                            }
+                        }
+                        layer.close(ct_window);
+                        console.dir(" 批量添加后：relationMediaIds = " + relationMediaIds)
+                    }
+                }
+                ,zIndex: layer.zIndex //重点1
+
+            });
+        });
+    }
+
+    //图文上传的loading
+    function loading(msg){
+        layui.use(['layer'],function () {
+
+            active=layer.open({
+                type: 1
+                ,title: false //不显示标题栏
+                ,content: '<div style="padding:20px; font-size:20px; color:#999"><i class="layui-icon layui-anim layui-anim-rotate layui-anim-loop">&#xe63d;</i> '+msg+' </div>'
+                ,shade:0.6//不显示遮罩
+                ,closeBtn: false
+                ,zIndex: layer.zIndex //重点1
+            });
+        });
+    }
+    function closeall() {
+        layui.use(['layer'],function () {
+            var layer = layui.layer;
+            layer.close(active);
+        });
+    }
+
+    //图文上传的临时缓冲
+    var uploadPicNameList = [];
+    function uploadPic(file) {
+        var fd = new FormData();
+        fd.append("imageTextPicFile", file);
+        $.ajax({
+            url: CONTEXT_PATH + '/front/imageText/savePic',
+            type: 'post',
+            processData: false,
+            contentType: false,
+            data: fd,
+            success: function (response) {
+                if(response.success) {
+                    //layer.msg("保存成功");
+                    // console.log('save success ' + JSON.stringify(response));
+                    uploadPicNameList.push(response.data);
+                } else {
+                    //layer.msg("保存失败:" + response.msg);
+                    layer.msg("save fail");
+                }
+            }
+        })
+    }
+
+    //图文上传成功后的复位
+    function resetImageTextForm() {
+        uploadPicNameList = [];
+        $('#manyPicInput').val("");
+        $(".manyPicList .manyPicadd").remove();
+
+        $('#imageText_read').attr("checked",false);
+        $("input[name='imageTextBelongLabelName']").attr("checked",false);
+
+        $('#imageTextFile').val("");
+        $thelistImageText.empty();
+
+        $('#filePicShow').attr("src","");
+        $('#thelistImageTextCover').empty();
+
+        $("#imageText_catalogueId").val("");
+        $("#imageText_mediaTitle").val("");
+        $("#imageText_mediaKeyword").val("");
+        $("#imageText_mediaBrief").val("");
+        $("#imageText_priceLabelid").val("");
+        $("#imageText_publishLabelid").val("");
+        $(".coverImgMain").hide();
+        relationMediaIds.length = 0;
+        $("#addConterUl" + tabTypeIndex).html("");
+        layui.form.render();
+    }
+
+    layui.use(['element', 'upload', 'form', 'layer'], function () {
+        var $ = layui.jquery,
+            element = layui.element,//导航的hover效果、二级菜单等功能，需要依赖element模块
+            form = layui.form
+            // layer=layui.layer
+        ;
+        //监听导航点击
+        element.on('nav(demo)', function (elem) {
+            // console.log('nav(demo)___elem ==' + elem);
+
+            layer.msg(elem.text());
+        });
+        element.on('tab(upMedia)', function(elem){
+            // console.log(elem.index);
+            tabTypeIndex = elem.index;
+            var files = uploaderVideo.getFiles();
+            // console.dir("点击tab前--------" + uploaderVideo.getFiles().length);
+            for (var i = 0; i < files.length; i++) {
+                uploaderVideo.removeFile(files[i], true);
+            }
+            relationMediaIds.length = 0;
+            $("#addConterUl"+tabTypeIndex).html('');
+            // console.dir("点击tab后--------"  + uploaderVideo.getFiles().length);
+        });
+        //视频上传封面单选
+        form.on("radio(uploadImg)", function (data) {
+            if (this.value == '0') {
+                //这是选中了自动选择封面
+                $("#videoUpCover").show();
+            } else if (this.value == '1') {
+                $("#videoUpCover").hide();
+                var fileid = $(".file-item").attr("id");
+                // console.log('fileid = ' + fileid);
+                if (fileid != undefined) {
+                    var ff = uploaderVideo.getFile(fileid);
+                    // console.dir("11--------" + uploaderVideo.getFiles().length);
+                    uploaderVideo.removeFile(ff, true);
+                    // console.dir("22--------" + uploaderVideo.getFiles().length);
+                }
+
+                $(".file-item").remove();
+
+            }
+        });
+
+        //内容关联弹出窗口全选
+        form.on('checkbox(allChoice)', function(data){
+            var child = $(data.elem).parents('table').find('tbody input[type="checkbox"]');
+            child.each(function(index, item){
+                item.checked = data.elem.checked;
+            });
+            form.render('checkbox');
+        });
+        //checkbox选择
+        form.on('checkbox(tableCheck)', function(data){
+            // console.log("a");
+            var dataChild=$("#tableM").find('tbody input[type="checkbox"]');
+            var allCheck=$("#tableM").find('thead input[type="checkbox"]');
+            if(data.elem.checked==true){
+                allCheck[0].checked=true;
+                dataChild.each(function(index, item){
+                    if(item.checked==false){
+                        allCheck[0].checked=false;
+                    };
+                });
+            }else{
+                allCheck[0].checked=false;
+            }
+            form.render('checkbox');
+        });
+    });
+
+    function getCheckboxCheckedValues(ckname) {
+        var type = '';
+        $('input[type=checkbox][name="'+ckname+'"]').each(function(){
+            if ($(this).prop("checked")) {
+                type += $(this).val() + ',';
+            }
+        });
+        if (type!=''){
+            type = type.substring(0,type.length - 1);
+        }
+        return type;
+    }
+
+    function getRadioCheckValue(raName) {
+        return $("input[name='"+raName+"']:checked").val();
+    }
+
+    function myalert(msg) {
+        layer.msg(msg, {
+            time: 2000, //2s后自动关闭
+            icon: 5,
+            anim: 6
+        });
+    }
+
+    var chunkSize = 10485760;
+    var mediaId = -1;
+    var uploaded = false;
+
+    /////////////video & audio start//////////////////
+
+    var $saveVideo = $('#saveVideo');
+    var $saveAudio = $('#saveAudio');
+
+    var $thelistVideo = $('#thelistVideo');
+    var $thelistVideoCover = $('#thelistVideoCover');
+
+    var $thelistAudio = $('#thelistAudio');
+    var $thelistAudioCover = $('#thelistAudioCover');
+
+    var $thelistImageText= $('#thelistImageText');
+    var $thelistImageTextCover = $('#thelistImageTextCover');
+
+    // HOOK 这个必须要再uploader实例化前面
+    WebUploader.Uploader.register({
+        'before-send-file': 'beforeSendFile',
+        'before-send': 'beforeSend'
+    }, {
+        beforeSendFile: function (file) {
+            // console.log("beforeSendFile");
+            // Deferred对象在钩子回掉函数中经常要用到，用来处理需要等待的异步操作。
+            var task = new $.Deferred();
+            // 根据文件内容来查询MD5
+            uploaderVideo.md5File(file).progress(function (percentage) {
+                // 及时显示进度
+                // console.log('计算md5进度:', percentage);
+                getProgressBar(file, percentage, "MD5", "MD5");
+            }).then(function (val) { // 完成
+                // console.log('md5 result:', val);
+                file.md5 = val;
+                // 模拟用户id
+                // file.uid = new Date().getTime() + "_" + Math.random() * 100;
+                file.uid = WebUploader.Base.guid();
+                // 进行md5判断
+                $.post(CONTEXT_PATH + "/front/file/checkFileMd5", {uid: file.uid, md5: file.md5},
+                    function (data) {
+                        console.log(data.status);
+                        var status = data.status.value;
+                        task.resolve();
+                        if (status == 101) {
+                            // 文件不存在，那就正常流程
+                        } else if (status == 100) {
+                            // 忽略上传过程，直接标识上传成功；
+                            uploaderVideo.skipFile(file);
+                            file.pass = true;
+                        } else if (status == 102) {
+                            // 部分已经上传到服务器了，但是差几个模块。
+                            file.missChunks = data.data;
+                        }
+                    });
+            });
+            return $.when(task);
+        },
+        beforeSend: function (block) {
+            // console.log("block")
+            var task = new $.Deferred();
+            var file = block.file;
+            var missChunks = file.missChunks;
+            var blockChunk = block.chunk;
+            // console.log("当前分块：" + blockChunk);
+            // console.log("missChunks:" + missChunks);
+            if (missChunks !== null && missChunks !== undefined && missChunks !== '') {
+                var flag = true;
+                for (var i = 0; i < missChunks.length; i++) {
+                    if (blockChunk == missChunks[i]) {
+                        console.log(file.name + ":" + blockChunk + ":还没上传，现在上传去吧。");
+                        flag = false;
+                        break;
+                    }
+                }
+                if (flag) {
+                    task.reject();
+                } else {
+                    task.resolve();
+                }
+            } else {
+                task.resolve();
+            }
+            return $.when(task);
+        }
+    });
+
+    // 实例化视频上传
+    var upladerVideoOptions = {
+        pick: {
+            id: '#videoUp',
+            innerHTML: '选择视频',
+            multiple: false  //一次点击选择文件的按钮，是否开起同时选择多个文件能力,默认：true
+        },
+        formData: {
+            uid: 0,
+            md5: '',
+            chunkSize: chunkSize
+            // ,uploaded: uploaded,
+            // mediaId : mediaId
+        },
+        //dnd: '#dndArea',
+        //paste: '#uploaderVideo',
+        swf: 'js/Uploader.swf',
+        chunked: true,
+        chunkSize: chunkSize, // 字节 1M分块
+        threads: 1, //pchj update， old:  threads: 3,
+        server: CONTEXT_PATH + '/front/file/fileUpload',
+        auto: false,
+        timeout:2000 * 60 * 1000,//2000分钟
+        // 禁掉全局的拖拽功能。这样不会出现图片拖进页面的时候，把图片打开。
+        disableGlobalDnd: true,
+        fileNumLimit: 4,
+        fileSizeLimit: 1024 * 1024 * 1024 * 1024,    //  1G = 1024 * 1024 * 1024 总文件大小允许最大1T
+        fileSingleSizeLimit: 1024 * 1024 * 1024 * 10   // 10G  //单文件大小允许最大10G
+        // ,accept: {
+        // 	title: 'audio',
+        // 	extensions: 'mp3',
+        // 	mimeTypes: 'audio/mp3'
+        // }
+
+        // 只允许选择图片文件。
+        // , accept: {
+        //     title: '视频和图片',
+        //     extensions: 'jpg,jpeg,png,mp4,ts,flv,JPG,JPEG,PNG,MP4,TS,FLV'
+        //     , mimeTypes: 'image/jpg,image/jpeg,image/png,video/mp4,video/ts,video/flv'
+        // }
+    };
+
+    //视频文件上传格式限制为mp4,m4v,flv,mov,mpg,mpeg,avi
+    //音频文件上传格式限制为mp3\mp2\wav\aac\ac3\flac\ape\mpa\m4a\ogg
+    //封面：jpg,jpeg,png
+
+    var uploaderVideo = WebUploader.create(upladerVideoOptions);
+
+    //增加视频1个按钮
+    uploaderVideo.addButton({
+        id: '#videoUpCover',
+        innerHTML: '选择封面'
+    });
+
+    //增加音频2个按钮
+    uploaderVideo.addButton({
+        id: '#audioUp',
+        innerHTML: '选择音频'
+    });
+    uploaderVideo.addButton({
+        id: '#audioUpCover',
+        innerHTML: '选择封面'
+    });
+
+    //文件入队列前
+    uploaderVideo.on('beforeFileQueued', function (file) {
+        // console.log('beforeFileQueued() in ');
+        file._refer = file.source._refer;
+        $btnn = $(file._refer);
+        var btnId = $btnn.attr('id');
+        var fileext = file.ext;
+        fileext = fileext.toLowerCase();
+
+        // console.log('btnId = ' + btnId);
+        // console.log('file ext = ' + file.ext);
+
+        if (btnId == 'videoUpCover') {
+            //控制添加文件操作的顺序，以控制文件队列中的顺序
+            var currFiles = uploaderVideo.getFiles();
+            if (currFiles.length <= 0) {
+                myalert('请先添加视频文件');
+                return false;
+            }
+
+            //控制文件的格式
+            if (fileext != 'jpg' && fileext != 'jpeg' && fileext != 'png') {
+                myalert('要求文件格式：jpg 或 jpeg 或 png');
+                return false;  //阻止添加到文件队列
+            }
+
+            //控制文件的数量，只能选1个更名
+            var flag = false; //是否有封面文件加入队列
+            for (var i = 0; i < currFiles.length; i++) {
+                var f = currFiles[i];
+                var ext = f.ext.toLowerCase();
+                if (ext == 'jpg' || ext == 'jpeg' || ext == 'png') {
+                    myalert('只能添加一个封面文件');
+                    flag = true;
+                    break;
+                }
+            }
+            if (flag) {
+                return false;
+            }
+        } else if (btnId == 'videoUp') {
+            //视频文件上传格式限制为mp4,m4v,flv,mov,mpg,mpeg,avi
+            if (fileext != 'mp4' && fileext!='m4v' && fileext!='flv' &&
+                fileext!='mov' && fileext!='mpg' && fileext!='mpeg'
+                && fileext!='avi') {
+                myalert('要求文件格式：mp4,m4v,flv,mov,mpg,mpeg,avi');
+                return false;
+            }
+            var currFiles = uploaderVideo.getFiles();
+            var flag = false; //是否有mp4文件加入队列
+            for (var i = 0; i < currFiles.length; i++) {
+                f = currFiles[i];
+                if (f.ext.toLowerCase() == 'mp4' || f.ext.toLowerCase() == 'm4v' || f.ext.toLowerCase() == 'flv' ||
+                    f.ext.toLowerCase() == 'mov' || f.ext.toLowerCase() == 'mpg' || f.ext.toLowerCase() == 'mpeg' ||
+                    f.ext.toLowerCase() == 'avi') {
+                    myalert('只能添加一个视频文件');
+                    flag = true;
+                    break;
+                }
+            }
+
+            if (flag) {
+                return false;
+            }
+        }else if (btnId == 'audioUp'){
+            //控制文件的格式 mp3\mp2\wav\aac\ac3\flac\ape\mpa\m4a\ogg
+            if (fileext != 'mp3' && fileext != 'mp2'  && fileext != 'wav'&& fileext != 'aac' &&
+                fileext != 'ac3' && fileext != 'flac' && fileext != 'ape' &&
+                fileext != 'mpa' && fileext != 'm4a' && fileext != 'ogg') {
+                myalert('要求文件格式：mp3|mp2|wav|aac|ac3|flac|ape|mpa|m4a|ogg');
+                return false;
+            }
+            var currFiles = uploaderVideo.getFiles();
+            var flag = false; //是否有mp4文件加入队列
+            for (var i = 0; i < currFiles.length; i++) {
+                f = currFiles[i];
+                var tempext = f.ext.toLocaleString();
+                if (fileext == 'mp3' || fileext == 'mp2'  || fileext == 'wav' || fileext == 'aac' ||
+                    fileext == 'ac3' || fileext == 'flac' || fileext == 'ape' ||
+                    fileext == 'mpa' || fileext == 'm4a'  || fileext == 'ogg') {
+                    myalert('只能添加一个音频文件');
+                    flag = true;
+                    break;
+                }
+            }
+            if (flag) {
+                return false;
+            }
+        } else if (btnId == 'audioUpCover') {
+
+            //控制添加文件操作的顺序，以控制文件队列中的顺序
+            var currFiles = uploaderVideo.getFiles();
+            if (currFiles.length <= 0) {
+                myalert('请先添加音频文件');
+                return false;
+            }
+
+            //控制文件的格式
+            if (fileext != 'jpg' && fileext != 'jpeg' && fileext != 'png') {
+                myalert('要求文件格式：jpg 或 jpeg 或 png');
+                return false;  //阻止添加到文件队列
+            }
+
+            //控制文件的数量，只能选1个更名
+            var flag = false; //是否有封面文件加入队列
+            for (var i = 0; i < currFiles.length; i++) {
+                var f = currFiles[i];
+                var ext = f.ext.toLowerCase();
+                if (ext == 'jpg' || ext == 'jpeg' || ext == 'png') {
+                    myalert('只能添加一个封面文件');
+                    flag = true;
+                    break;
+                }
+            }
+            if (flag) {
+                return false;
+            }
+        }
+    });
+
+    //文件入队列时
+    uploaderVideo.on('fileQueued', function (file) {
+        // console.log("fileQueued() in ");
+        $btnn = $(file._refer);
+        var btnId = $btnn.attr('id');
+        // console.log("btnId =  " +btnId);
+        // debugger;
+        if (btnId == 'videoUpCover') {  //点击了选择封面的按钮
+            $thelistVideoCover.append('<div id="' + file.id + '" class="item">' +
+                '<h4 class="info">文件名：' + file.name + '</h4>' +
+                '<p class="state">状态：等待上传...</p>' +
+                '</div>');
+            previewImage(file, $thelistVideoCover, uploaderVideo);
+        } else if (btnId == 'videoUp') {
+            $thelistVideo.append('<div id="' + file.id + '" class="item">' +
+                '<h4 class="info">文件名：' + file.name + '</h4>' +
+                '<p class="state">状态：等待上传...</p>' +
+                '</div>');
+        }else if (btnId == 'audioUp'){
+            $thelistAudio.append('<div id="' + file.id + '" class="item">' +
+                '<h4 class="info">文件名：' + file.name + '</h4>' +
+                '<p class="state">状态：等待上传...</p>' +
+                '</div>');
+        } else if (btnId == 'audioUpCover') {
+            console.log("a");
+            $thelistAudioCover.append('<div id="' + file.id + '" class="item">' +
+                '<h4 class="info">文件名：' + file.name + '</h4>' +
+                '<p class="state">状态：等待上传...</p>' +
+                '</div>');
+
+            previewImage(file, $thelistAudioCover, uploaderVideo);
+        } else if (btnId == 'imageTextUp'){
+            console.log('-----')
+            $thelistImageText.append('<div id="' + file.id + '" class="item">' +
+                '<h4 class="info">文件名：' + file.name + '</h4>' +
+                '<p class="state">状态：等待上传...</p>' +
+                '</div>');
+        } else if (btnId == 'imageTextUpCover') {
+            console.log('eiie')
+            $thelistImageTextCover.append('<div id="' + file.id + '" class="item">' +
+                '<h4 class="info">文件名：' + file.name + '</h4>' +
+                '<p class="state">状态：等待上传...</p>' +
+                '</div>');
+
+            previewImage(file, $thelistImageTextCover, uploaderVideo);
+        }
+    });
+
+    //图片预览
+    function previewImage(file, thelist, p_uploader) {
+        var $li = $(
+            '<div id="' + file.id + '" class="file-item thumbnail">' +
+            '<img>' +
+            // '<div class="info">' + file.name + '</div>' +
+            '</div>'
+            ),
+            $img = $li.find('img');
+        // $thelist为容器jQuery实例
+        thelist.append($li);
+        var thumbnailWidth = 100;
+        var thumbnailHeight = 100;
+
+        p_uploader.makeThumb(file, function (error, src) {
+            if (error) {
+                // $img.replaceWith('<span>不能预览</span>');
+                return;
+            }
+
+            $img.attr('src', src);
+        }, thumbnailWidth, thumbnailHeight);
+    }
+
+    //当某个文件的分块在发送前触发，主要用来询问是否要添加附带参数，大文件在开起分片上传的前提下此事件可能会触发多次。
+    uploaderVideo.onUploadBeforeSend = function (obj, data) {
+        // console.log("onUploadBeforeSend");
+        var file = obj.file;
+        data.md5 = file.md5 || '';
+        data.uid = file.uid;
+        debugger;
+        if (mediaId == undefined){
+            mediaId = window.sessionStorage.getItem("mediaId");
+        }
+        data.mediaId = mediaId;
+        data.uploaded = uploaded;
+        var mediaType = getMediaType();
+        data.relationMediaIds = relationMediaIds;
+        if (mediaType == 'VIDEO') {
+            // console.log('data.mediaId = '+data.mediaId);
+            data.mediaType = mediaType;
+            //封面来源，单选
+            var video_coverOrigin_value = getRadioCheckValue('video_coverOrigin');
+            //勾选的归属ids，多选
+            var belongIds = getCheckboxCheckedValues('video_belongLabelname');
+            //视频基本字段
+            data.mediaTitle=$("#video_mediaTitle").val();
+            data.catalogueId=$("#video_catalogueId").find("option:selected").val();
+            data.mediaKeyword=$("#video_mediaKeyword").val();
+            data.belongLabelid = belongIds;
+            data.priceLabelid=$("#video_priceLabelid").find("option:selected").val();
+            data.publishLabelid=$("#video_publishLabelid").find("option:selected").val();
+            data.coverOrigin=video_coverOrigin_value;
+            data.mediaBrief=$("#video_mediaBrief").val();
+        }else if (mediaType == 'AUDIO') {
+            data.mediaType = mediaType;
+            //勾选的归属ids，多选
+            var belongIds = getCheckboxCheckedValues('audio_belongLabelname');
+            //视频基本字段
+            data.mediaTitle=$("#audio_mediaTitle").val();
+            data.catalogueId=$("#audio_catalogueId").find("option:selected").val();
+            data.mediaKeyword=$("#audio_mediaKeyword").val();
+            data.belongLabelid = belongIds;
+            data.priceLabelid=$("#audio_priceLabelid").find("option:selected").val();
+            data.publishLabelid=$("#audio_publishLabelid").find("option:selected").val();
+            data.coverOrigin='0'; //上传的
+            data.mediaBrief=$("#audio_mediaBrief").val();
+        }
+    };
+
+    // 上传中
+    uploaderVideo.on('uploadProgress', function (file, percentage) {
+        // console.log('uploadProgress() 2file._refer = ' + file._refer);
+        $btnn = $(file._refer);
+        var id = $btnn.attr("id");  //知道点击了哪个上传文件的按钮
+        // console.log("id = " + id);
+
+        getProgressBar(file, percentage, "FILE", "上传中");
+    });
+    // 上传返回结果
+    uploaderVideo.on('uploadSuccess', function (file, response) {
+        var text = '已上传';
+        if (file.pass) {
+            text = "文件妙传功能，文件已上传。"
+        }
+        // console.log('uploadSuccess file: ' + file.name);
+        // console.log('response.data.mediaId = ' + response.data.mediaId);
+
+        //成功一个上传，更新状态
+        uploaded = true;
+        mediaId = response.data.mediaId;
+        window.sessionStorage.setItem("mediaId", response.data.mediaId);
+
+        $('#' + file.id).find('p.state').text(text);
+    });
+
+    uploaderVideo.on('uploadError', function (file) {
+        $('#' + file.id).find('p.state').text('上传出错');
+    });
+
+    uploaderVideo.on('uploadComplete', function (file) {
+        $("#videoFinish").show();
+        $("#videoLoading").fadeOut();
+    });
+
+
+    function getMediaType(){
+        var files = uploaderVideo.getFiles();
+        for (var i = 0; i < files.length; i++) {
+            var ffff =files[i];
+            var fileext = ffff.ext.toLowerCase();
+            if (fileext == 'mp3' || fileext == 'mp2'  || fileext == 'wav' || fileext == 'aac' ||
+                fileext == 'ac3' || fileext == 'flac' || fileext == 'ape' ||
+                fileext == 'mpa' || fileext == 'm4a'  || fileext == 'ogg') {
+                return "AUDIO";
+            }else if (fileext == 'mp4' || fileext == 'm4v' || fileext == 'flv' ||
+                fileext == 'mov' || fileext == 'mpg' || fileext == 'mpeg' ||
+                fileext == 'avi') {
+                return "VIDEO";
+            } else {
+                return "-1";
+            }
+        }
+    }
+
+    //提交校验--视频上传
+    function validateVideoPost() {
+
+        //封面来源，单选
+        var video_coverOrigin_value = getRadioCheckValue('video_coverOrigin');
+        debugger;
+        var currFile = uploaderVideo.getFiles();
+        if (video_coverOrigin_value == '0' && currFile.length < 2) {
+            myalert('请选择封面文件');
+            return false;
+        }
+
+        var catalogumediaKeywordeId = $("#video_catalogueId").find("option:selected").val();
+        if (catalogumediaKeywordeId == '') {
+            myalert('请选择类型');
+            return false;
+        }
+
+        //勾选的归属ids，多选
+        var belongIds = getCheckboxCheckedValues('video_belongLabelname');
+        if (belongIds == '') {
+            myalert('请选择归属标签');
+            return false;
+        }
+
+        //标题
+        var mediaTitle = $.trim($("#video_mediaTitle").val());
+        if (mediaTitle == '') {
+            myalert('请输入标题');
+            return false;
+        }
+        //关键字
+        var video_mediaKeyword = $.trim($("#video_mediaKeyword").val());
+        if (video_mediaKeyword == '') {
+            myalert('请输入关键字');
+            return false;
+        }
+
+        //简介
+        // var mediaBrief = $.trim($("#video_mediaBrief").val());
+        // if (mediaBrief == '') {
+        //     myalert('请输入简介');
+        //     return false;
+        // }
+
+        //价格
+        var priceLabelid = $("#video_priceLabelid").find("option:selected").val();
+        if (priceLabelid == '') {
+            myalert('请选择价格');
+            return false;
+        }
+        if (!$('#video_read').is(':checked')) {
+            myalert('必须同意《版权服务规则协议》');
+            return false;
+        }
+
+        return true;
+    }
+
+    //提交校验--音频上传
+    function validateAudioPost() {
+
+        var catalogumediaKeywordeId = $("#audio_catalogueId").find("option:selected").val();
+        if (catalogumediaKeywordeId == '') {
+            myalert('请选择类型');
+            return false;
+        }
+
+        //勾选的归属ids，多选
+        var belongIds = getCheckboxCheckedValues('audio_belongLabelname');
+        if (belongIds == '') {
+            myalert('请选择归属标签');
+            return false;
+        }
+
+        //标题
+        var mediaTitle = $.trim($("#audio_mediaTitle").val());
+        if (mediaTitle == '') {
+            myalert('请输入标题');
+            return false;
+        }
+        //关键字
+        var audio_mediaKeyword = $.trim($("#audio_mediaKeyword").val());
+        if (audio_mediaKeyword == '') {
+            myalert('请输入关键字');
+            return false;
+        }
+
+        //简介
+        // var mediaBrief = $.trim($("#audio_mediaBrief").val());
+        // if (mediaBrief == '') {
+        //     myalert('请输入简介');
+        //     return false;
+        // }
+
+        //价格
+        var priceLabelid = $("#audio_priceLabelid").find("option:selected").val();
+        if (priceLabelid == '') {
+            myalert('请选择价格');
+            return false;
+        }
+        if (!$('#audio_read').is(':checked')) {
+            myalert('必须同意《版权服务规则协议》');
+            return false;
+        }
+
+        return true;
+    }
+
+    //提交校验--图文上传
+    function validateImageTextPost() {
+        var file = $('#imageTextFile')[0].files;
+        if (file.length == 0) {
+            myalert('请选择文件');
+            return false;
+        }
+
+        var picList = $('#manyPicInput')[0].files;
+        if (picList.length == 0) {
+            myalert('请选择图片');
+            return false;
+        }
+
+        // var cover = $('#filePic')[0].files;
+        // if (cover.length == 0) {
+        //     myalert('请选择封面');
+        //     return false;
+        // }
+
+        var catalogumediaKeywordeId = $("#imageText_catalogueId").find("option:selected").val();
+        if (catalogumediaKeywordeId == '') {
+            myalert('请选择类型');
+            return false;
+        }
+
+        //勾选的归属ids，多选
+        var belongIds = getCheckboxCheckedValues('imageTextBelongLabelName');
+        if (belongIds == '') {
+            myalert('请选择归属标签');
+            return false;
+        }
+
+        //标题
+        var mediaTitle = $.trim($("#imageText_mediaTitle").val());
+        if (mediaTitle == '') {
+            myalert('请输入标题');
+            return false;
+        }
+        //关键字
+        var audio_mediaKeyword = $.trim($("#imageText_mediaKeyword").val());
+        if (audio_mediaKeyword == '') {
+            myalert('请输入关键字');
+            return false;
+        }
+
+        //简介
+        // var mediaBrief = $.trim($("#imageText_mediaBrief").val());
+        // if (mediaBrief == '') {
+        //     myalert('请输入简介');
+        //     return false;
+        // }
+
+        //价格
+        var priceLabelid = $("#imageText_priceLabelid").find("option:selected").val();
+        if (priceLabelid == '') {
+            myalert('请选择价格');
+            return false;
+        }
+
+        //转载
+        // var publishLabelid = $("#imageText_publishLabelid").find("option:selected").val();
+        // if (publishLabelid == '') {
+        //     myalert('请选择转载内容');
+        //     return false;
+        // };
+
+        if (!$('#imageText_read').is(':checked')) {
+            myalert('必须同意《版权服务规则协议》');
+            return false;
+        }
+
+        return true;
+    }
+
+    // 文件上传 -- 视频
+    $saveVideo.on('click', function () {
+
+        var jyFlag = validateVideoPost();
+        var files = uploaderVideo.getFiles();
+        if (files.length <=0){
+            myalert('请先选择文件。');
+            return false;
+        }
+        // console.log(files);
+        if (jyFlag) {
+            $("#videoProgress").show();
+            // console.log("上传...");
+            uploaderVideo.upload();
+            // console.log("上传成功");
+        }
+    });
+
+    // 文件上传--音频
+    $saveAudio.on('click', function () {
+        // console.log('audio up in ');
+        var jyFlag = validateAudioPost();
+        var files = uploaderVideo.getFiles();
+        // console.log(files);
+        // return false;
+        if (files.length <=0){
+            myalert('请先选择文件。');
+            return false;
+        }
+        if (jyFlag) {
+            $("#videoProgress").show();
+            // console.log("上传...");
+            uploaderVideo.upload();
+            // console.log("上传成功");
+        }
+    });
+
+    /**
+     *  生成进度条封装方法
+     * @param file 文件
+     * @param percentage 进度值
+     * @param id_Prefix id前缀
+     * @param titleName 标题名
+     */
+    function getProgressBar(file, percentage, id_Prefix, titleName) {
+
+        //var $li = $('#' + file.id), $percent = $li.find('#' + id_Prefix + '-progress-bar');
+        var $li = $('#upW_processtest'), $percent = $li.find('#' + id_Prefix + '-progress-bar');
+        if (titleName == "MD5") {
+            titleName = "处理中"
+        } else {
+            titleName = titleName;
+        }
+        ;
+        // 避免重复创建
+        if (!$percent.length) {
+            $percent = $('<div id="' + id_Prefix + '-progress" class="progress progress-striped active" style="width:320px; margin-left:auto; margin-right:auto">' +
+                '<div id="' + id_Prefix + '-progress-bar" class="progress-bar" role="progressbar" style="width: 0%">' +
+                '</div>' +
+                '</div>'
+            ).appendTo($li).find('#' + id_Prefix + '-progress-bar');
+        }
+        var progressPercentage = Math.floor(percentage * 100) + '%';
+        $percent.css('width', progressPercentage);
+        $percent.html(titleName + ':' + progressPercentage);
+    }
+
+    /**
+     * 隐藏进度条
+     * @param file 文件对象
+     * @param id_Prefix id前缀
+     */
+    function fadeOutProgress(file, id_Prefix) {
+        $('#' + file.id).find('#' + id_Prefix + '-progress').fadeOut();
+    }
+
+    /////////////video & audio end//////////////////
+
+</script>
+</body>
+</html>
+

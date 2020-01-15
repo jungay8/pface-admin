@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<style>
+    .clearfix:after {
+        visibility: hidden;
+        display: block;
+        font-size: 0;
+        content: " ";
+        clear: both;
+        height: 0;
+    }
+    .clearfix { display: inline-table; }
+    /* Hides from IE-mac \*/
+    * html .clearfix { height: 1%; }
+    .clearfix { display: block; }
+    /* End hide from IE-mac */
+    .ls_fl{float: left;}
+    .ls_fr{float:right;}
+    .ls_md2{margin-bottom:20px;}
+    .lsperson_head{width: 170px; height: 160px; border:1px solid #e4e4e4; line-height: 158px; text-align: center;}
+    .lsperson_head img{width: 168px; max-height: 158px;}
+    .ls_ml25{margin-left: 25px;}
+    .lsperson_info span{padding-left: 5px;}
+    .lsperson_Id{margin-top:24px; width: 246px; height: 155px; border:1px solid #e4e4e4; line-height: 155px; text-align: center;}
+    .lsperson_Id img{width: 246px;max-height:155px;}
+    .lsvideoM{width: 568px; height: 256px; background: #000;}
+    .ls_teaC{text-align: center;}
+    .ls_bdb{border-bottom: 1px solid #f7f7f7;}
+    .ls_redfont{color:#d2181c;}
+    .ls_bgG{background: #F7F7F7; padding:8px;}
+    .ls_bluefont{color:#337ab7}
+    .lsAudio_m{border:1px solid #ebebeb;background: #fcfcfc;}
+    .lsAudio_poster{width: 90px; height: 90px; position:relative;}
+    .lsAudio_poster img{width: 90px; max-height: 90px;}
+
+    ul.ls_fileImg,.ls_fileImg li{list-style: none; margin:0;-webkit-margin-before: 0;-webkit-margin-after: 0;    -webkit-padding-start:0}
+    .ls_fileImg li{float: left; width: 144px; line-height: 134px; height: 134px;border: 1px solid #f7f7f7;
+        margin-right: 15px; margin-bottom: 15px; list-style: none;}
+    .ls_fileImg li img{width: 142px; max-height: 132px;}
+
+</style>
+<!-- Content Header (Page header) -->
+<section class="content-header" style="">
+    <h1>
+        用户审核管理
+        <small>用户审核管理页面</small>
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> 主页</a></li>
+        <li><a href="#">用户审核管理</a></li>
+        <li class="active">用户审核</li>
+    </ol>
+</section>
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box">
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <div id="toolbar">
+                        <form class="form-inline" id="searchForm">
+                            <div class="form-group">
+                                <label for="memberType">会员类型</label>
+                                <select name="memberType" id="memberType" class="form-control"
+                                        data-placeholder="请从列表选择一项" required>
+                                    <option th:each="type : ${memberTypeList}" th:value="${type.name}" th:text="${type.text}">
+                                        会员不存在
+                                    </option>
+                                </select>
+                                <label for="isCert">认证状态</label>
+                                <select name="isCert" id="isCert" class="form-control"
+                                        data-placeholder="请从列表选择一项" required>
+                                    <!--<option th:each="cert : ${certTypeList}" th:value="${cert.name}" th:text="${cert.text}">-->
+                                        <!--审核状态不存在-->
+                                    <!--</option>-->
+                                    <option value="CERTIFING" selected>认证中</option>
+                                    <option value="CERTIFIED">认证通过</option>
+                                    <option value="CERTFAIL">认证失败</option>
+                                    <option value="UNCERTIFIED">未认证</option>
+                                    <option value="ALL">全部</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="uname">会员名称</label>
+                                <input type="text" class="form-control input-sm"  name="uname" id="uname" placeholder="请输入名称">
+                            </div>
+                            <div class="btn-group btn-group-sm">
+                                <button type="button" class="btn btn-default" onclick="javascript:Search();">
+                                    <i class="glyphicon glyphicon-search"></i>
+                                    查询
+                                </button>
+                                <button type="reset" class="btn btn-default" style="display: none">
+                                    <i class="glyphicon glyphicon-trash"></i>
+                                    清空
+                                </button>
+                            </div>
+                        </form>
+                        <div class="btn-group btn-group-sm" style="display:none;">
+                            <!-- Provides extra visual weight and identifies the primary action in a set of buttons -->
+                            <button shiro:hasPermission="cert:create" type="button" id="addBtn" class="btn btn-default"
+                                    data-toggle="modal"
+                                    data-target="#addModal"><i class="glyphicon glyphicon-plus"></i> 新增
+                            </button>
+                            <!-- Indicates caution should be taken with this action -->
+                            <button shiro:hasPermission="cert:update" type="button" id="editBtn" class="btn btn-default"
+                                    data-toggle="modal"
+                                    data-target="#editModal"
+                                    data-action="{type:'editable',form:'#editForm',table:'#table'}"
+                                    disabled><i class="glyphicon glyphicon-edit"></i> 修改
+                            </button>
+                            <!-- Indicates a dangerous or potentially negative action -->
+                            <button shiro:hasPermission="cert:delete" type="button" id="deleteBtn" class="btn btn-default" data-toggle="modal"
+                                    data-target="#deleteModal"
+                                    data-action="{type:'delete',form:'#deleteForm',idField:'id',table:'#table'}"
+                                    disabled><i class="glyphicon glyphicon-remove"></i> 删除
+                            </button>
+                        </div>
+                    </div>
+                    <table id="table"></table>
+                </div>
+                <!-- /.box-body -->
+            </div>
+            <!-- /.box -->
+
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+</section>
+<!-- /.content -->
+
+<!-- add Modal -->
+<div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="addModalLabel">添加会员</h4>
+            </div>
+            <div class="modal-body">
+                <form id="addForm">
+                    <div class="form-group">
+                        <label class="control-label" for="name"><span class="asterisk">*</span>会员名称:</label>
+                        <input id="name" type="text" class="form-control" name="name" placeholder="输入会员名称"
+                               minlength="3" required>
+                        <div class="help-block with-errors"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" for="type"><span class="asterisk">*</span>会员类型:</label>
+                        <select name="memberType" id="type" class="form-control"
+                                data-placeholder="请从列表选择一项" required>
+                            <option th:each="memberType : ${memberTypeList}" th:value="${memberType.name}" th:text="${memberType.text}">
+                                会员类型不存在
+                            </option>
+                        </select>
+                        <div class="help-block with-errors"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" for="description">会员描述:</label>
+                        <input id="description" type="text" class="form-control" name="description" placeholder="输入会员描述">
+                        <div class="help-block with-errors"></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="submit" form="addForm" class="btn btn-primary"
+                        data-action="{type:'submit',form:'#addForm',url:'@{/admin/member/create}',after:'$.myAction.refreshTable'}">
+                    确定
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="editModalLabel">修改会员</h4>
+            </div>
+            <div class="modal-body">
+                <form id="editForm">
+                    <input type="hidden" name="id"/>
+                    <div class="form-group">
+                        <label class="control-label" for="editName"><span class="asterisk">*</span>会员名称:</label>
+                        <input id="editName" type="text" class="form-control" name="uname" placeholder="输入会员名称"
+                               minlength="3" required>
+                        <div class="help-block with-errors"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" for="editType"><span class="asterisk">*</span>会员类型:</label>
+                        <select name="memberType" id="editType" class="form-control"
+                                data-placeholder="请从列表选择一项" required>
+                            <option th:each="memberType : ${memberTypeList}" th:value="${memberType.name}" th:text="${memberType.text}">
+                                会员类型不存在
+                            </option>
+                        </select>
+                        <div class="help-block with-errors"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" for="editDescription">会员描述:</label>
+                        <input id="editDescription" type="text" class="form-control" name="description" placeholder="输入会员描述">
+                        <div class="help-block with-errors"></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="submit" form="editForm" class="btn btn-primary"
+                        data-action="{type:'submit',form:'#editForm',url:'@{/admin/member/update}',after:'$.myAction.refreshTable'}">
+                    确定
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- delete modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteSmallModalLabel">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="deleteSmallModalLabel">删除会员</h4>
+            </div>
+            <div class="modal-body">
+                <form id="deleteForm"></form>
+                确定要删除选中的 <span class="records"></span> 条记录?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" form="deleteForm" class="btn btn-primary"
+                        data-action="{type:'submit',form:'#deleteForm',url:'@{/admin/member/delete-batch}',after:'$.myAction.refreshTable'}">
+                    确定
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="actionButtons" class="admin-hide">
+    <a style="display:none;" class="like" href="javascript:void(0)" data-toggle="tooltip" title="Like"><i class="glyphicon glyphicon-heart"></i></a>　
+    <a class="audit ml10" href="javascript:void(0)" data-toggle="tooltip" title="审核"><i class="glyphicon glyphicon-edit"></i>审核</a>　
+    <!--<a shiro:hasPermission="cert:update" class="edit ml10" href="javascript:void(0)" data-toggle="tooltip" title="编辑"><i class="glyphicon glyphicon-edit"></i>编辑</a>　
+    <a shiro:hasPermission="cert:delete" class="remove ml10" href="javascript:void(0)" data-toggle="tooltip" title="删除"><i class="glyphicon glyphicon-remove"></i>删除</a>　-->
+</div>
+
+<div id="actionButtonsView" class="admin-hide">
+    <a style="display:none;" class="like" href="javascript:void(0)" data-toggle="tooltip" title="Like"><i class="glyphicon glyphicon-heart"></i></a>　
+    <a class="audit ml10" href="javascript:void(0)" data-toggle="tooltip" title="查看"><i class="glyphicon glyphicon-edit"></i>查看</a>　
+    <!--<a shiro:hasPermission="cert:update" class="edit ml10" href="javascript:void(0)" data-toggle="tooltip" title="编辑"><i class="glyphicon glyphicon-edit"></i>编辑</a>　
+    <a shiro:hasPermission="cert:delete" class="remove ml10" href="javascript:void(0)" data-toggle="tooltip" title="删除"><i class="glyphicon glyphicon-remove"></i>删除</a>　-->
+</div>
+
+<div class="modal fade" id="certModal" tabindex="-1" role="dialog" aria-labelledby="addModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="addModalLabel">认证审核</h4>
+            </div>
+            <div class="modal-body" style="overflow-x: hidden; overflow-y: auto">
+                <form id="auditForm">
+                    <input type="hidden" name="uid" id="uid"/>
+                    <div class="clearfix">
+                        <div class="ls_fl lsperson_head">
+                            <img id="head"  alt="此处为头像" /><!--此处为头像-->
+                        </div>
+                        <div class="ls_fl ls_ml25 lsperson_info">
+                            <div class="form-group">
+                                <label class="control-label" for="name">用户信息:</label> <span id="userType">个人用户</span>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label" for="name">联系方式:</label> <span id="tel">158757575757</span>
+                            </div>
+                            <div class="form-group" id="personDiv">
+                                <label class="control-label" for="name">个人身份证:</label> <span id="personid">430987667876767654</span>
+                            </div>
+                            <div class="form-group" id="companyDiv">
+                                <label class="control-label" for="name">公司运营代码:</label> <span id="companyid">430987667876767654</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="clearfix ls_md2">
+                        <div class="ls_fl lsperson_Id lsperson_IdZm">
+                            <img id="front"  alt="此处为身份证正面照" /><!--此处为身份证正面照-->
+                        </div>
+                        <div class="ls_fr lsperson_Id lsperson_Idfm">
+                            <img id="back"  alt="此处为身份证反面照" /><!--此处为身份证反面照-->
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin-top: 20px;">
+                        <label class="control-label" for="name">是否审核通过:</label>
+                        <label class="checkbox-inline">
+                            <input type="radio" name="yes" value="y"> 是
+                        </label>
+                        <label class="checkbox-inline">
+                            <input type="radio" name="yes" value="n" checked> 否
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" for="name">审核说明:</label>
+                        <textarea name="reason" id="reason" class="form-control maxlength" rows="3" maxlength="64"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" id="auditSubmit" form="addForm" class="btn btn-primary" onclick="submitAudit()">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script th:inline="javascript">
+
+    var $table = $('#table');
+    $("body").bind("keypress",".input-sm",function(event){
+        if(event.keyCode == 13){
+            Search();
+            return false;
+        }
+    });
+
+    $(function () {
+        var Wh=document.documentElement.clientHeight*0.85-120;
+        $(".modal-body").height(Wh+"px");
+
+        // bootstrap table初始化
+        // http://bootstrap-table.wenzhixin.net.cn/zh-cn/documentation/
+        $table.bootstrapTable({
+            url: CONTEXT_PATH + '/admin/cert/listUser',
+            pagination: true,
+            queryParams: function queryParams(params){
+                var param = {
+                    pageNumber: params.pageNumber,
+                    pageSize: params.pageSize,
+                    sortName: params.sortName,
+                    sortOrder: params.sortOrder,
+                    memberType:$.trim($('#memberType').val()),
+                    isCert:$.trim($('#isCert').val()),
+                    uname:$.trim($('#uname').val())
+                };
+                return param;
+            },
+            //初始化加载第一页，默认第一页
+            pageNumber: 1,
+            //每页的记录行数
+            pageSize: 10,
+            //可供选择的每页的行数
+            pageList: [10,25,50,100],
+            idField: 'id',
+            detailView : false,
+            detailFormatter :"detailFormatter",
+            columns: [
+                //{field: 'state', checkbox: true},
+                //{field: 'memberUser.id', title: '编号', sortable: true, halign: 'left'},
+                {field: 'memberUser.uname', title: '会员名称', sortable: true,sortName:'uname', halign: 'left'},
+                {field: 'memberUser.mobile', title: '手机号', sortable: false, halign: 'left'},
+                {field: 'memberUser.memberType.name', title: '会员类型ID', sortable: false, halign: 'left',visible: false},
+                {field: 'memberUser.memberType.text', title: '会员类型', sortable: false, halign: 'left'},
+                {field: 'memberUser.isCert.name', title: '认证状态', sortable: false, halign: 'left',visible: false},
+                {field: 'memberUser.isCert.text', title: '认证状态', sortable: false, halign: 'left'},
+                {field: 'lastedAuditMsg', title: '审核说明', sortable: false, halign: 'left',formatter:'formatMsg'},
+                {
+                    field: 'action',
+                    title: '操作',
+                    halign: 'center',
+                    align: 'center',
+                    formatter: 'actionFormatter',
+                    events: 'actionEvents',
+                    clickToSelect: false
+                }
+            ]
+        });
+    });
+
+    // 数据表格展开内容
+    function detailFormatter(index, row) {
+        var html = [];
+        $.each(row, function (key, value) {
+            html.push('<p><b>' + key + ':</b> ' + value + '</p>');
+        });
+        return html.join('');
+    }
+
+    function actionFormatter(value, row, index) {
+        var cert= row.memberUser.isCert.name.toUpperCase();
+        if(cert=='UNCERTIFIED'){
+            return "未提交资料";
+        }if (cert == 'CERTFAIL' || cert == 'CERTIFIED'){
+            return $('#actionButtonsView').html();
+        } else if (cert == 'CERTIFING') {
+            return $('#actionButtons').html();
+        } else {
+            return "状态未知";
+        }
+        //return $('#actionButtons').html();
+    }
+
+    window.actionEvents = {
+        'click .like': function (e, value, row, index) {
+            alert('You click like icon, row: ' + JSON.stringify(row));
+            console.log(value, row, index);
+        },
+        'click .audit': function (e, value, row, index) {
+            $('#certModal').modal('show')
+            //$('#auditForm').fillForm(row);
+            var user=row.memberUser;
+            $("#uid").val(user.id);
+
+            // $("#auditSubmit").hide();
+            //  var cert= user.isCert.name.toUpperCase();
+            //  if(cert=='CERTIFING' || cert=='certifing'){
+            //      $("#auditSubmit").show();
+            //  }
+            //
+
+            editEnabled(row);
+
+            // console.log(user.memberType.name);
+            // console.log(row.memberCert);
+
+            $("#tel,#personid,#companyid").text('');
+            //$("#personid").val("");
+            $("#head,#front,#back").attr("src","");
+            var memberTypeName = user.memberType.name.toUpperCase();
+            if(memberTypeName=='PERSON'){
+                $("#companyDiv").hide();
+                $("#personDiv").show();
+
+                // $("#userType").text('个人用户:');
+
+                $("#userType").text('个人用户:'+user.uname);
+                $("#tel").text(row.memberCert.contactWay1);
+                $("#personid").text(row.memberCert.personId);
+
+                //$("#head").attr("src",CONTEXT_PATH+'/image?url='+encodeURIComponent(row.memberCert.iconUrl));
+               // $("#front").attr("src",CONTEXT_PATH+'/image?url='+encodeURIComponent(row.memberCert.personidBack));
+               // $("#back").attr("src",CONTEXT_PATH+'/image?url='+encodeURIComponent(row.memberCert.personidFront));
+                $("#head").attr("src",CONTEXT_PATH+getUrlPath(row.memberCert.iconUrl));
+                $("#front").attr("src",CONTEXT_PATH+getUrlPath(row.memberCert.personidBack));
+                $("#back").attr("src",CONTEXT_PATH+getUrlPath(row.memberCert.personidFront));
+            }else if(memberTypeName=='COMPANY'){
+                $("#personDiv").hide();
+                $("#companyDiv").show();
+                // $("#userType").text('企业用户:');
+
+                $("#userType").text('企业用户：'+row.memberCert.companyName);
+                $("#tel").text(row.memberCert.contactWay1);
+                $("#companyid").text(row.memberCert.companyCode);
+
+                $("#head").attr("src",CONTEXT_PATH+'/image?url='+encodeURIComponent(row.memberCert.iconUrl));
+                $("#front").attr("src",CONTEXT_PATH+'/image?url='+encodeURIComponent(row.memberCert.companyFront));
+                $("#back").attr("src",CONTEXT_PATH+'/image?url='+encodeURIComponent(row.memberCert.companyBack));
+            }
+
+            // console.log(value, row, index);
+        },
+        'click .edit': function (e, value, row, index) {
+            $('#editModal').modal('show')
+            $('#editForm').fillForm(row);
+            console.log(value, row, index);
+        },
+        'click .remove': function (e, value, row, index) {
+            $('#deleteModal').modal('show');
+            $('.records').html('1');
+            var html = '';
+            for (var key in row) {
+                html += '<input type="hidden" name="' + key + '" value="' + row[key] + '">';
+            }
+            $('#deleteForm').html(html);
+        }
+    };
+
+    function editEnabled(row) {
+        var status = row.memberUser.isCert.name.toUpperCase();
+        if (status == 'UNCERTIFIED' || status=='CERTFAIL' || status == 'CERTIFIED') {
+            $("input:radio[name='yes']").each(function(index,domEle){
+                $(this).attr("disabled", true);
+
+                if ($(this).val() == 'y' && status == 'CERTIFIED') {
+                    $(this).prop("checked", true);
+                }
+
+                if ($(this).val() == 'n' && status == 'CERTFAIL') {
+                    $(this).prop("checked", true);
+                }
+            });
+
+            $("#reason").text(row.lastedAuditMsg);
+            $("#reason").attr("disabled", true);
+
+            $("#auditSubmit").hide();
+        }else {  //CERTIFING
+
+            $("#auditSubmit").show();
+            $("input:radio[name='yes']").each(function(index,domEle){
+                $(this).attr("disabled", false);
+                $(this).removeAttr("checked");
+            });
+            $("#reason").text("");
+            $("#reason").attr("disabled", false);
+        }
+    }
+
+   function Search() {
+      var memberType= $('#memberType').val();
+       var certType= $('#isCert').val();
+       var uname = $('#uname').val();
+      var options = $('#table').bootstrapTable('refresh', {
+                       silent: true,
+                       query:{
+                               memberType:memberType,
+                               isCert:certType,
+                               uname:uname
+                              }
+                      });
+   }
+
+    function formatMsg(value) {
+        //此处对value值做判断，不然value为空就会报错
+        value=value?value:'';
+        var length=value.length;
+        if(length&&length>10){
+            lelngth=10;
+        }
+        return"<a data-container='body' data-toggle='popover' data-placement='right' data-content ='"+value+"'>"+value.substring(0,length)+"</a>";
+
+    }
+    $(function(){
+
+        $('textarea.maxlength').maxlength({
+            alwaysShow: true,
+            threshold: 10,
+            warningClass: "label label-info",
+            limitReachedClass: "label label-warning",
+            placement: 'bottom-right',
+            message: '%charsTyped%/%charsTotal% 字符.'
+        });
+    })
+
+</script>
+<script th:inline="javascript" th:src="@{/static/pface/js/memberAudit.js}"></script>
+</html>

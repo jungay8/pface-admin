@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+	<!--<script type="text/javascript" src="https://libs.baidu.com/jquery/1.8.3/jquery.min.js"></script>-->
+	<script type="text/javascript" th:src="@{/static/js/jquery183.js}"></script>
+	<script th:src="@{/static/pface/js/jquery.msgbox.min.js}"></script>
+	<head>
+		<meta charset="utf-8">
+		<meta name="context-path" th:content="@{/}"/>
+		<title>无感人脸识别——登录页</title>
+		<link rel="stylesheet" th:href="@{/static/pface/js/layui/css/layui.css}">
+		<link rel="stylesheet" th:href="@{/static/pface/css/common.css}">
+		<link rel="stylesheet" th:href="@{/static/pface/css/login.css}">
+		<script th:inline="javascript">
+            var CONTEXT_PATH = [[${#request.getContextPath()}]];
+		</script>
+	</head>
+	<body>
+		<!--导航-->
+		<!--<div class="top clearfix" th:replace="~{front/header :: header}"></div>-->
+		<div class="loginImg">
+			<img class="WaImg loginimgBg"  th:src="@{/static/pface/img/loginImg.jpg}"/>
+			<div class="loginContainer">
+				<div class="wapper">					
+					<div class="dzMain loginInputTxt">
+						<div class="loginInputTit">
+							欢迎登录
+						</div>
+						<div class="LoginMainFrom">
+							<form  id="loginForm" class="layui-form" action="/front/user/login" method="post">
+				            	<div class="LoginInput">
+				                	<input type="text" class="form-control is-invalid" required  lay-verify="required" name="name" id="name" placeholder="请输入您的账号" >
+				                    <div class="LoginInput_Inco"><img class="WaImg" th:src="@{/static/pface/img/username.png}"/></div>
+				                </div>
+				                <div class="LoginInput">
+				                	<input class="form-control is-invalid" type="password" required  lay-verify="required" name="password" id="password" placeholder="请输入您的密码"/>
+				                    <div class="LoginInput_Inco"><img class="WaImg" th:src="@{/static/pface/img/password.png}"/></div>
+				                </div>
+				                <div class="Login_Opera">	
+				                	<span class="fr">
+				                		<img id="imgcaptcha" th:src="@{/captcha/kaptcha.jpg}" th:onclick= "'javascript:random()'"/>
+				                	</span>				                   
+				                    <div class="LoginInput logincodeInput" >
+					                	<input type="text" class="form-control is-invalid" required  lay-verify="required" name="captcha" id="captcha" placeholder="请输入验证码">
+					                    <div class="LoginInput_Inco"><img class="WaImg" th:src="@{/static/pface/img/register.png}"/></div>
+					                </div>
+				                </div>
+				                <!--<div class="cheched_forget clearfix">-->
+				                	<!--<div class="fr">-->
+				                		<!--<a href="#" class="red_link">忘记密码？</a>-->
+				                	<!--</div>-->
+				                	<!--<div class="cheched">					                	-->
+										<!--<div class="layui-form">											-->
+											<!--<input type="checkbox" name="记住我" lay-skin="primary" title="记住我" checked="checked">-->
+										<!--</div>-->
+					                <!--</div>-->
+				                <!--</div>				                -->
+				                <div class="LoginInput LoginInputBtn">
+				                	<button lay-submit lay-filter="formLogin" id="loginBtn">登  &nbsp;&nbsp;录</button>                  
+				                </div>
+				            </form>
+				            <!--<div class="link_register">-->
+				            	<!--还没有账号？<a href="/front/reg" class="red_link">去注册</a>-->
+								<!--<p style="color: red" th:text="${errormsg}" th:if="${not #strings.isEmpty(errormsg)} "></p>-->
+				            <!--</div>-->
+						</div>
+					</div>
+					
+				</div>	
+			</div>							
+		</div>
+		<!--footer-->
+<div class="footer" th:replace="~{front/footer :: footer}"> </div>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script th:src="@{/static/pface/js/layui/layui.js}"></script>
+<script th:src="@{/static/pface/js/iput.js}"></script>
+<script>
+	layui.use(['form', 'layer','layedit'],function(){
+		  var form = layui.form
+		  ,layer = layui.layer,
+		  layedit=layui.layedit;
+		  //创建一个编辑器
+			var editIndex = layedit.build('LAY_demo_editor');
+	 
+		  //监听提交 
+		  form.on('submit(formLogin)', function(data){
+			//layer.msg(JSON.stringify(data.field));
+			//登录
+              $("#loginForm").submit();
+			//login();
+			return false;
+		  });
+	});
+	
+function random() {
+    var pathName = window.document.location.pathname;
+    $("#imgcaptcha").attr('src',CONTEXT_PATH+"/captcha/kaptcha.jpg?rnd=" + Math.random());
+
+}
+
+	
+	
+function login(){
+	
+	this.axios({
+        method: "POST",
+        url: CONTEXT_PATH+'/front/user/login',
+        data: {
+               name: $("#name").val(),
+               password: $("#password").val(),
+			   captcha:$("#captcha").val()
+          },
+        headers: {
+            //'Content-Type': 'application/x-www-form-urlencoded'
+			'Content-Type': 'application/json;charset=UTF-8'			
+        }
+    }).then(function(res) {
+        console.log(res);
+        if(res.data.success){
+            //storageSessionObj("user",res.data.data);
+            layer.msg("登录成功");
+            window.location.href = CONTEXT_PATH+res.data.extra.url;
+		}else{
+            //$.alert(res.data.msg);
+            layer.msg(res.data.msg);
+		}
+
+    }).catch(function (error) {
+             console.log(error);
+			 layer.msg(JSON.stringify(error.msg));
+    });
+	  
+	
+}
+	
+
+</script>
+
+</body>
+</html>

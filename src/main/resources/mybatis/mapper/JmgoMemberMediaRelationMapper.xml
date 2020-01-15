@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.pface.admin.modules.member.mapper.JmgoMemberMediaRelationMapper" >
+  <resultMap id="BaseResultMap" type="com.pface.admin.modules.member.po.JmgoMemberMediaRelation" >
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="media_file_id" property="mediaFileId" jdbcType="INTEGER" />
+    <result column="relation_media_file_id" property="relationMediaFileId" jdbcType="INTEGER" />
+  </resultMap>
+
+  <resultMap id="MemberMediaRelationPojoResultMap" type="com.pface.admin.modules.front.vo.MemberMediaRelationPojo">
+    <result column="id" jdbcType="BIGINT" property="id"/>
+    <result column="media_file_id" jdbcType="BIGINT" property="mediaFileId"/>
+    <result column="relation_media_file_id" jdbcType="BIGINT" property="relationMediaFileId"/>
+    <result column="media_title" jdbcType="VARCHAR" property="relationMediaFileTitle"/>
+  </resultMap>
+
+  <select id="queryMemberMediaRelationList" resultMap="MemberMediaRelationPojoResultMap">
+      SELECT
+          relation.id,
+          relation.media_file_id,
+          relation.relation_media_file_id,
+          m.media_title
+      FROM
+          jmgo_member_media_relation relation
+      INNER JOIN jmgo_member_media_file f ON relation.relation_media_file_id = f.id
+      INNER JOIN jmgo_member_media m ON f.id = m.media_file_id
+      <where>
+        1=1
+        <if test="mediaFileId!=null and mediaFileId!=''">
+          AND relation.media_file_id = #{mediaFileId}
+        </if>
+        <if test="uid!=null">
+          and f.uid = ${uid}
+        </if>
+      </where>
+  </select>
+
+</mapper>

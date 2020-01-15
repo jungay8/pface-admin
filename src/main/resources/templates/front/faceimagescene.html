@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+	<!--<script type="text/javascript" src="https://libs.baidu.com/jquery/1.8.3/jquery.min.js"></script>-->
+	<script type="text/javascript" th:src="@{/static/js/jquery183.js}"></script>
+	<script th:src="@{/static/pface/js/jquery.msgbox.min.js}"></script>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="context-path" th:content="@{/}"/>
+		<link rel="stylesheet" th:href="@{/static/pface/js/layui/css/layui.css}">
+		<link rel="stylesheet" th:href="@{/static/pface/css/common.css}">
+        <link rel="stylesheet" th:href="@{/static/pface/css/manage.css}" />
+        <link rel="stylesheet" th:href="@{/static/pface/css/upload.css}" />
+		<title>无感人脸——会议管理</title>
+		<script th:inline="javascript">
+            var CONTEXT_PATH = [[${#request.getContextPath()}]];
+		</script>
+	</head>
+	<body>
+		<!--导航-->
+		<div class="top clearfix" th:replace="~{front/header :: header}"></div>
+		<!--内容管理-->
+		<div class="container">
+			<div class="wapper">
+				<div class="m_conter clearfix hav_line">
+					<div class="fl left_nav" th:replace="~{front/leftnav::leftnav}"></div>
+					<!--右边-->
+					<div class="fr right_conter">
+
+						<div class="right_title">
+							<div class="colorblack manage_tit">
+								<img th:src="@{/static/pface/img/tit_inco.png}"/>
+								<span>会议管理</span>
+								<span class="fr layui-btn layui-btn-danger btn-radius layui-edit btn_min"  id="getCheckData">
+											新建
+										</span>
+							</div>
+						</div>
+
+
+						<div class="layui-form videoListM">
+						<form  class="layui-form" lay-filter="choiceForm" id="search_form1" method="post" action="/front/faceimagescene">
+							<!--<input type="radio" name="tabelTime"  lay-filter="timeradio" value="0" title="最近一天" th:attr ="checked=${tabelTime == '0' ?true:false}"/>-->
+							<!--<input type="radio" name="tabelTime"  lay-filter="timeradio" value="1" title="时间段:"  th:attr ="checked=${tabelTime == '1' ?true:false}"/>-->
+							<!--<div class="layui-inline timeChoice">-->
+								<!--<input class="layui-input" type="text" name="times" placeholder="请选择时间段"  th:value="${times}" id="LAY_chice_s">-->
+							<!--</div>-->
+							<input class="layui-input" type="text" name="faceusescenename" id="queryfaceusescenename"
+								   style="display: inline-block;vertical-align: middle; width:200px;margin-top: 10px;margin-bottom: 10px;margin-right: 10px;margin-bottom: 10px"
+								   placeholder="请输入会议名称"  th:value="${faceusescenename}">
+							<div class="layui-inline">
+								<span class="layui-btn layui-btn-warm btn-radius closeBlack" id="search">查询</span>
+							</div>
+						</form>
+						<hr />
+						<table class="layui-table" lay-filter="demo" id="tableM">
+							<!--<colgroup>-->
+								<!--&lt;!&ndash;<col width="50">&ndash;&gt;-->
+								<!--<col width="210">-->
+								<!--<col width="150">-->
+								<!--<col width="230">-->
+								<!--<col width="180">-->
+								<!--<col width="180">-->
+								<!--<col width="180">-->
+								<!--<col width="180">-->
+								<!--<col width="250">-->
+							<!--</colgroup>-->
+							<thead>
+							<tr>
+								<!--<th><input type="checkbox" lay-skin="primary" lay-filter="allChoice"></th>-->
+								<th>会议名称</th>
+								<th>主题</th>
+								<th>地址</th>
+								<th>开始时间</th>
+								<th>结束时间</th>
+								<th>签到开始</th>
+								<th>签到结束</th>
+								<th>操作</th>
+							</tr>
+							</thead>
+							<tbody>
+							<tr th:each="usescene : ${sceneList}">
+								<!--<td><input type="checkbox" lay-filter="tableCheck" lay-skin="primary" th:value="${usescene.id}+'#'+${usescene.fileName}"></td>-->
+								<td th:text="${usescene.scenename}"></td>
+								<td th:text="${usescene.theme}"></td>
+								<td th:text="${usescene.address}"></td>
+								<td th:text="${#dates.format(usescene.startDate, 'yyyy-MM-dd')}"></td>
+								<td th:text="${#dates.format(usescene.endDate, 'yyyy-MM-dd')}"></td>
+								<td th:text="${#dates.format(usescene.asignStarttime, 'yyyy-MM-dd HH:mm:ss')}"></td>
+								<td th:text="${#dates.format(usescene.asignEndtime, 'yyyy-MM-dd HH:mm:ss')}"></td>
+								<td>
+									<a class="conterIntr_delet" th:onclick="'javascript:delfaceappusescene(\''+${usescene.id}+'\');'"><i class="layui-icon layui-icon-delete"></i>删除</a>
+									<a class="layui-edit conterIntr_edit video_edit"  data-name="会议id" th:data="${usescene.id}
+									+'#'+${usescene.scenename}
+									+'#'+${usescene.theme}
+									+'#'+${usescene.address}
+									+'#'+${#dates.format(usescene.startDate, 'yyyy-MM-dd')}+' ~ '+${#dates.format(usescene.endDate, 'yyyy-MM-dd')}
+									+'#'+${#dates.format(usescene.asignStarttime, 'yyyy-MM-dd HH:mm:ss')}+' ~ '+${#dates.format(usescene.asignEndtime, 'yyyy-MM-dd HH:mm:ss')}
+									+'#'+${usescene.remark}"><i class="layui-icon layui-icon-edit"></i>编辑</a>
+									<!--<a class="layui-btn layui-btn-primary layui-btn-xs video_delete" data-name="会议id" th:data="${usescene.id}">删除</a>-->
+								</td>
+							</tr>
+							</tbody>
+
+						</table>
+							<div class="conterIntro_bottom">
+								<div id="pageNum" class="pageNum textRight"></div>
+							</div>
+					</div>
+			</div>
+				</div>
+
+				</div>
+		</div>
+		
+<!--footer-->
+<div class="footer" th:replace="~{front/footer :: footer}"></div>
+<div>
+	<form name="listpage" id="listpage" method="post">
+		<input type="hidden" name="pageNumKey" id="pageNumKey" th:value="${pageNum}">
+		<input type="hidden" name="pageSizeKey" id="pageSizeKey" th:value="${pageSize}">
+		<input type="hidden" name="faceusescenename" id="pagefaceusescenename" th:value="${faceusescenename}">
+	</form>
+</div>
+
+<!-会议编辑窗口-->
+<div class="videoM_List" id="newsedit" style="display:none ;" >
+	<ul class="videoEdit layui-form" id="uploadVideoListDiv">
+
+		<div class="" style="margin-top: 20px;margin-right: 20px;margin-bottom: 20px">
+			<form class="layui-form" action="">
+				<input type="hidden" id="sceneid" value="">
+			<div class="layui-form-item">
+				<label class="layui-form-label" style="width: 100px"><font color="red">*</font>会议名称</label>
+				<div class="layui-input-block">
+					<input type="text" name="scenename" id="scenename"  required  lay-verify="scenename" placeholder="请输入会议名称" autocomplete="off" class="layui-input">
+				</div>
+			</div>
+
+			<div class="layui-form-item">
+				<label class="layui-form-label"  style="width: 100px"><font color="red">*</font>会议时段</label>
+				<div class="layui-input-block">
+					<input type="text" name="startEndDate" id="startEndDate" placeholder="会议开始日期-会议结束日期" value="" autocomplete="off" class="layui-input">
+				</div>
+			</div>
+
+			<div class="layui-form-item">
+				<!--<div class="layui-inline">-->
+				<label class="layui-form-label" style="width: 100px"><font color="red">*</font>签到时段</label>
+				<div class="layui-input-block">
+					<input type="text" name="asignStartEndDate" id="asignStartEndDate" placeholder="签到开始时间-签到结束时间" value="" autocomplete="off" class="layui-input">
+				</div>
+				<!--</div>-->
+			</div>
+
+			<div class="layui-form-item">
+				<label class="layui-form-label" style="width: 100px">会议主题</label>
+				<div class="layui-input-block">
+					<input type="text" name="theme" id="theme" lay-verify="theme" autocomplete="off" placeholder="会议主题" class="layui-input">
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label" style="width: 100px"><font color="red">*</font>会议地址</label>
+				<div class="layui-input-block">
+					<input type="text" name="address" id="address" lay-verify="address" autocomplete="off" placeholder="会议地址" class="layui-input">
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label" style="width: 100px">会议备注</label>
+				<div class="layui-input-block">
+					<input type="text" name="remark" id="remark" lay-verify="remark" autocomplete="off" placeholder="会议备注" class="layui-input">
+				</div>
+			</div>
+		</form></div>
+
+	</ul>
+	<div class="textCenter upload_btnbt vidoe_upAll">
+		<div class="">
+			<button class="layui-btn layui-btn-warm btn-radius btn_min" id="commitAllFileBtnId">提交
+			</button>
+			<a href="javascript:void(0)"
+			   class="layui-btn layui-btn-warm btn-radius btn_min return_exq">取消</a>
+		</div>
+	</div>
+
+</div>
+
+<script th:inline="javascript">
+            /*<![CDATA[*/
+
+            var totalRecords = [[${total}]];
+            var page = [[${pageNum}]];
+            var pageSize = [[${pageSize}]];
+			var faceusescenename = [[faceusescenename]];
+
+            /*]]>*/
+</script>
+<script th:src="@{/static/pface/js/layui/layui.js}"></script>
+<script th:src="@{/static/pface/js/layui/lay.modules/laydate.js}"></script>
+<script th:src="@{/static/pface/js/faceappusescene.js}"></script>
+
+<script th:inline="javascript">
+	// var cataloguesLabels = [[${cataloguesLabels}]];
+	// var belongLabels = [[${belongLabels}]];
+	// var pricesLabels = [[${pricesLabels}]];
+	// var publishLabels = [[${publishLabels}]];
+</script>
+
+<script type='text/javascript' th:inline="javascript">
+	layui.use(['table','form', 'laydate'], function(){
+		var $ = layui.jquery
+				,table = layui.table
+				,form=layui.form
+				,laydate = layui.laydate;
+		//日期
+		laydate.render({
+			elem: '#startEndDate'
+			,range: '~'
+		});
+		laydate.render({
+			elem: '#asignStartEndDate'
+			,type: 'datetime'
+			,range: '~'
+		});
+		//这里是查询操作
+		$(document).on('click','#search',function(){
+			$form = $("#search_form1");
+			$form.submit();
+		});
+
+		//新增会议
+		$(document).on('click','#getCheckData',function(){
+			active.editTitle = "新增会议";
+			$("#sceneid").val("");
+			$("#scenename").val("");
+			$("#theme").val("");
+			$("#address").val("");
+			$("#startEndDate").val("");
+			$("#asignStartEndDate").val("");
+			$("#remark").val("");
+			// active.drawContent();
+			active.setTop();
+		});
+		//修改会议
+		$(document).on('click','.video_edit',function(){
+			debugger;
+			active.editTitle = "修改会议";
+			var item=$(this).attr("data");
+			var itemArray = item.split("#");
+			$("#sceneid").val(itemArray[0]);
+			$("#scenename").val(itemArray[1]);
+			$("#theme").val(itemArray[2]);
+			$("#address").val(itemArray[3]);
+			var startEndDate = itemArray[4];
+			var asignStartEndDate = itemArray[5];
+			laydate.render({elem:'#startEndDate',range:'~',value:startEndDate}); //2020-01-16 ~ 2020-02-29  注意：~ 的前后有空格啊！！！！坑
+			laydate.render({elem:'#asignStartEndDate',range:'~',value:asignStartEndDate});
+			$("#remark").val(itemArray[6]);
+			active.setTop();
+		});
+		//删除会议
+		$(document).on('click','.video_delete',function(){
+			var sceneid = $(this).attr("data");
+			if ($.trim(sceneid) == ''){
+				return ;
+			}
+			layer.confirm('您确定要删除该项吗?', {btn: ['确定', '取消'], title: "提示"}, function (index) {
+				var fd = new FormData();
+				fd.append("sceneid", sceneid);
+				$.ajax({
+					processData: false,
+					contentType: false,
+					type: "POST",
+					url: CONTEXT_PATH + '/front/appusescene/mydelete',
+					data: fd,
+					success: function (response) {
+						if (response.success) {
+							layer.msg(response.msg, {
+								time: 2000,
+								icon: 5,
+								anim: 6
+							},function () {
+								window.location.href = response.extra.url;
+							});
+						} else {
+							active.myalert(response.msg);
+						}
+					},
+					error: function (error) {
+						console.log(error);
+					}
+				});
+
+			});
+			return false;
+		});
+		//提交
+		$(document).on("click", "#commitAllFileBtnId", function (){
+			var scenename = $("#scenename").val();
+			if ($.trim(scenename) == ''){
+				active.myalert('会议名称不能为空。');
+				return ;
+			}
+			var startEndDate = $("#startEndDate").val();
+			if ($.trim(startEndDate) == ''){
+				active.myalert('会议时段不能为空。');
+				return ;
+			}
+			var asignStartEndDate = $("#asignStartEndDate").val();
+			if ($.trim(asignStartEndDate) == ''){
+				active.myalert('签到时段不能为空。');
+				return ;
+			}
+			var theme = $("#theme").val();
+			var address = $("#address").val();
+			if ($.trim(address) == ''){
+				active.myalert('会议地址不能为空。');
+				return ;
+			}
+			var remark = $("#remark").val();
+			var sceneid = $("#sceneid").val();
+			var fd = new FormData();
+			fd.append("sceneid", sceneid);
+			fd.append("scenename", scenename);
+			fd.append("startEndDate", startEndDate);
+			fd.append("asignStartEndDate", asignStartEndDate);
+			fd.append("theme", theme);
+			fd.append("address", address);
+			fd.append("remark", remark);
+
+			$.ajax({
+				processData: false,
+				contentType: false,
+				type: "POST",
+				url: CONTEXT_PATH + '/front/appusescene/mysave',
+				data: fd,
+				success: function (response) {
+					if (response.success) {
+						layer.msg(response.msg, {
+							time: 2000,
+							icon: 5,
+							anim: 6
+						},function () {
+							window.location.href = response.extra.url;
+						});
+					} else {
+						active.myalert(response.msg);
+					}
+				},
+				error: function (error) {
+					console.log(error);
+				}
+			});
+		});
+		//关闭弹窗
+		$(document).on('click','.return_exq',function () {
+			layer.closeAll();
+		});
+
+		var wh=document.body.clientHeight*0.7;
+
+		form.on('checkbox(allChoice)', function(data){
+			var child = $(data.elem).parents('table').find('tbody input[type="checkbox"]');
+			child.each(function(index, item){
+				item.checked = data.elem.checked;
+			});
+			form.render('checkbox');
+		});
+
+		//弹出层
+		var active = {
+			editTitle : '新增会议',
+			setTop: function(){
+				var that = this;
+				//多窗口模式，层叠置顶
+				layer.open({
+					skin: 'Ldemo-class',
+					maxmin: true,
+					type: 1
+					,title: active.editTitle
+					,btnAlign: 'l' //按钮居左
+					,shade: 0.65
+					,area: ['300px', wh+"px"]
+					,content:$('#newsedit')
+					,cancel:function () {
+						console.log("cancel() in ");
+					}
+					,zIndex: layer.zIndex //重点1
+
+				});
+			},
+			myalert:function(msg){
+				layer.msg(msg, {
+					time: 3000, //3s后自动关闭
+					icon: 5,
+					anim: 6
+				});
+			}
+		}
+	});
+</script>
+</body>
+</html>

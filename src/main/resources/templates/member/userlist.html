@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<!-- Content Header (Page header) -->
+<section class="content-header" style="">
+    <h1>
+        后台用户列表
+        <small>后台用户列表管理</small>
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> 主页</a></li>
+        <li><a href="#">后台用户列表</a></li>
+        <li class="active">后台用户列表管理</li>
+    </ol>
+</section>
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box">
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <div id="toolbar">
+                        <form class="form-inline" id="searchForm">
+                            <!--<div class="form-group">-->
+                                <!--<label class="control-label" for="userType"><span class="asterisk">*</span>用户类型:</label>-->
+                                <!--<select name="userType" id="userType" class="form-control"-->
+                                        <!--data-placeholder="请从列表选择一项" required>-->
+                                    <!--<option value="all"> 全部</option>-->
+                                    <!--<option value="front"> 前台用户</option>-->
+                                    <!--<option value="back" checked> 后台用户</option>-->
+                                <!--</select>-->
+                                <!--<div class="help-block with-errors"></div>-->
+                            <!--</div>-->
+                            <div class="form-group">
+                                <label for="searchName"> 用户名称</label>
+                                <input type="text" class="form-control input-sm" name="searchName" id="searchName" placeholder="请输入用户名称">
+                            </div>
+                            <div class="btn-group btn-group-sm">
+                                <button type="button" class="btn btn-default"  onclick="javascript:Search();">
+                                    <!--<button type="button" class="btn btn-default" onclick="javascript:$('table').bootstrapTable('refresh', {silent: true});">-->
+
+                                    <i class="glyphicon glyphicon-search"></i>
+                                    查询
+                                </button>
+                                <!--<button type="reset" class="btn btn-default">-->
+                                    <!--<i class="glyphicon glyphicon-trash"></i>-->
+                                    <!--清空-->
+                                <!--</button>-->
+                            </div>
+                        </form>
+                        <div class="btn-group btn-group-sm">
+                            <!-- Provides extra visual weight and identifies the primary action in a set of buttons -->
+                            <button  shiro:hasPermission="userlist:create" type="button" id="addBtn" class="btn btn-default"
+                                    data-toggle="modal"
+                                    data-target="#addModal"><i class="glyphicon glyphicon-plus"></i> 新增
+                            </button>
+                            <!-- Indicates caution should be taken with this action -->
+                            <!--<button style="display:none;" disabled="disabled" shiro:hasPermission="userlist:update" type="button" id="editBtn" class="btn btn-default"-->
+                                    <!--data-toggle="modal"-->
+                                    <!--data-target="#editModal"-->
+                                    <!--data-action="{type:'editable',form:'#editForm',table:'#table'}"-->
+                                    <!--&gt;<i class="glyphicon glyphicon-edit"></i> 修改-->
+                            <!--</button>-->
+                            <!-- Indicates a dangerous or potentially negative action -->
+                            <!--<button style="display:none;" disabled="disabled" shiro:hasPermission="userlist:delete" type="button" id="deleteBtn" class="btn btn-default" data-toggle="modal"-->
+                                    <!--data-target="#deleteModal"-->
+                                    <!--data-action="{type:'delete',form:'#deleteForm',idField:'id',table:'#table'}"-->
+                                    <!--&gt;<i class="glyphicon glyphicon-remove"></i> 删除-->
+                            <!--</button>-->
+                        </div>
+                    </div>
+                    <table id="table"></table>
+                </div>
+                <!-- /.box-body -->
+            </div>
+            <!-- /.box -->
+
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+</section>
+<!-- /.content -->
+
+
+<!-- add Modal -->
+<div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="addModalLabel">添加用户</h4>
+            </div>
+            <div class="modal-body">
+                <form id="addForm">
+                    <div class="form-group">
+                        <label class="control-label" for="username1"><span class="asterisk">*</span>用户名称:</label>
+                        <input id="username1" type="text" class="form-control" name="username" placeholder="输入用户名称"
+                               minlength="3" required>
+                        <div class="help-block with-errors"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label" for="mobile1"><span class="asterisk">*</span>手机号:</label>
+                        <input id="mobile1" type="text" class="form-control" name="mobile" placeholder="输入手机号"
+                            minlength="3" required>
+                        <div class="help-block with-errors"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label">登陆初始密码:</label>
+                        <label class="control-label">123456</label>
+                        <input id="password1" type="hidden" class="form-control" name="password" value="123456" placeholder="登录密码">
+                        <div class="help-block with-errors"></div>
+                    </div>
+
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="submit" form="addForm" class="btn btn-primary"
+                        data-action="{type:'submit',form:'#addForm',url:'@{/admin/userlist/createUser}',after:'$.myAction.refreshTable'}">
+                    确定
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="editModalLabel">修改会员</h4>
+            </div>
+            <div class="modal-body">
+                <form id="editForm">
+                    <input type="hidden" name="id"/>
+                    <div class="form-group">
+                        <label class="control-label" for="username2"><span class="asterisk">*</span>会员名称:</label>
+                        <input id="username2" type="text" class="form-control" name="username" placeholder="输入会员名称"
+                               minlength="3" required>
+                        <div class="help-block with-errors"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" for="mobile2"><span class="asterisk">*</span>手机号:</label>
+                        <input id="mobile2" type="text" class="form-control" name="mobile" placeholder="输入手机号"
+                               minlength="3" required>
+                        <div class="help-block with-errors"></div>
+                    </div>
+                    <!--<div class="form-group">-->
+                        <!--<label class="control-label" for="editType"><span class="asterisk">*</span>会员类型:</label>-->
+                        <!--<select name="memberType" id="editType" class="form-control"-->
+                                <!--data-placeholder="请从列表选择一项" required>-->
+                            <!--<option th:each="memberType : ${memberTypeList}" th:value="${memberType.name}" th:text="${memberType.text}">-->
+                                <!--会员类型不存在-->
+                            <!--</option>-->
+                        <!--</select>-->
+                        <!--<div class="help-block with-errors"></div>-->
+                    <!--</div>-->
+                    <!--<div class="form-group">-->
+                        <!--<label class="control-label" for="editDescription">会员描述:</label>-->
+                        <!--<input id="editDescription" type="text" class="form-control" name="description" placeholder="输入会员描述">-->
+                        <!--<div class="help-block with-errors"></div>-->
+                    <!--</div>-->
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="submit" form="editForm" class="btn btn-primary"
+                        data-action="{type:'submit',form:'#editForm',url:'@{/admin/userlist/updateUser}',after:'$.myAction.refreshTable'}">
+                    确定
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- delete modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteSmallModalLabel">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="deleteSmallModalLabel">删除会员</h4>
+            </div>
+            <div class="modal-body">
+                <form id="deleteForm"></form>
+                确定要删除选中的 <span class="records"></span> 条记录?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" form="deleteForm" class="btn btn-primary"
+                        data-action="{type:'submit',form:'#deleteForm',url:'@{/admin/userlist/deleteUser}',after:'$.myAction.refreshTable'}">
+                    确定
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="actionButtons" class="admin-hide">
+    <a style="display:none;" class="like" href="javascript:void(0)" data-toggle="tooltip" title="Like"><i class="glyphicon glyphicon-heart"></i></a>　
+    <a class="edit ml10" href="javascript:void(0)" data-toggle="tooltip" title="编辑"><i class="glyphicon glyphicon-edit"></i></a>　
+    <a class="remove ml10" href="javascript:void(0)" data-toggle="tooltip" title="删除"><i class="glyphicon glyphicon-remove"></i></a>　
+</div>
+
+<script th:inline="javascript">
+
+    var $table = $('#table');
+    $("body").bind("keypress","#searchName",function(event){
+        // console.log("keypress1")
+        if(event.keyCode == 13){
+            // console.log("keypress2")
+            Search();
+            // $('table').bootstrapTable('refresh', {silent: true});
+            return false;
+        }
+        // console.log("keypress3")
+        // return false;
+    });
+    $(function () {
+        // bootstrap table初始化
+        // http://bootstrap-table.wenzhixin.net.cn/zh-cn/documentation/
+        $table.bootstrapTable({
+            url: CONTEXT_PATH + '/admin/userlist/listPage',
+            pagination: true,
+            queryParams: function queryParams(params){
+                var param = {
+                    pageNumber: params.pageNumber,
+                    pageSize: params.pageSize,
+                    sortName: params.sortName,
+                    sortOrder: params.sortOrder,
+                    searchName:$.trim($('#searchName').val())
+                };
+                return param;
+            },
+            //初始化加载第一页，默认第一页
+            pageNumber: 1,
+            //每页的记录行数
+            pageSize: 10,
+            //可供选择的每页的行数
+            pageList: [10,25,50,100],
+            idField: 'id',
+            detailView : false,
+            detailFormatter :"detailFormatter",
+            columns: [
+                //{field: 'state', checkbox: true},
+                //{field: 'uid', title: '用户id', sortable: true, halign: 'left',visible: true},
+                {field: 'username', title: '用户名称', sortable: false, halign: 'left'},
+                {field: 'mobile', title: '手机号', sortable: false, halign: 'left'},
+                // {field: 'userType', title: '用户类型', formatter: 'getUserType',sortable: false, halign: 'left'},
+                // {field: 'memType', title: '会员类型', formatter: 'getMemType',sortable: false, halign: 'left',visible: false},
+                // {field: 'certType', title: '认证状态',formatter: 'getCertType', sortable: false, halign: 'left',visible: false},
+                {
+                    field: 'action',
+                    title: '操作',
+                    halign: 'center',
+                    align: 'center',
+                    formatter: 'actionFormatter',
+                    events: 'actionEvents',
+                    clickToSelect: false
+                }
+            ]
+        });
+    });
+
+    function getUserType(value) {
+        if('back'==value){
+            return '后台运营用户';
+        }else if('front'==value){
+            return '前台会员';
+        }else{
+            return '后台运营用户';
+        }
+    }
+
+    function getMemType(value) {
+        if('COMPANY'==value || 'company'==value){
+            return '企业用户';
+        }else if('PERSON'==value || 'person'==value){
+            return '个人用户';
+        }else{
+            return '企业用户';
+        }
+    }
+
+    function getCertType(value) {
+        if('UNCERTIFIED'==value || 'uncertified'==value){
+            return '未认证';
+        }else if('CERTIFING'==value || 'certifing'==value){
+            return '认证中';
+        }else if('CERTFAIL'==value || 'certfail'==value){
+            return '认证失败';
+        }else if('CERTIFIED'==value || 'certified'==value){
+            return '认证通过';
+        }
+        else{
+            return '未认证';
+        }
+    }
+
+    // 数据表格展开内容
+    function detailFormatter(index, row) {
+        var html = [];
+        $.each(row, function (key, value) {
+            html.push('<p><b>' + key + ':</b> ' + value + '</p>');
+        });
+        return html.join('');
+    }
+
+    function actionFormatter(value, row, index) {
+        return $('#actionButtons').html();
+    }
+
+    window.actionEvents = {
+        // 'click .like': function (e, value, row, index) {
+        //     alert('You click like icon, row: ' + JSON.stringify(row));
+        //     console.log(value, row, index);
+        // },
+        'click .edit': function (e, value, row, index) {
+            $('#editModal').modal('show')
+            $('#editForm').fillForm(row);
+            // console.log(value, row, index);
+        },
+        'click .remove': function (e, value, row, index) {
+            $('#deleteModal').modal('show');
+            $('.records').html('1');
+            var html = '';
+            for (var key in row) {
+                html += '<input type="hidden" name="' + key + '" value="' + row[key] + '">';
+            }
+            $('#deleteForm').html(html);
+        }
+    };
+
+    function Search() {
+
+        var searchName= $.trim($('#searchName').val());
+        if (isEmpty(searchName)) { //为空时查全部
+            searchName = "";
+        }
+        // var userType= $('#userType').val();
+        var options = $('#table').bootstrapTable('refresh', {
+            silent: true,
+            query:
+                {
+                    searchName:searchName
+                    // ,userType:userType
+                }
+        });
+    }
+
+    function isEmpty(obj){
+        if(typeof obj == "undefined" || obj == null || obj == ""){
+            return true;
+        }else{
+            return false;
+        }
+    }
+</script>
+</html>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.pface.admin.otherdb.mapper.UserInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.pface.admin.otherdb.po.UserInfo" >
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="USER_ID" property="userId" jdbcType="INTEGER" />
+    <result column="USER_LOGIN" property="userLogin" jdbcType="VARCHAR" />
+    <result column="USER_PASSWORD" property="userPassword" jdbcType="VARCHAR" />
+    <result column="USER_NAME" property="userName" jdbcType="VARCHAR" />
+    <result column="USER_MAIL" property="userMail" jdbcType="VARCHAR" />
+    <result column="USER_PHONE" property="userPhone" jdbcType="VARCHAR" />
+    <result column="USER_COMPANY" property="userCompany" jdbcType="VARCHAR" />
+    <result column="USER_ADDRESS" property="userAddress" jdbcType="VARCHAR" />
+    <result column="USER_CREATETIME" property="userCreatetime" jdbcType="TIMESTAMP" />
+    <result column="USER_PONITS" property="userPonits" jdbcType="INTEGER" />
+    <result column="USER_LOGO" property="userLogo" jdbcType="VARCHAR" />
+    <result column="USER_STATUS" property="userStatus" jdbcType="BIT" />
+    <result column="USER_TYPE" property="userType" jdbcType="INTEGER" />
+    <result column="USER_QQ" property="userQq" jdbcType="VARCHAR" />
+    <result column="USER_JOB" property="userJob" jdbcType="VARCHAR" />
+    <result column="USER_HANDPHONE" property="userHandphone" jdbcType="VARCHAR" />
+    <result column="USER_TYPE_MEMO" property="userTypeMemo" jdbcType="VARCHAR" />
+    <result column="USER_CONTRACT" property="userContract" jdbcType="VARCHAR" />
+    <result column="USER_LIMIT_LVL" property="userLimitLvl" jdbcType="INTEGER" />
+    <result column="USER_LIMIT_PROVINCE" property="userLimitProvince" jdbcType="NVARCHAR" />
+    <result column="USER_LIMIT_CITY" property="userLimitCity" jdbcType="NVARCHAR" />
+    <result column="USER_LIMIT_COUNTRY" property="userLimitCountry" jdbcType="NVARCHAR" />
+    <result column="USER_BIZ_TYPE" property="userBizType" jdbcType="NVARCHAR" />
+    <result column="USER_TIME_VALUE" property="userTimeValue" jdbcType="INTEGER" />
+    <result column="USER_MTR_BIZ_TYPE" property="userMtrBizType" jdbcType="INTEGER" />
+    <result column="USER_TVMID" property="userTvmid" jdbcType="VARCHAR" />
+    <result column="PROVINCE_ID" property="provinceId" jdbcType="INTEGER" />
+    <result column="CITY_ID" property="cityId" jdbcType="INTEGER" />
+    <result column="COUNTRY_ID" property="countryId" jdbcType="INTEGER" />
+  </resultMap>
+  <insert id="save" parameterType="com.pface.admin.otherdb.po.UserInfo" >
+    <selectKey  resultType="java.lang.Integer" order="AFTER" keyProperty="userId">
+        select ident_current('dbo.USER_INFO') AS userId
+    </selectKey>
+    insert into dbo.USER_INFO (USER_LOGIN,USER_NAME,USER_PASSWORD,USER_PHONE,USER_MAIL,USER_TYPE,USER_STATUS)
+    values (#{userLogin},#{userName},#{userPassword},#{userPhone},#{userMail},#{userType},#{userStatus})
+  </insert>
+</mapper>

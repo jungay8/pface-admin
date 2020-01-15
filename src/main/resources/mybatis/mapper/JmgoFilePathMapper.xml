@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.pface.admin.modules.member.mapper.JmgoFilePathMapper" >
+  <resultMap id="BaseResultMap" type="com.pface.admin.modules.member.po.JmgoFilePath" >
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="pathname" property="pathname" jdbcType="VARCHAR" />
+    <result column="virtualpath" property="virtualpath" jdbcType="VARCHAR" />
+    <result column="realpath" property="realpath" jdbcType="VARCHAR" />
+    <result column="useflag" property="useflag" jdbcType="INTEGER" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+  </resultMap>
+</mapper>

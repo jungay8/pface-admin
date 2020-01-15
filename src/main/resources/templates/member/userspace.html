@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<!-- Content Header (Page header) -->
+<section class="content-header" style="">
+    <h1>
+        库存管理
+        <small>用户存储量统计页面</small>
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> 主页</a></li>
+        <li><a href="#">库存管理</a></li>
+        <li class="active">用户存储量统计</li>
+    </ol>
+</section>
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box">
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <div>
+                        <form class="form-inline" id="searchForm">
+                            <div class="form-group">
+                                <label for="searchName">会员名称</label>
+                                <input type="text" class="form-control input-sm" name="name" id="searchName" placeholder="请输入名称">
+                            </div>
+                            <div class="btn-group btn-group-sm">
+                                <button type="button" class="btn btn-default" onclick="javascript:Search();">
+                                    <i class="glyphicon glyphicon-search"></i>
+                                    统计
+                                </button>
+                                <!--<button type="reset" class="btn btn-default">-->
+                                <!--<i class="glyphicon glyphicon-trash"></i>-->
+                                <!--清空-->
+                                <!--</button>-->
+                            </div>
+                        </form>
+                    </div>
+                    <!--<div id="toolbar">-->
+                        <!--<div class="btn-group btn-group-sm">-->
+                            <!-- Provides extra visual weight and identifies the primary action in a set of buttons -->
+                            <!--<button style="display: none" shiro:hasPermission="pricelab:create" type="button" id="addBtn" class="btn btn-default"-->
+                            <!--data-toggle="modal"-->
+                            <!--data-target="#addModal"><i class="glyphicon glyphicon-plus"></i> 新增-->
+                            <!--</button>-->
+                            <!-- Indicates caution should be taken with this action -->
+                            <!--<button style="display: none" shiro:hasPermission="pricelab:update" type="button" id="editBtn" class="btn btn-default"-->
+                            <!--data-toggle="modal"-->
+                            <!--data-target="#editModal"-->
+                            <!--data-action="{type:'editable',form:'#editForm',table:'#table'}"-->
+                            <!--disabled><i class="glyphicon glyphicon-edit"></i> 修改-->
+                            <!--</button>-->
+                            <!-- Indicates a dangerous or potentially negative action -->
+                            <!--<button shiro:hasPermission="pricelab:delete" type="button" id="deleteBtn" class="btn btn-default" data-toggle="modal"-->
+                                    <!--data-target="#deleteModal"-->
+                                    <!--data-action="{type:'delete',form:'#deleteForm',idField:'id',table:'#table'}"-->
+                                    <!--disabled><i class="glyphicon glyphicon-remove"></i> 删除-->
+                            <!--</button>-->
+                        <!--</div>-->
+                    <!--</div>-->
+                    <table id="table"></table>
+                </div>
+                <!-- /.box-body -->
+            </div>
+            <!-- /.box -->
+
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+</section>
+<!-- /.content -->
+
+<div id="actionButtons" class="admin-hide">
+    <a style="display: none" class="like" href="javascript:void(0)" data-toggle="tooltip" title="Like"><i class="glyphicon glyphicon-heart"></i></a>　
+    <!--<a shiro:hasPermission="pricelab:update" class="edit ml10" href="javascript:void(0)" data-toggle="tooltip" title="编辑"><i class="glyphicon glyphicon-edit"></i></a>　-->
+    <!--<a shiro:hasPermission="pricelab:delete" class="remove ml10" href="javascript:void(0)" data-toggle="tooltip" title="删除"><i class="glyphicon glyphicon-remove"></i></a>　-->
+</div>
+
+<script th:inline="javascript">
+
+    var $table = $('#table');
+    $("body").bind("keypress","#searchName",function(event){
+        if(event.keyCode == 13){
+            Search();
+            return false;
+        }
+    });
+    $(function () {
+        // bootstrap table初始化
+        // http://bootstrap-table.wenzhixin.net.cn/zh-cn/documentation/
+        $table.bootstrapTable({
+            url: CONTEXT_PATH + '/admin/userspace/list',
+            showToggle:false,                    //是否显示详细视图和列表视图的切换按钮
+            cardView: false,                    //是否显示详细视图
+            detailView: false,                  //是否显示父子表
+            cache: false,                       // 设置为 false 禁用 AJAX 数据缓存， 默认为true
+            sortable: true,                     //是否启用排序
+            sortOrder: "asc",
+            //showExport: phoneOrPc(),              //是否显示导出按钮(此方法是自己写的目的是判断终端是电脑还是手机,电脑则返回true,手机返回falsee,手机不显示按钮)
+            // exportDataType: "basic",              //basic', 'all', 'selected'.
+            // exportTypes:['excel','xlsx'],	    //导出类型
+            //exportButton: $('#btn_export'),     //为按钮btn_export  绑定导出事件  自定义导出按钮(可以不用)
+            /* exportOptions:{
+                 //ignoreColumn: [0,0],            //忽略某一列的索引
+                 fileName: '数据导出',              //文件名称设置
+                 worksheetName: 'Sheet1',          //表格工作区名称
+                 tableName: '商品数据表',
+                 excelstyles: ['background-color', 'color', 'font-size', 'font-weight'],
+                 //onMsoNumberFormat: DoOnMsoNumberFormat
+             },*/
+            //设置为 true 会有隔行变色效果
+            striped: true,
+            //设置为 true 会在表格底部显示分页条。
+            pagination: true,
+            queryParams: function queryParams(params){
+                var param = {
+                    pageNumber: params.pageNumber,
+                    pageSize: params.pageSize,
+                    sortName: params.sortName,
+                    sortOrder: params.sortOrder,
+                    userName : $.trim($('#searchName').val())
+                };
+                return param;
+            },
+            //初始化加载第一页，默认第一页
+            pageNumber: 1,
+            //每页的记录行数
+            pageSize: 10,
+            //可供选择的每页的行数
+            pageList: [10,25,50,100],
+            idField: 'userId',
+            columns: [
+                // {field: 'state', checkbox: true},
+                // {field: 'userId', title: '用户id编号', sortable: true, halign: 'left'},
+                {field: 'userName', title: '用户', sortable: true, halign: 'left'},
+                {field: 'videoSpace', title: '视频空间（MB）', sortable: true, halign: 'left'},
+                {field: 'audioSpace', title: '音频空间（MB）', sortable: true, halign: 'left'},
+                // {field: 'uid', title: '会员id', sortable: true, halign: 'left',visible: false},
+                {field: 'docSpace', title: '图文空间（MB）', sortable: true, halign: 'left'},
+                {field: 'totalSpace', title: '总空间（MB）', sortable: true, halign: 'left'}//,
+                // {field: 'labelStatus.name', title: '审核id', sortable: true, halign: 'left',visible: false},
+                // {field: 'labelStatus.text', title: '审核状态', sortable: true, halign: 'left',visible: false},
+                // {
+                //     field: 'action',
+                //     title: '操作',
+                //     halign: 'center',
+                //     align: 'center',
+                //     formatter: 'actionFormatter',
+                //     events: 'actionEvents',
+                //     clickToSelect: false
+                // }
+            ]
+        });
+    });
+
+    // 数据表格展开内容
+    function detailFormatter(index, row) {
+        var html = [];
+        $.each(row, function (key, value) {
+            html.push('<p><b>' + key + ':</b> ' + value + '</p>');
+        });
+        return html.join('');
+    }
+
+    function actionFormatter(value, row, index) {
+        return $('#actionButtons').html();
+    }
+
+    window.actionEvents = {
+        /* 'click .like': function (e, value, row, index) {
+             alert('You click like icon, row: ' + JSON.stringify(row));
+             console.log(value, row, index);
+         },*/
+        'click .edit': function (e, value, row, index) {
+            $('#editModal').modal('show')
+            $('#editForm').fillForm(row);
+            console.log(value, row, index);
+        },
+        'click .remove': function (e, value, row, index) {
+            $('#deleteModal').modal('show');
+            $('.records').html('1');
+            var html = '';
+            for (var key in row) {
+                html += '<input type="hidden" name="' + key + '" value="' + row[key] + '">';
+            }
+            $('#deleteForm').html(html);
+        }
+    };
+    function Search() {
+        var _uid= $('#searchName').val();
+        var options = $('#table').bootstrapTable('refresh', {
+            silent: true,
+            query:
+                {
+                    userName:_uid
+                }
+        });
+    }
+
+
+    /*判断终端是手机还是电脑--用于判断文件是否导出(电脑需要导出)*/
+    function phoneOrPc(){
+        var sUserAgent = navigator.userAgent.toLowerCase();
+        var bIsIpad = sUserAgent.match(/ipad/i) == "ipad";
+        var bIsIphoneOs = sUserAgent.match(/iphone os/i) == "iphone os";
+        var bIsMidp = sUserAgent.match(/midp/i) == "midp";
+        var bIsUc7 = sUserAgent.match(/rv:1.2.3.4/i) == "rv:1.2.3.4";
+        var bIsUc = sUserAgent.match(/ucweb/i) == "ucweb";
+        var bIsAndroid = sUserAgent.match(/android/i) == "android";
+        var bIsCE = sUserAgent.match(/windows ce/i) == "windows ce";
+        var bIsWM = sUserAgent.match(/windows mobile/i) == "windows mobile";
+        if (bIsIpad || bIsIphoneOs || bIsMidp || bIsUc7 || bIsUc || bIsAndroid || bIsCE || bIsWM) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+</script>
+</html>

@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+
+<section class="content-header" style="">
+    <h1>
+        授权管理
+        <small>授权管理页面</small>
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> 主页</a></li>
+        <li><a href="#">授权管理</a></li>
+        <li class="active">授权管理</li>
+    </ol>
+</section>
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box">
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <div>
+                        <form class="form-inline" id="searchForm">
+
+                            <div class="form-group">
+
+                                <label for="username">客户：</label>
+                                <select name="username" id="username" class="form-control">
+                                    <option value="">全部</option>
+                                    <option th:each="user : ${users}" th:value="${user.id}" th:text="${user.username}">
+                                        不存在
+                                    </option>
+                                </select>
+                                <label for="deviceId">智能设备：</label>
+                                <select name="deviceId" id="deviceId" class="form-control">
+                                    <option value="">全部</option>
+                                    <option th:each="sensebox : ${senseboxalllist}" th:value="${sensebox.deviceId}" th:text="${sensebox.deviceId}">
+                                        分类不存在
+                                    </option>
+                                </select>
+                                <!--<label for="cameraStatus">相机在线状态</label>-->
+                                <!--<select name="cameraStatus" id="cameraStatus" class="form-control">-->
+                                    <!--<option value="">全部</option>-->
+                                    <!--<option value="on">在线</option>-->
+                                    <!--<option value="off">离线</option>-->
+                                <!--</select>-->
+
+                            </div>
+                            <!--<div class="form-group" style="display: none">
+                                <label for="reservation">时间</label>
+                                <div class="input-group">
+                                    <div class="input-group-addon">
+                                        <i class="fa fa-calendar"></i>
+                                    </div>
+                                    <input type="text" class="form-control input-sm" id="reservation">
+                                    <input type="hidden" name="startDate" id="startDate">
+                                    <input type="hidden" name="endDate" id="endDate">
+                                </div>
+                            </div>-->
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-default btn-sm" onclick="javascript:Search();">
+                                    <i class="glyphicon glyphicon-search"></i>
+                                    查询
+                                </button>
+                                <!--<button type="reset" class="btn btn-default btn-sm" id="reset"-->
+                                        <!--onclick="javascript:document.querySelectorAll('#startDate, #endDate').forEach(d=> d.value='')">-->
+                                    <!--<i class="glyphicon glyphicon-trash"></i>-->
+                                    <!--清空-->
+                                <!--</button>-->
+                            </div>
+                        </form>
+                    </div>
+                    <div id="toolbar">
+
+                    </div>
+                    <table id="table"></table>
+                </div>
+                <!-- /.box-body -->
+            </div>
+            <!-- /.box -->
+
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+</section>
+<!-- /.content -->
+
+
+<!-- edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="editModalLabel">修改授权</h4>
+            </div>
+            <div class="modal-body">
+                <form id="editForm">
+                    <input type="hidden" name="id"/>
+                    <input type="hidden" name="deviceId"/>
+                    <div class="form-group">
+                        <label class="control-label" for="uusername"><span class="asterisk"></span>客户:</label>
+                        <input id="uusername" type="text" class="form-control" name="username" placeholder=""  disabled="disabled">
+                        <div class="help-block with-errors"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label" for="udeviceId"><span class="asterisk"></span>设备名称:</label>
+                        <input id="udeviceId" type="text" class="form-control" name="deviceId" placeholder="" disabled="disabled">
+                        <div class="help-block with-errors"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" for="ucameraName"><span class="asterisk"></span>相机名称:</label>
+                        <input id="ucameraName" type="text" class="form-control" name="cameraName" placeholder="" disabled="disabled">
+                        <div class="help-block with-errors"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label" for="uchannel"><span class="asterisk"></span>通道号:</label>
+                        <input id="uchannel" type="text" class="form-control" name="channel" value="admin" placeholder="" disabled="disabled">
+                        <div class="help-block with-errors"></div>
+                    </div>
+
+                    <div class="form-group" style="display: block">
+                            <label  class="control-label" for="reservation">时间</label>
+                            <div class="input-group">
+                                <div class="input-group-addon">
+                                    <i class="fa fa-calendar"></i>
+                                </div>
+                                <input type="text" class="form-control input-sm" id="reservation">
+                                <input type="hidden" name="authBegindate" id="startDate">
+                                <input type="hidden" name="authEnddate" id="endDate">
+                            </div>
+                        </div>
+
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="submit" form="editForm" class="btn btn-primary"
+                        data-action="{type:'submit',form:'#editForm',url:'@{/admin/faceuserchannelres/update}',after:'$.myAction.refreshTable'}">
+                    确定
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- batch delete modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteSmallModalLabel">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="deleteSmallModalLabel">删除授权</h4>
+            </div>
+            <div class="modal-body">
+                <form id="deleteForm"></form>
+                确定要删除 <span class="records"></span> 条记录?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" form="deleteForm" class="btn btn-primary"
+                        data-action="{type:'submit',form:'#deleteForm',url:'@{/admin/faceuserchannelres/logic-delete-batch}',after:'$.myAction.refreshTable'}">
+                    确定
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="actionButtons" class="admin-hide">
+    <a style="display:none;" class="like" href="javascript:void(0)" data-toggle="tooltip" title="Like"><i class="glyphicon glyphicon-heart"></i></a>　
+    <!--<a class="edit ml10" href="javascript:void(0)" data-toggle="tooltip" title="编辑"><i class="glyphicon glyphicon-edit"></i></a>　-->
+    <a class="remove ml10" href="javascript:void(0)" data-toggle="tooltip" title="删除"><i class="glyphicon glyphicon-remove"></i></a>　
+</div>
+
+
+<script>
+
+    var $table = $('#table');
+    // $("body").bind("keypress","#member",function(event){
+    //     if(event.keyCode == 13){
+    //         Search();
+    //         return false;
+    //     }
+    // });
+    $(function () {
+        //Date range picker
+        var beginTimeTake;
+        $('#reservation').daterangepicker({
+            "timePicker": false,
+            "timePicker24Hour": true,
+            "linkedCalendars": false,
+            "autoUpdateInput": false,
+            "locale": {
+                format: 'YYYY-MM-DD',
+                separator: ' ~ ',
+                applyLabel: "应用",
+                cancelLabel: "取消",
+                resetLabel: "重置",
+                daysOfWeek: ["日", "一", "二", "三", "四", "五", "六"],
+                monthNames: ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"],
+            }
+        }, function (start, end, label) {
+            if (!this.startDate) {
+                this.element.val('');
+            } else {
+                $('#startDate').val(this.startDate.format(this.locale.format));
+                $('#endDate').val(this.endDate.format(this.locale.format));
+                this.element.val(this.startDate.format(this.locale.format) + this.locale.separator + this.endDate.format(this.locale.format));
+            }
+        });
+        // bootstrap table初始化
+        // http://bootstrap-table.wenzhixin.net.cn/zh-cn/documentation/
+        $table.bootstrapTable({
+            url: CONTEXT_PATH + '/admin/faceuserchannelres/listpage',
+            pagination: true,
+            queryParams: function queryParams(params){
+                var param = {
+                    pageNumber: params.pageNumber,
+                    pageSize: params.pageSize,
+                    sortName: params.sortName,
+                    sortOrder: params.sortOrder,
+                    username:$('#username').val(),
+                    deviceId:$('#deviceId').val(),
+                    cameraStatus:$('#cameraStatus').val()
+                };
+                return param;
+            },
+            //初始化加载第一页，默认第一页
+            pageNumber: 1,
+            //每页的记录行数
+            pageSize: 10,
+            //可供选择的每页的行数
+            pageList: [10,25,50],
+            idField: 'id',
+            detailView: false,
+            columns: [
+                //{field: 'state', checkbox: true},
+                //{field: 'id', title: '编号', sortable: true, halign: 'left'},
+                {field: 'deviceId', title: '设备id', sortable: false, halign: 'left'},
+                {field: 'channel', title: '通道ID', sortable: false, halign: 'left'},
+                {field: 'cameraStatus', title: '通道相机状态', formatter:'cameraStatusName',sortable: false, halign: 'left'},
+                {field: 'cameraName', title: '相机名称', sortable: false, halign: 'left',visible: false},
+                {field: 'cameraInstallLocation', title: '安装位置', sortable: false, halign: 'left',visible: false},
+                {field: 'authBegindate', title: '授权开始时间',  formatter:'timeFormatter', sortable: false, halign: 'left'},
+                {field: 'authEnddate', title: '授权结束时间', formatter:'timeFormatter', sortable: false, halign: 'left'},
+                {field: 'username', title: '授权用户', sortable: false, halign: 'left'},
+                {
+                    field: 'action',
+                    title: '操作',
+                    halign: 'center',
+                    align: 'center',
+                    formatter: 'actionFormatter',
+                    events: 'actionEvents',
+                    clickToSelect: false
+                }
+            ]
+        });
+    });
+
+
+    window.actionEvents = {
+        'click .like': function (e, value, row, index) {
+            alert('You click like icon, row: ' + JSON.stringify(row));
+            console.log(value, row, index);
+        },
+        'click .edit': function (e, value, row, index) {
+            debugger;
+            $('#editModal').modal('show')
+            $('#editForm').fillForm(row);
+            $("#uremark").val(row.remark);//页面认id
+            console.log(value, row, index);
+        },
+        'click .remove': function (e, value, row, index) {
+            $.ajax({
+                type: "POST",
+                url: CONTEXT_PATH + '/admin/faceuserchannelres/checkFaceUserChannelRes',
+                async:false,
+                data: {
+                    id: row["id"]
+                },
+                dataType: "json",
+                success: function (data) {
+                    if (data.success) {
+                        if (data.extra.flag) {
+                            $('#deleteModal').modal('show');
+                            $('.records').html('1');
+                            var html = '';
+                            for (var key in row) {
+                                html += '<input type="hidden" name="' + key + '" value="' + row[key] + '">';
+                            }
+                            $('#deleteForm').html(html);
+                        }else{
+                            alert(data.extra.msg)
+                        }
+                    }else {
+                        console.log("请求静态数据错误,请稍后再试。")
+                    }
+                },
+                error: function (e) {
+                    console.log("请求静态数据错误,请稍后再试。")
+                }
+
+            })
+
+        }
+    };
+
+
+    function timeFormatter(value, row, index) {
+        return Utils.dateFormat.formatTimestamp(value, 'yyyy-MM-dd hh:mm:ss');
+    }
+    function cameraStatusName(value, row, index) {
+        var name = '';
+        if (value=='on'){
+            name = '在线';
+        } else if (value =='off'){
+            name = '离线';
+        }else{
+            name = '未知';
+        }
+        return name;
+    }
+
+    function execTimeFormatter(value, row, index) {
+        return value + ' ms';
+    }
+
+    function actionFormatter(value, row, index) {
+        return $('#actionButtons').html();
+    }
+
+    function Search() {
+        var username= $('#username').val();
+        var deviceId= $('#deviceId').val();
+        var cameraStatus=$('#cameraStatus').val();
+
+        var options = $('#table').bootstrapTable('refresh', {
+            silent: true,
+            query:
+                {
+                    username:username,
+                    deviceId:deviceId,
+                    cameraStatus:cameraStatus
+                }
+        });
+    }
+
+</script>
+</html>

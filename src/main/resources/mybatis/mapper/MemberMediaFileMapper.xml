@@ -1,0 +1,339 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pface.admin.modules.member.mapper.MemberMediaFileMapper">
+    <resultMap id="BaseResultMap" type="com.pface.admin.modules.member.po.MemberMediaFile">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="uid" jdbcType="BIGINT" property="uid"/>
+        <result column="media_type" jdbcType="VARCHAR" property="mediaType"/>
+        <!--<result column="catalogue_id" jdbcType="BIGINT" property="catalogueId"/>-->
+        <result column="is_media_info" jdbcType="VARCHAR" property="isMediaInfo"/>
+        <result column="is_publish_media" jdbcType="VARCHAR" property="isPublishMedia"/>
+        <result column="media_status" jdbcType="VARCHAR" property="mediaStatus"/>
+        <result column="goods_status" jdbcType="VARCHAR" property="goodsStatus"/>
+        <result column="file_url" jdbcType="VARCHAR" property="fileUrl"/>
+        <result column="file_encode_url" jdbcType="VARCHAR" property="fileEncodeUrl"/>
+        <result column="file_view_url" jdbcType="VARCHAR" property="fileViewUrl"/>
+        <result column="file_encode_name" jdbcType="VARCHAR" property="fileEncodeName"/>
+        <result column="file_view_name" jdbcType="VARCHAR" property="fileViewName"/>
+        <result column="file_cover_name" jdbcType="VARCHAR" property="fileCoverName"/>
+        <result column="file_name" jdbcType="VARCHAR" property="fileName"/>
+        <result column="file_new_name" jdbcType="VARCHAR" property="fileNewName"/>
+        <result column="file_size" jdbcType="DOUBLE" property="fileSize"/>
+        <result column="file_view_size" jdbcType="DOUBLE" property="fileViewSize"/>
+        <result column="file_encode_size" jdbcType="DOUBLE" property="fileEncodeSize"/>
+        <result column="file_md5" jdbcType="VARCHAR" property="fileMd5"/>
+        <result column="file_ext" jdbcType="VARCHAR" property="fileExt"/>
+        <result column="file_duration" jdbcType="BIGINT" property="fileDuration"/>
+        <result column="file_bitrate" jdbcType="VARCHAR" property="fileCodec"/>
+        <result column="file_codec" jdbcType="VARCHAR" property="fileMd5"/>
+        <result column="file_resolution" jdbcType="VARCHAR" property="fileResolution"/>
+        <result column="file_aspect_ration" jdbcType="VARCHAR" property="fileAspectRation"/>
+        <result column="changcodeflag" property="changcodeflag" jdbcType="INTEGER"/>
+        <result column="changcodeResult" jdbcType="VARCHAR" property="changcodeResult"/>
+        <result column="changcodetaskid" jdbcType="VARCHAR" property="changcodetaskid"/>
+        <result column="upload_date" jdbcType="TIMESTAMP" property="uploadDate"/>
+        <result column="op_date" jdbcType="TIMESTAMP" property="opDate"/>
+        <result column="del_flag" property="delFlag" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <resultMap id="MemberMediaPojoResultMap" type="com.pface.admin.modules.front.vo.MemberMediaPojo">
+
+        <result column="id" jdbcType="BIGINT" property="id"/>
+        <result column="uid" jdbcType="BIGINT" property="uid"/>
+        <result column="uname" jdbcType="VARCHAR" property="uname"/>
+        <result column="media_type" jdbcType="VARCHAR" property="mediaType"/>
+        <!--<result column="catalogue_id" jdbcType="BIGINT" property="catalogueId"/>-->
+        <result column="is_media_info" jdbcType="VARCHAR" property="isMediaInfo"/>
+        <result column="is_publish_media" jdbcType="VARCHAR" property="isPublishMedia"/>
+        <result column="media_status" jdbcType="VARCHAR" property="mediaStatus"/>
+        <result column="goods_status" jdbcType="VARCHAR" property="goodsStatus"/>
+        <result column="file_url" jdbcType="VARCHAR" property="fileUrl"/>
+        <result column="file_encode_url" jdbcType="VARCHAR" property="fileEncodeUrl"/>
+        <result column="file_view_url" jdbcType="VARCHAR" property="fileViewUrl"/>
+        <result column="file_encode_name" jdbcType="VARCHAR" property="fileEncodeName"/>
+        <result column="file_view_name" jdbcType="VARCHAR" property="fileViewName"/>
+        <result column="file_cover_name" jdbcType="VARCHAR" property="fileCoverName"/>
+        <result column="file_name" jdbcType="VARCHAR" property="fileName"/>
+        <result column="file_new_name" jdbcType="VARCHAR" property="fileNewName"/>
+        <result column="file_size" jdbcType="DOUBLE" property="fileSize"/>
+        <result column="file_view_size" jdbcType="DOUBLE" property="fileViewSize"/>
+        <result column="file_encode_size" jdbcType="DOUBLE" property="fileEncodeSize"/>
+        <result column="file_md5" jdbcType="VARCHAR" property="fileMd5"/>
+        <result column="file_ext" jdbcType="VARCHAR" property="fileExt"/>
+        <result column="file_duration" jdbcType="BIGINT" property="fileDuration"/>
+        <result column="file_bitrate" jdbcType="VARCHAR" property="fileBitrate"/>
+        <result column="file_codec" jdbcType="VARCHAR" property="fileCodec"/>
+        <result column="file_resolution" jdbcType="VARCHAR" property="fileResolution"/>
+        <result column="file_aspect_ration" jdbcType="VARCHAR" property="fileAspectRation"/>
+        <result column="changcodeflag" property="changcodeflag" jdbcType="INTEGER"/>
+        <result column="changcodetaskid" jdbcType="VARCHAR" property="changcodetaskid"/>
+        <result column="upload_date" jdbcType="TIMESTAMP" property="uploadDate"/>
+        <result column="op_date" jdbcType="TIMESTAMP" property="opDate"/>
+        <result column="del_flag" property="delFlag" jdbcType="INTEGER"/>
+
+        <result column="mediaId" jdbcType="BIGINT" property="mediaId" />
+        <result column="media_file_id" jdbcType="BIGINT" property="mediaFileId" />
+        <result column="media_title" jdbcType="VARCHAR" property="mediaTitle" />
+        <result column="media_keyword" jdbcType="VARCHAR" property="mediaKeyword" />
+        <result column="belong_labelid" jdbcType="VARCHAR" property="belongLabelid" />
+        <result column="price_labelid" jdbcType="VARCHAR" property="priceLabelid" />
+        <result column="price" property="price" jdbcType="DOUBLE" />
+        <result column="publish_labelid" jdbcType="VARCHAR" property="publishLabelid" />
+        <result column="catalogue_id" jdbcType="BIGINT" property="catalogueId" />
+        <result column="cover_url" jdbcType="VARCHAR" property="coverUrl" />
+        <result column="upload_cover_url" jdbcType="VARCHAR" property="uploadCoverUrl" />
+        <result column="cover_source_url" jdbcType="VARCHAR" property="coverSourceUrl" />
+        <result column="cover_origin" jdbcType="VARCHAR" property="coverOrigin" />
+        <result column="lastedAuditMsg" jdbcType="VARCHAR" property="lastedAuditMsg" />
+        <result column="imgfileIds" jdbcType="VARCHAR" property="imgfileIds" />
+        <result column="imgfilePaths" jdbcType="VARCHAR" property="imgfilePaths" />
+
+        <!--<result column="uid" jdbcType="BIGINT" property="uid" />-->
+        <!--<result column="op_date" jdbcType="TIMESTAMP" property="opDate" />-->
+        <!--<result column="del_flag" property="delFlag" jdbcType="INTEGER" />-->
+    </resultMap>
+
+
+    <select id="getDiskByCatalog" parameterType="java.lang.Long"
+            resultType="com.pface.admin.modules.member.dto.DiskInfoDTO">
+        SELECT
+        tmp.catalogueId,
+        cat.name,
+        tmp.totalSize
+        FROM (
+        select catalogue_id as catalogueId, sum(file_size) as totalSize from jmgo_member_media_file
+        where del_flag=0
+        <if test="catalogId != null and catalogId != ''">
+            AND catalogue_id=#{catalogId}
+        </if>
+        GROUP BY catalogue_id
+        ) tmp
+        LEFT JOIN jmgo_member_catalogue cat on tmp.catalogueId=cat.id
+    </select>
+    <select id="getDiskByUid" parameterType="java.lang.Long" resultType="com.pface.admin.modules.member.dto.DiskInfoDTO">
+        SELECT
+        tmp.uid,
+        usr.uname,
+        tmp.totalSize
+        FROM (
+        select uid as uid, sum(file_size) as totalSize from jmgo_member_media_file
+        where del_flag=0
+        <if test="uid != null and uid != ''">
+            AND uid=#{uid}
+        </if>
+        GROUP BY uid
+        )tmp
+        LEFT JOIN jmgo_member_user usr on tmp.uid=usr.id
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id"
+            parameterType="com.pface.admin.modules.member.po.MemberMediaFile" >
+
+    INSERT INTO jmgo_member_media_file(uid, media_status, is_publish_media, is_media_info, catalogue_id, media_type,
+    goods_status, file_url, file_encode_url, file_view_url, file_name, file_new_name, file_encode_name, file_view_name,
+    file_cover_name, file_size, file_encode_size, file_view_size, changcodeflag, changcodeResult, changcodetaskid, file_md5,
+    file_ext, file_duration, file_bitrate, file_codec, file_resolution, file_aspect_ration, upload_date, op_date, del_flag)
+    VALUES (#{uid}, #{mediaStatus}, #{isPublishMedia}, #{isMediaInfo}, #{catalogueId}, #{mediaType},
+    #{goodsStatus}, #{fileUrl}, #{fileEncodeUrl}, #{fileViewUrl}, #{fileName}, #{fileNewName}, #{fileEncodeName}, #{fileViewName},
+    #{fileCoverName}, #{fileSize}, #{fileEncodeSize}, #{fileViewSize}, #{changcodeflag}, #{changcodeResult},#{changcodetaskid},#{fileMd5},
+    #{fileExt},#{fileDuration},#{fileBitrate}, #{fileCodec}, #{fileResolution}, #{fileAspectRation}, #{uploadDate}, #{opDate},#{delFlag})
+    </insert>
+
+    <!--这里的列名称对象resultMap中的column-->
+    <sql id="queryMemberMediaColumns">
+        f.id,
+        f.uid,
+        u.uname,
+        f.media_status ,
+        f.is_media_info ,
+        f.media_type ,
+        f.goods_status ,
+        f.file_url ,
+        f.file_encode_url ,
+        f.file_view_url ,
+        f.file_name ,
+        f.file_new_name ,
+        f.file_encode_name ,
+        f.file_view_name,
+        f.file_cover_name ,
+        f.file_size ,
+        f.file_encode_size ,
+        f.file_view_size ,
+        f.changcodeflag,
+        f.changcodeResult,
+        f.changcodetaskid,
+        f.file_md5 ,
+        f.file_ext ,
+        f.file_duration ,
+        f.file_bitrate,
+        f.file_codec,
+        f.file_resolution ,
+        f.file_aspect_ration ,
+        f.upload_date ,
+        f.op_date ,
+        f.del_flag ,
+        m.id as mediaId,
+        m.media_file_id ,
+        m.media_title ,
+        m.media_keyword ,
+        m.belong_labelid ,
+        GROUP_CONCAT(DISTINCT belong.label) as belongLabelNames,
+        m.price_labelid ,
+        price.label as priceLabelName,
+        price.price,
+        m.publish_labelid ,
+        publish.label as publishLabelName,
+        m.catalogue_id ,
+        cata.`name` as catalogueName,
+        m.media_brief as "mediaBrief",
+        m.cover_url ,
+        m.upload_cover_url ,
+        m.cover_source_url ,
+        m.cover_origin,
+        C.audit_msg lastedAuditMsg,
+        GROUP_CONCAT(DISTINCT imgfile.id) imgfileIds,
+        GROUP_CONCAT(DISTINCT imgfile.image_path) imgfilePaths
+    </sql>
+
+    <select id="queryMemberMediaList"  resultMap="MemberMediaPojoResultMap">
+        SELECT
+          <include refid="queryMemberMediaColumns"/>
+         from jmgo_member_media_file f
+        LEFT JOIN jmgo_member_user u on f.uid = u.id
+        LEFT JOIN jmgo_member_media m on f.id = m.media_file_id
+        LEFT JOIN jmgo_member_belong_label belong on FIND_IN_SET( belong.id, m.belong_labelid) >0
+        LEFT JOIN jmgo_member_catalogue cata on m.catalogue_id = cata.id
+        LEFT JOIN jmgo_member_price_label price on m.price_labelid = price.id
+        LEFT JOIN jmgo_member_publish_label publish on m.publish_labelid = publish.id
+        LEFT JOIN jmgo_member_media_doc_imgfiles imgfile on f.id = imgfile.docid
+        LEFT JOIN (SELECT A.* FROM jmgo_member_audit_log A
+            INNER JOIN (SELECT log.msg_origin_id, max(log.audit_date) maxAuditDate
+            FROM jmgo_member_audit_log log
+            GROUP BY log.msg_origin_id) B on A.audit_date = B.maxAuditDate ) C on f.id =C.msg_origin_id
+        <where>
+            1=1
+            <if test="uid!=null">
+                and f.uid = #{uid}
+            </if>
+            <if test="mediaType!=null and mediaType!=''">
+                and f.media_type in
+                <foreach item="item" index="index" collection="mediaType"
+                         open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+
+            <if test="isMediaInfo!=null and isMediaInfo!=''">
+                and f.is_media_info = #{isMediaInfo}
+            </if>
+
+            <if test="isPublishMedia!=null and isPublishMedia!=''">
+                and f.is_publish_media = #{isPublishMedia}
+            </if>
+
+            <if test="mediaStatus!=null and mediaStatus!=''">
+                and f.media_status = #{mediaStatus}
+            </if>
+
+            <if test="goodsStatus!=null and goodsStatus!=''">
+                and f.goods_status = #{goodsStatus}
+            </if>
+
+            <if test="fileName!=null and fileName!=''">
+                and f.file_name like '%${fileName}%'
+            </if>
+
+            <if test="fileSize!=null">
+                and f.file_size &gt;= #{fileSize}
+            </if>
+
+            <if test="changcodeflag!=null">
+                and f.changcodeflag = #{changcodeflag}
+            </if>
+
+            <if test="bUploadDate!=null">
+                and f.upload_date &gt;= #{bUploadDate}
+            </if>
+
+            <if test="eUploadDate!=null">
+                and f.upload_date &lt;= #{eUploadDate}
+            </if>
+
+            <if test="mediaTitle!=null and mediaTitle!=''">
+                and m.media_title like '%${mediaTitle}%'
+            </if>
+
+            <if test="mediaKeyword!=null and mediaKeyword!=''">
+                and (m.media_title like '%${mediaKeyword}%' or m.media_keyword like '%${mediaKeyword}%')
+            </if>
+
+            <if test="priceLabelid!=null and priceLabelid!=''">
+                and m.price_labelid = #{priceLabelid}
+            </if>
+            <if test="publishLabelid!=null and publishLabelid!=''">
+                and m.publish_labelid = #{publishLabelid}
+            </if>
+            <if test="catalogueId!=null">
+                and m.catalogue_id = #{catalogueId}
+            </if>
+            <if test="coverOrigin!=null and coverOrigin!=''">
+                and m.cover_origin = #{coverOrigin}
+            </if>
+            <if test="belongLabelid!=null and belongLabelid!=''">
+                and ${belongLabelid}
+            </if>
+            <if test="uname!=null and uname!=''">
+                and u.uname like '%${uname}%'
+            </if>
+        </where>
+        GROUP BY f.id, m.belong_labelid
+        order by f.upload_date desc
+    </select>
+
+    <resultMap id="MemberUserspaceResultMap" type="com.pface.admin.modules.member.po.MemberUserspace">
+        <result column="userId" jdbcType="BIGINT" property="userId"/>
+        <result column="userName" jdbcType="VARCHAR" property="userName" />
+        <result column="videoSpace" jdbcType="DOUBLE" property="videoSpace"/>
+        <result column="audioSpace" jdbcType="DOUBLE" property="audioSpace"/>
+        <result column="docSpace" jdbcType="DOUBLE" property="docSpace"/>
+        <result column="totalSpace" jdbcType="DOUBLE" property="totalSpace"/>
+    </resultMap>
+
+    <select id="assembleUserspace"  resultMap="MemberUserspaceResultMap">
+    SELECT
+        u.id as userId, u.uname as userName,
+        round((IFNULL(sum(CASE f.media_type  WHEN  'VIDEO' THEN
+        IFNULL(f.file_size,0) +
+        IFNULL(f.file_encode_size,0)+
+        IFNULL(f.file_view_size,0) end),0))/(1024*1024) , 2) as videoSpace,
+
+        round((IFNULL(sum(CASE f.media_type  WHEN  'AUDIO' THEN
+        IFNULL(f.file_size,0) +
+        IFNULL(f.file_encode_size,0)+
+        IFNULL(f.file_view_size,0) end),0))/(1024*1024) , 2)  as audioSpace,
+
+        round((IFNULL(sum(CASE f.media_type  WHEN  'IMAGETEXT' THEN
+        IFNULL(f.file_size,0) +
+        IFNULL(f.file_encode_size,0)+
+        IFNULL(f.file_view_size,0)+
+        IFNULL(imgf.image_file_size,0) end),0))/(1024*1024) , 2) as docSpace,
+
+        round((IFNULL(sum(IFNULL(f.file_size,0) + IFNULL(f.file_encode_size,0)+ IFNULL(f.file_view_size,0) + IFNULL(imgf.image_file_size,0)),0))/(1024*1024),2) as totalSpace
+
+        from jmgo_member_media_file f
+        INNER JOIN jmgo_member_user u on f.uid = u.id
+        LEFT JOIN jmgo_member_media_doc_imgfiles imgf on f.id = imgf.docid
+        <where>
+            1=1
+            <if test="userName!=null and userName!=''">
+                and u.uname like '%${userName}%'
+            </if>
+        </where>
+        GROUP by u.id, u.uname
+        ORDER BY u.op_date
+    </select>
+
+</mapper>

@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+
+<section class="content-header" style="">
+    <h1>
+        资源授权管理
+        <small>资源授权管理页面</small>
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> 主页</a></li>
+        <li><a href="#">资源授权管理</a></li>
+        <li class="active">资源授权管理</li>
+    </ol>
+</section>
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box">
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <div>
+                        <form class="form-inline" id="searchForm">
+
+                            <div class="form-group">
+
+                                <label for="deviceId">智能设备：</label>
+                                <select name="deviceId" id="deviceId" class="form-control">
+                                    <option value="">全部</option>
+                                    <option th:each="sensebox : ${senseboxalllist}" th:value="${sensebox.deviceId}" th:text="${sensebox.deviceId}">
+                                        分类不存在
+                                    </option>
+                                </select>
+                                <!-- 暂时决定 已安装相机的通道才可以授权-->
+                                <label for="issetup">通道是否安装相机</label>
+                                <select name="issetup" id="issetup" class="form-control">
+                                    <!--<option value="">全部</option>-->
+                                    <option value="yes">已安装</option>
+                                    <!--<option value="no">未安装</option>-->
+                                </select>
+
+                            </div>
+                            <!--<div class="form-group" style="display: none">
+                                <label for="reservation">时间</label>
+                                <div class="input-group">
+                                    <div class="input-group-addon">
+                                        <i class="fa fa-calendar"></i>
+                                    </div>
+                                    <input type="text" class="form-control input-sm" id="reservation">
+                                    <input type="hidden" name="startDate" id="startDate">
+                                    <input type="hidden" name="endDate" id="endDate">
+                                </div>
+                            </div>-->
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-default btn-sm" onclick="javascript:Search();">
+                                    <i class="glyphicon glyphicon-search"></i>
+                                    查询
+                                </button>
+                                <!--<button type="reset" class="btn btn-default btn-sm" id="reset"-->
+                                        <!--onclick="javascript:document.querySelectorAll('#startDate, #endDate').forEach(d=> d.value='')">-->
+                                    <!--<i class="glyphicon glyphicon-trash"></i>-->
+                                    <!--清空-->
+                                <!--</button>-->
+                            </div>
+                        </form>
+                    </div>
+                    <div id="toolbar">
+
+                    </div>
+                    <table id="table"></table>
+                </div>
+                <!-- /.box-body -->
+            </div>
+            <!-- /.box -->
+
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+</section>
+<!-- /.content -->
+
+
+<!-- edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="editModalLabel">授权</h4>
+            </div>
+            <div class="modal-body">
+                <form id="editForm">
+                    <input type="hidden" name="deviceId"/>
+                    <input type="hidden" name="channel"/>
+                    <input type="hidden" name="canAuthStartdate"/>
+                    <div class="form-group">
+                        <label class="control-label" for="usysUserid"><span class="asterisk"></span>授权客户:</label>
+                        <select name="sysUserid" id="usysUserid" class="form-control">
+                            <option th:each="user : ${users}" th:value="${user.id}" th:text="${user.username}">
+                                不存在
+                            </option>
+                        </select>
+                        <div class="help-block with-errors"></div>
+                    </div>
+
+                    <div class="form-group" style="display: block">
+                            <label  class="control-label" for="reservation">授权时间段：<br />
+                                注意一：一旦授权，不可更改，请务必谨慎。<br />
+                                注意二：开始时间要求大于等于：<span id="maxAuthStartdateLabel" style="color: red"></span>
+                            </label>
+                            <div class="input-group">
+                                <div class="input-group-addon">
+                                    <i class="fa fa-calendar"></i>
+                                </div>
+                                <input type="text" class="form-control input-sm" id="reservation">
+                                <input type="hidden" name="authBegindate" id="startDate">
+                                <input type="hidden" name="authEnddate" id="endDate">
+                            </div>
+                    </div>
+
+                    <div class="form-group">
+                    <label class="control-label" for="uremark">备注:</label>
+                    <input id="uremark" type="text" class="form-control" name="remark" placeholder="输入备注">
+                    <div class="help-block with-errors"></div>
+                </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="submit" form="editForm" class="btn btn-primary"
+                        data-action="{type:'submit',form:'#editForm',url:'@{/admin/facedevicechannelres/authorize}',after:'$.myAction.refreshTable'}">
+                    确定
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- batch delete modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteSmallModalLabel">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="deleteSmallModalLabel">删除授权</h4>
+            </div>
+            <div class="modal-body">
+                <form id="deleteForm"></form>
+                确定要删除 <span class="records"></span> 条记录?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" form="deleteForm" class="btn btn-primary"
+                        data-action="{type:'submit',form:'#deleteForm',url:'@{/admin/facedevicechannelres/logic-delete-batch}',after:'$.myAction.refreshTable'}">
+                    确定
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="actionButtons" class="admin-hide">
+    <a style="display:none;" class="like" href="javascript:void(0)" data-toggle="tooltip" title="Like"><i class="glyphicon glyphicon-heart"></i></a>　
+    <a class="edit ml10" href="javascript:void(0)" data-toggle="tooltip" title="授权"><i class="glyphicon glyphicon-edit"></i></a>　
+    <!--<a class="remove ml10" href="javascript:void(0)" data-toggle="tooltip" title="删除"><i class="glyphicon glyphicon-remove"></i></a>　-->
+</div>
+
+
+<script>
+
+    var $table = $('#table');
+    // $("body").bind("keypress","#member",function(event){
+    //     if(event.keyCode == 13){
+    //         Search();
+    //         return false;
+    //     }
+    // });
+    $(function () {
+        //Date range picker
+        var beginTimeTake;
+        $('#reservation').daterangepicker({
+            "timePicker": false,
+            "timePicker24Hour": true,
+            "linkedCalendars": false,
+            "autoUpdateInput": false,
+            "locale": {
+                format: 'YYYY-MM-DD',
+                separator: ' ~ ',
+                applyLabel: "应用",
+                cancelLabel: "取消",
+                resetLabel: "重置",
+                daysOfWeek: ["日", "一", "二", "三", "四", "五", "六"],
+                monthNames: ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"],
+            }
+        }, function (start, end, label) {
+            if (!this.startDate) {
+                this.element.val('');
+            } else {
+                $('#startDate').val(this.startDate.format(this.locale.format));
+                $('#endDate').val(this.endDate.format(this.locale.format));
+                this.element.val(this.startDate.format(this.locale.format) + this.locale.separator + this.endDate.format(this.locale.format));
+            }
+        });
+        // bootstrap table初始化
+        // http://bootstrap-table.wenzhixin.net.cn/zh-cn/documentation/
+        $table.bootstrapTable({
+            url: CONTEXT_PATH + '/admin/facedevicechannelres/listpage',
+            pagination: true,
+            queryParams: function queryParams(params){
+                var param = {
+                    pageNumber: params.pageNumber,
+                    pageSize: params.pageSize,
+                    sortName: params.sortName,
+                    sortOrder: params.sortOrder,
+                    deviceId:$('#deviceId').val(),
+                    issetup:$('#issetup').val()
+                };
+                return param;
+            },
+            //初始化加载第一页，默认第一页
+            pageNumber: 1,
+            //每页的记录行数
+            pageSize: 10,
+            //可供选择的每页的行数
+            pageList: [10,25,50],
+            idField: 'id',
+            detailView: false,
+            columns: [
+                //{field: 'state', checkbox: true},
+                //{field: 'id', title: '编号', sortable: true, halign: 'left'},
+                {field: 'deviceId', title: '设备id', sortable: false, halign: 'left'},
+                {field: 'channel', title: '通道ID', sortable: false, halign: 'left'},
+                {field: 'issetup', title: '通道是否安装相机', formatter:'issetupname',sortable: false, halign: 'left'},
+                {field: 'cameraName', title: '相机名称', sortable: false, halign: 'left'},
+                {field: 'cameraStatus', title: '相机状态',formatter:'cameraStatusName', sortable: false, halign: 'left'},
+                {field: 'cameraInstallLocation', title: '安装位置', sortable: false, halign: 'left',visible: false},
+                {field: 'authedUsernames', title: '已有授权用户', sortable: false, halign: 'left'},
+                {field: 'canAuthStartdate', title: '可授权开始时间', sortable: false, halign: 'left'},
+                {
+                    field: 'action',
+                    title: '操作',
+                    halign: 'center',
+                    align: 'center',
+                    formatter: 'actionFormatter',
+                    events: 'actionEvents',
+                    clickToSelect: false
+                }
+            ]
+        });
+    });
+
+
+    window.actionEvents = {
+        'click .like': function (e, value, row, index) {
+            alert('You click like icon, row: ' + JSON.stringify(row));
+            console.log(value, row, index);
+        },
+        'click .edit': function (e, value, row, index) {
+            debugger;
+            $('#editModal').modal('show')
+            $('#editForm').fillForm(row);
+            // $("#uremark").val(row.remark);//页面认id
+            $('#maxAuthStartdateLabel').html(row['canAuthStartdate']);
+            console.log(value, row, index);
+        },
+        'click .remove': function (e, value, row, index) {
+            $('#deleteModal').modal('show');
+            $('.records').html('1');
+            var html = '';
+            for (var key in row) {
+                html += '<input type="hidden" name="' + key + '" value="' + row[key] + '">';
+            }
+            $('#deleteForm').html(html);
+        }
+    };
+
+
+    function timeFormatter(value, row, index) {
+        // return Utils.dateFormat.formatTimestamp(value, 'yyyy-MM-dd hh:mm:ss');
+        return Utils.dateFormat.formatTimestamp(value, 'yyyy-MM-dd');
+    }
+
+    function issetupname(value, row, index) {
+        var name = '';
+        if (value=='yes'){
+            name = '已安装';
+        } else if (value =='no'){
+            name = '未安装';
+        }else{
+            name = '';
+        }
+        return name;
+    }
+    function cameraStatusName(value, row, index) {
+        var name = '';
+        if (value=='on'){
+            name = '在线';
+        } else if (value =='off'){
+            name = '离线';
+        }else{
+            name = '未知';
+        }
+        return name;
+    }
+    function execTimeFormatter(value, row, index) {
+        return value + ' ms';
+    }
+
+    function actionFormatter(value, row, index) {
+        return $('#actionButtons').html();
+    }
+
+    function Search() {
+        var deviceId= $('#deviceId').val();
+        var issetup=$('#issetup').val();
+
+        var options = $('#table').bootstrapTable('refresh', {
+            silent: true,
+            query:
+                {
+                    deviceId:deviceId,
+                    issetup:issetup
+                }
+        });
+    }
+
+</script>
+</html>

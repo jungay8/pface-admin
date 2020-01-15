@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+
+	<body>
+		<!--导航th:if="${userinfo!=null && (userinfo.isCert.name eq 'certified')}"-->
+		<section  class="fl left_nav" th:fragment="leftnav">
+			<div class="fl left_nav">
+				<div class="leftNav_top">
+					<div class="leftTop_Inco">
+						<img  style="width: 60px;height: 60px;border-radius: 5px;" th:src="@{/static/pface/img/people_Inco.png}" />
+						<!--<img  style="width: 60px;height: 60px;border-radius: 5px;" th:if="${userinfo.headUrl==null}" th:src="@{/static/pface/img/people_Inco.png}" />-->
+						<!--<img style="width: 60px;height: 60px;border-radius: 5px;" th:if="${userinfo.headUrl!=null}" th:src="${@imageFileBean.getImageFileUrl(userinfo.headUrl)}" />-->
+					</div>
+					<p class="pt-1 pd-2 fontgray" th:if="${userinfo!=null}" th:text="'欢迎您，'+${userinfo.username}"></p>
+					<!--<h4 class="ptd-1">成为节目购融媒体<br/>短视频商家获持续收益</h4>-->
+					<!--<a href="/front/upload" class="layui-btn layui-btn-warm btn-radius" th:if="${userinfo.isCert.name} eq 'CERTIFIED'">上传内容</a>-->
+					<!--<a href="/front/certification" class="layui-btn layui-btn-warm btn-radius" th:if="${userinfo.isCert.name} ne 'CERTIFIED'">申请认证</a>-->
+				</div>
+				<div class="leftNav_main">
+					<div class="leftNav_list pt-1">
+						<div class="leftNav_tit">
+							<img th:src="@{/static/pface/img/leftNav_tit1.png}"/>功能树
+						</div>
+						<ul>
+							<li th:class="${navclass} eq 'faceimagescene'? 'Nactived':'Unactived'">
+								<a href="/front/faceimagescene">会议管理</a>
+							</li>
+							<li th:class="${navclass} eq 'faceimage'? 'Nactived':'Unactived'">
+								<a href="/front/faceimagelibs">人像管理</a>
+							</li>
+							<li th:class="${navclass} eq 'faceasignlist'? 'Nactived':'Unactived'">
+								<a href="/front/queryAppSnapList">抓拍列表</a>
+							</li>
+							<li th:class="${navclass} eq 'faceasignlistasemble'? 'Nactived':'Unactived'">
+								<a href="/front/assembleAppSnapList">签到统计</a>
+							</li>
+							<li th:class="${navclass} eq 'asignshow'? 'Nactived':'Unactived'">
+								<a href="/front/asignshow">签到大屏</a>
+							</li>
+							<li style="margin-bottom: 200px">
+
+							</li>
+
+							<!--<li th:class="${navclass} eq 'attribution'? 'Nactived':'Unactived'">-->
+								<!--<a href="/front/attribution" th:class="${userinfo.isCert.name} eq 'CERTIFIED' ? 'enabled':'disabled'" >归属标签</a>-->
+							<!--</li>-->
+							<!--<li th:class="${navclass} eq 'publab'? 'Nactived':'Unactived'">-->
+								<!--<a href="/front/publab" th:class="${userinfo.isCert.name} eq 'CERTIFIED' ? 'enabled':'disabled'" >转载标签</a>-->
+							<!--</li>-->
+						</ul>
+					</div>
+					<!--<div class="leftNav_list ptd-1">-->
+						<!--<div class="leftNav_tit">-->
+							<!--<img th:src="@{/static/pface/img/leftNav_tit2.png}"/> 账户管理-->
+						<!--</div>-->
+						<!--<ul>-->
+							<!--<li th:class="${navclass} eq 'myinfo'? 'Nactived':'Unactived'">-->
+								<!--<a href="/front/myinfo" th:class="${userinfo.isCert.name} eq 'CERTIFIED' ? 'enabled':'disabled'" >我的账户</a>-->
+							<!--</li>-->
+							<!--<li th:class="${navclass} eq 'certification'? 'Nactived':'Unactived'">-->
+								<!--<a href="/front/certification" >账户认证</a>-->
+							<!--</li>-->
+						<!--</ul>-->
+					<!--</div>-->
+				</div>
+			</div>
+		</section>
+		<-- head end -->
+
+</body>
+</html>

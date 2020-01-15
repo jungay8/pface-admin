@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.pface.admin.modules.member.mapper.FaceSenseboxMapper" >
+  <resultMap id="BaseResultMap" type="com.pface.admin.modules.member.po.FaceSensebox" >
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="ip" property="ip" jdbcType="VARCHAR" />
+    <result column="port" property="port" jdbcType="VARCHAR" />
+    <result column="loginname" property="loginname" jdbcType="VARCHAR" />
+    <result column="loginpassword" property="loginpassword" jdbcType="VARCHAR" />
+    <result column="device_id" property="deviceId" jdbcType="VARCHAR" />
+    <result column="serial_id" property="serialId" jdbcType="VARCHAR" />
+    <result column="version" property="version" jdbcType="VARCHAR" />
+    <result column="web_version" property="webVersion" jdbcType="VARCHAR" />
+    <result column="max_storage" property="maxStorage" jdbcType="INTEGER" />
+    <result column="cur_storage" property="curStorage" jdbcType="INTEGER" />
+    <result column="storage_strategy" property="storageStrategy" jdbcType="TINYINT" />
+    <result column="http_url" property="httpUrl" jdbcType="VARCHAR" />
+    <result column="http_key" property="httpKey" jdbcType="VARCHAR" />
+    <result column="camera_mode" property="cameraMode" jdbcType="VARCHAR" />
+    <result column="startno" property="startno" jdbcType="INTEGER" />
+    <result column="endno" property="endno" jdbcType="INTEGER" />
+    <result column="create_by" property="createBy" jdbcType="VARCHAR" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
+    <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="del_flag" property="delFlag" jdbcType="VARCHAR" />
+  </resultMap>
+
+  <resultMap id="BaseResultMapExtend" type="com.pface.admin.modules.member.dto.FaceSenseboxExDTO" extends="BaseResultMap" >
+    <result column="min_auth_begindate" property="minAuthBegindate" jdbcType="TIMESTAMP" />
+    <result column="max_auth_enddate" property="maxAuthEnddate" jdbcType="TIMESTAMP" />
+  </resultMap>
+
+  <!-- 查询用户至少要有1天的授权日期的所有智能设备 -->
+  <select id="queryAuthedSenseboxOfUser" parameterType="java.util.HashMap" resultMap="BaseResultMapExtend">
+    SELECT
+    A.*
+    FROM ( SELECT
+          min(res.auth_begindate) min_auth_begindate,
+          max(res.auth_enddate) max_auth_enddate,
+          box.*
+      FROM
+          face_sensebox box
+      INNER JOIN face_user_channel_res res ON box.device_id = res.device_id AND res.del_flag = '1'
+      <where>
+          1=1
+          <if test="sysUserid!=null and sysUserid!=''">
+              and res.sys_userid = #{sysUserid}
+          </if>
+      </where>
+      GROUP BY box.device_id) A
+    WHERE DATE_ADD(SYSDATE(), INTERVAL 1 DAY) &lt;= A.max_auth_enddate
+  </select>
+</mapper>

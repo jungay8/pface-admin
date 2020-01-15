@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<!-- Content Header (Page header) -->
+<section class="content-header" style="">
+    <h1>
+        价格标签管理
+        <small>价格标签页面</small>
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> 主页</a></li>
+        <li><a href="#">价格标签管理</a></li>
+        <li class="active">价格标签</li>
+    </ol>
+</section>
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box">
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <div>
+                        <form class="form-inline" id="searchForm">
+                            <div class="form-group">
+                                <label for="member">会员</label>
+                                <!--<select name="uid" id="member" class="form-control"
+                                        data-placeholder="请从列表选择一项">
+                                    <option value="">全部</option>
+                                    <option th:each="members : ${memberList}" th:value="${members.id}" th:text="${members.uname}">
+                                        会员不存在
+                                    </option>
+                                </select>-->
+                                <input type="text" class="form-control input-sm" name="uid" id="member" placeholder="请输入会员名称">
+                            </div>
+                            <div class="form-group">
+                                <label for="labelid">标签名称</label>
+                                <input type="text" class="form-control input-sm" name="labelname" id="labelid" placeholder="请输入标签名称">
+                            </div>
+                            <div class="btn-group btn-group-sm">
+                                <button type="button" class="btn btn-default" onclick="javascript:Search();">
+                                    <i class="glyphicon glyphicon-search"></i>
+                                    查询
+                                </button>
+                                <!--<button type="reset" class="btn btn-default">-->
+                                    <!--<i class="glyphicon glyphicon-trash"></i>-->
+                                    <!--清空-->
+                                <!--</button>-->
+                            </div>
+                        </form>
+                    </div>
+                    <div id="toolbar">
+                        <div class="btn-group btn-group-sm">
+                            <!-- Provides extra visual weight and identifies the primary action in a set of buttons -->
+                            <!--<button style="display: none" shiro:hasPermission="pricelab:create" type="button" id="addBtn" class="btn btn-default"-->
+                                    <!--data-toggle="modal"-->
+                                    <!--data-target="#addModal"><i class="glyphicon glyphicon-plus"></i> 新增-->
+                            <!--</button>-->
+                            <!-- Indicates caution should be taken with this action -->
+                            <!--<button style="display: none" shiro:hasPermission="pricelab:update" type="button" id="editBtn" class="btn btn-default"-->
+                                    <!--data-toggle="modal"-->
+                                    <!--data-target="#editModal"-->
+                                    <!--data-action="{type:'editable',form:'#editForm',table:'#table'}"-->
+                                    <!--disabled><i class="glyphicon glyphicon-edit"></i> 修改-->
+                            <!--</button>-->
+                            <!-- Indicates a dangerous or potentially negative action -->
+                            <button shiro:hasPermission="pricelab:delete" type="button" id="deleteBtn" class="btn btn-default" data-toggle="modal"
+                                    data-target="#deleteModal"
+                                    data-action="{type:'delete',form:'#deleteForm',idField:'id',table:'#table'}"
+                                    disabled><i class="glyphicon glyphicon-remove"></i> 删除
+                            </button>
+                        </div>
+                    </div>
+                    <table id="table"></table>
+                </div>
+                <!-- /.box-body -->
+            </div>
+            <!-- /.box -->
+
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+</section>
+<!-- /.content -->
+
+<!-- add Modal -->
+<div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="addModalLabel">添加价格标签</h4>
+            </div>
+            <div class="modal-body">
+                <form id="addForm">
+                    <div class="form-group">
+                        <label class="control-label" for="name"><span class="asterisk">*</span>会员名称:</label>
+                        <input id="name" type="text" class="form-control" name="name" placeholder="输入会员名称"
+                               minlength="3" required>
+                        <div class="help-block with-errors"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" for="type"><span class="asterisk">*</span>会员类型:</label>
+                        <select name="memberType" id="type" class="form-control"
+                                data-placeholder="请从列表选择一项" required>
+                            <option th:each="memberType : ${memberTypeList}" th:value="${memberType.name}" th:text="${memberType.text}">
+                                会员类型不存在
+                            </option>
+                        </select>
+                        <div class="help-block with-errors"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" for="description">会员描述:</label>
+                        <input id="description" type="text" class="form-control" name="description" placeholder="输入会员描述">
+                        <div class="help-block with-errors"></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="submit" form="addForm" class="btn btn-primary"
+                        data-action="{type:'submit',form:'#addForm',url:'@{/admin/pricelab/create}',after:'$.myAction.refreshTable'}">
+                    确定
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="editModalLabel">修改价格标签</h4>
+            </div>
+            <div class="modal-body">
+                <form id="editForm">
+                    <input type="hidden" name="id"/>
+                    <div class="form-group">
+                        <label class="control-label" for="editlabel"><span class="asterisk">*</span>标签名称:</label>
+                        <input id="editlabel" type="text" class="form-control" name="label"  autocomplete="off" placeholder="输入标签名称"
+                               minlength="1" required>
+                        <div class="help-block with-errors"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" for="editPrice"><span class="asterisk">*</span>标签价格:</label>
+                        <input id="editPrice" type="text" class="form-control" name="price"  autocomplete="off" placeholder="输入标签价格"
+                               minlength="1" required>
+                        <div class="help-block with-errors"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" for="editDescription">标签描述:</label>
+                        <input id="editDescription" type="text" class="form-control" name="labelDesc" autocomplete="off" placeholder="输入会员描述">
+                        <div class="help-block with-errors"></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="submit" form="editForm" class="btn btn-primary"
+                        data-action="{type:'submit',form:'#editForm',url:'@{/admin/pricelab/update}',after:'$.myAction.refreshTable'}">
+                    确定
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- delete modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteSmallModalLabel">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="deleteSmallModalLabel">删除价格标签</h4>
+            </div>
+            <div class="modal-body">
+                <form id="deleteForm"></form>
+                确定要删除选中的 <span class="records"></span> 条记录?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" form="deleteForm" class="btn btn-primary"
+                        data-action="{type:'submit',form:'#deleteForm',url:'@{/admin/pricelab/logic-delete-batch}',after:'$.myAction.refreshTable'}">
+                    确定
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="actionButtons" class="admin-hide">
+    <a style="display: none" class="like" href="javascript:void(0)" data-toggle="tooltip" title="Like"><i class="glyphicon glyphicon-heart"></i></a>　
+    <a class="edit ml10" href="javascript:void(0)" data-toggle="tooltip" title="编辑"><i class="glyphicon glyphicon-edit"></i></a>　
+    <a class="remove ml10" href="javascript:void(0)" data-toggle="tooltip" title="删除"><i class="glyphicon glyphicon-remove"></i></a>　
+</div>
+
+<script th:inline="javascript">
+
+    var $table = $('#table');
+    $("body").bind("keypress","#member",function(event){
+        if(event.keyCode == 13){
+            Search();
+            return false;
+        }
+        // return false;
+    });
+    $(function () {
+        // bootstrap table初始化
+        // http://bootstrap-table.wenzhixin.net.cn/zh-cn/documentation/
+        $table.bootstrapTable({
+            url: CONTEXT_PATH + '/admin/pricelab/list',
+            showToggle:false,                    //是否显示详细视图和列表视图的切换按钮
+            cardView: false,                    //是否显示详细视图
+            detailView: false,                  //是否显示父子表
+            cache: false,                       // 设置为 false 禁用 AJAX 数据缓存， 默认为true
+            sortable: true,                     //是否启用排序
+            sortOrder: "asc",
+            //showExport: phoneOrPc(),              //是否显示导出按钮(此方法是自己写的目的是判断终端是电脑还是手机,电脑则返回true,手机返回falsee,手机不显示按钮)
+           // exportDataType: "basic",              //basic', 'all', 'selected'.
+           // exportTypes:['excel','xlsx'],	    //导出类型
+            //exportButton: $('#btn_export'),     //为按钮btn_export  绑定导出事件  自定义导出按钮(可以不用)
+           /* exportOptions:{
+                //ignoreColumn: [0,0],            //忽略某一列的索引
+                fileName: '数据导出',              //文件名称设置
+                worksheetName: 'Sheet1',          //表格工作区名称
+                tableName: '商品数据表',
+                excelstyles: ['background-color', 'color', 'font-size', 'font-weight'],
+                //onMsoNumberFormat: DoOnMsoNumberFormat
+            },*/
+            //设置为 true 会有隔行变色效果
+            striped: true,
+            //设置为 true 会在表格底部显示分页条。
+            pagination: true,
+            queryParams: function queryParams(params){
+                var param = {
+                    pageNumber: params.pageNumber,
+                    pageSize: params.pageSize,
+                    sortName: params.sortName,
+                    sortOrder: params.sortOrder,
+                    uname:$.trim($('#member').val()),
+                    label:$.trim($('#labelid').val())
+                };
+                return param;
+            },
+            //初始化加载第一页，默认第一页
+            pageNumber: 1,
+            //每页的记录行数
+            pageSize: 10,
+            //可供选择的每页的行数
+            pageList: [10,25,50,100],
+            idField: 'id',
+            columns: [
+                {field: 'state', checkbox: true},
+                // {field: 'id', title: '编号', sortable: true, halign: 'left'},
+                {field: 'label', title: '标签名称', sortable: false, halign: 'left'},
+                {field: 'price', title: '价格', sortable: false, halign: 'left'},
+                {field: 'labelDesc', title: '标签描述', sortable: false, halign: 'left',visible: false},
+                // {field: 'uid', title: '会员id', sortable: true, halign: 'left',visible: false},
+                {field: 'uname', title: '会员名称', sortable: false, halign: 'left'},
+                {field: 'opDate', title: '修改日期', sortable: false, halign: 'left'},
+                // {field: 'labelStatus.name', title: '审核id', sortable: true, halign: 'left',visible: false},
+                // {field: 'labelStatus.text', title: '审核状态', sortable: true, halign: 'left',visible: false},
+                {
+                    field: 'action',
+                    title: '操作',
+                    halign: 'center',
+                    align: 'center',
+                    formatter: 'actionFormatter',
+                    events: 'actionEvents',
+                    clickToSelect: false
+                }
+            ]
+        });
+    });
+
+    // 数据表格展开内容
+    function detailFormatter(index, row) {
+        var html = [];
+        $.each(row, function (key, value) {
+            html.push('<p><b>' + key + ':</b> ' + value + '</p>');
+        });
+        return html.join('');
+    }
+
+    function actionFormatter(value, row, index) {
+        return $('#actionButtons').html();
+    }
+
+    window.actionEvents = {
+       /* 'click .like': function (e, value, row, index) {
+            alert('You click like icon, row: ' + JSON.stringify(row));
+            console.log(value, row, index);
+        },*/
+        'click .edit': function (e, value, row, index) {
+            $('#editModal').modal('show')
+            $('#editForm').fillForm(row);
+            console.log(value, row, index);
+        },
+        'click .remove': function (e, value, row, index) {
+            $('#deleteModal').modal('show');
+            $('.records').html('1');
+            var html = '';
+            for (var key in row) {
+                html += '<input type="hidden" name="' + key + '" value="' + row[key] + '">';
+            }
+            $('#deleteForm').html(html);
+        }
+    };
+    function Search() {
+        var uname= $.trim($('#member').val());
+        var label = $.trim($('#labelid').val());
+        var options = $('#table').bootstrapTable('refresh', {
+            silent: true,
+            query:
+                {
+                    uname:uname,
+                    label:label
+                }
+        });
+    }
+    /*判断终端是手机还是电脑--用于判断文件是否导出(电脑需要导出)*/
+    function phoneOrPc(){
+        var sUserAgent = navigator.userAgent.toLowerCase();
+        var bIsIpad = sUserAgent.match(/ipad/i) == "ipad";
+        var bIsIphoneOs = sUserAgent.match(/iphone os/i) == "iphone os";
+        var bIsMidp = sUserAgent.match(/midp/i) == "midp";
+        var bIsUc7 = sUserAgent.match(/rv:1.2.3.4/i) == "rv:1.2.3.4";
+        var bIsUc = sUserAgent.match(/ucweb/i) == "ucweb";
+        var bIsAndroid = sUserAgent.match(/android/i) == "android";
+        var bIsCE = sUserAgent.match(/windows ce/i) == "windows ce";
+        var bIsWM = sUserAgent.match(/windows mobile/i) == "windows mobile";
+        if (bIsIpad || bIsIphoneOs || bIsMidp || bIsUc7 || bIsUc || bIsAndroid || bIsCE || bIsWM) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+</script>
+</html>

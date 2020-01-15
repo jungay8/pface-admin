@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.pface.admin.modules.member.mapper.FaceSnapListMapper" >
+  <resultMap id="BaseResultMap" type="com.pface.admin.modules.member.po.FaceSnapList" >
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="device_id" property="deviceId" jdbcType="VARCHAR" />
+    <result column="lib_id" property="libId" jdbcType="TINYINT" />
+    <result column="lib_name" property="libName" jdbcType="VARCHAR" />
+    <result column="lib_type" property="libType" jdbcType="TINYINT" />
+    <result column="camera_name" property="cameraName" jdbcType="VARCHAR" />
+    <result column="channel" property="channel" jdbcType="TINYINT" />
+    <result column="position" property="position" jdbcType="VARCHAR" />
+    <result column="img_id" property="imgId" jdbcType="VARCHAR" />
+    <result column="img_path" property="imgPath" jdbcType="VARCHAR" />
+    <result column="person_addr" property="personAddr" jdbcType="VARCHAR" />
+    <result column="person_age" property="personAge" jdbcType="VARCHAR" />
+    <result column="person_gender" property="personGender" jdbcType="VARCHAR" />
+    <result column="person_idcard" property="personIdcard" jdbcType="VARCHAR" />
+    <result column="person_name" property="personName" jdbcType="VARCHAR" />
+    <result column="pos_top" property="posTop" jdbcType="INTEGER" />
+    <result column="pos_left" property="posLeft" jdbcType="INTEGER" />
+    <result column="pos_bottom" property="posBottom" jdbcType="INTEGER" />
+    <result column="pos_right" property="posRight" jdbcType="INTEGER" />
+    <result column="quality" property="quality" jdbcType="INTEGER" />
+    <result column="similarity" property="similarity" jdbcType="INTEGER" />
+    <result column="snap_id" property="snapId" jdbcType="VARCHAR" />
+    <result column="snap_path" property="snapPath" jdbcType="VARCHAR" />
+    <result column="trigger_time" property="triggerTime" jdbcType="TIMESTAMP" />
+    <result column="snap_mask" property="snapMask" jdbcType="VARCHAR" />
+    <result column="snap_race" property="snapRace" jdbcType="VARCHAR" />
+    <result column="snap_zangjiang" property="snapZangjiang" jdbcType="VARCHAR" />
+    <result column="threshold" property="threshold" jdbcType="VARCHAR" />
+    <result column="snap_age" property="snapAge" jdbcType="INTEGER" />
+    <result column="snap_glasses" property="snapGlasses" jdbcType="INTEGER" />
+    <result column="snap_gender" property="snapGender" jdbcType="INTEGER" />
+    <result column="snap_beard" property="snapBeard" jdbcType="INTEGER" />
+    <result column="create_by" property="createBy" jdbcType="VARCHAR" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
+    <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="del_flag" property="delFlag" jdbcType="VARCHAR" />
+  </resultMap>
+</mapper>

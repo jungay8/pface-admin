@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<script type="text/javascript" src="https://libs.baidu.com/jquery/1.8.3/jquery.min.js"></script>
+<script th:src="@{/static/pface/js/jquery.msgbox.min.js}"></script>
+<head>
+    <meta charset="UTF-8">
+    <meta name="context-path" th:content="@{/}"/>
+    <link rel="stylesheet" th:href="@{/static/pface/js/layui/css/layui.css}">
+    <link rel="stylesheet" th:href="@{/static/pface/css/common.css}">
+    <link rel="stylesheet" th:href="@{/static/pface/css/upload.css}" />
+    <title>节目购——视频暂存库管理</title>
+    <script th:inline="javascript">
+        var CONTEXT_PATH = [[${#request.getContextPath()}]];
+    </script>
+</head>
+<body>
+<!--导航-->
+<div class="top clearfix" th:replace="~{front/header :: header}"></div>
+<!--内容管理-->
+<div class="container">
+    <div class="wapper">
+        <div class="m_conter clearfix hav_line">
+            <div class="fl left_nav" th:replace="~{front/leftnav::leftnav}"></div>
+            <!--右边-->
+            <div class="fr right_conter">
+                <div class="videoListM">
+                    <form  class="layui-form" lay-filter="choiceForm">
+                        <input type="radio" name="tabelTime"  lay-filter="timeradio" value="0" title="最近一天"/>
+                        <input type="radio" name="tabelTime"  lay-filter="timeradio" value="1" title="时间段:"/>
+                        <div class="layui-inline timeChoice">
+                            <input class="layui-input" type="text" name="times" placeholder="请选择时间段"  id="LAY_chice_s">
+                        </div>
+                        <div class="layui-inline">
+                            <span class="layui-btn layui-btn-warm btn-radius closeBlack" id="search">查询</span>
+                        </div>
+                        <div class="layui-inline fr">
+                            <span class="layui-btn layui-btn-warm btn-radius closeBlack" id="getCheckData">批量编目</span>
+                        </div>
+                    </form>
+
+                    <table class="layui-table" lay-filter="demo" id="tableM">
+                        <colgroup>
+                            <col width="80">
+                            <col width="80">
+                            <col width="420">
+                            <col width="80">
+                            <col width="220">
+                            <col>
+                        </colgroup>
+                        <thead>
+                        <tr>
+                            <th><input type="checkbox" lay-skin="primary" lay-filter="allChoice"></th>
+                            <th>序号</th>
+                            <th>文件名</th>
+                            <th>大小</th>
+                            <th>上传时间</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td><input type="checkbox" lay-filter="tableCheck" lay-skin="primary"></td>
+                            <td>1</td>
+                            <td>上传的视频名称1</td>
+                            <td>500M</td>
+                            <td>2019-7-6</td>
+                            <td><a class="layui-btn layui-btn-primary layui-btn-xs video_edit" data-name="上传的视频名称1">编目</a></td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" lay-filter="tableCheck" lay-skin="primary"></td>
+                            <td>2</td>
+                            <td>上传的视频名称2</td>
+                            <td>500M</td>
+                            <td>2019-7-6</td>
+                            <td><a class="layui-btn layui-btn-primary layui-btn-xs video_edit"  data-name="上传的视频名称2">编目</a></td>
+                        </tr>
+                        </tbody>
+
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!--footer-->
+<div class="footer" th:replace="~{front/footer :: footer}"> </div>
+<!--编目弹出窗口-->
+<div class="newsedit videoM_List" id="newsedit" style="display:none ;" >
+    <ul  class="videoEdit layui-form">
+        <li>
+            <form lay-filter="alertForm" class="layui-form">
+                <div class="videoML_m">
+                    <div class="choicethis">
+                        <input type="checkbox" name="videocheck" lay-skin="primary">
+                    </div>
+                    <div class="videoML_top">
+                        <div class="videoML_Pic fl" style="width: 146px; overflow: hidden;">
+                            <input type="radio"  name="uploadImg" lay-filter="uploadImg" value="0" title="手动上传封面">
+                            <input type="radio" name="uploadImg"  lay-filter="uploadImg" value="1" title="系统自动截取" checked>
+                            <div class="layui-upload-drag viedo_picZD" style="display: block;">
+                                <i class="layui-icon layui-iconup">&#xe64a;</i>
+                                <p>此封面图<br/>由系统自动截取</p>
+                            </div>
+                            <div class="layui-upload-drag viedo_pic" style="display: none;"  onclick="getElementById('videoML_1').click()">
+                                <i class="layui-icon layui-iconup">&#xe67c;</i>
+                                <p>点击上传封面</p>
+                                <input type="file" class="videoML_input" style="display: none;" id="videoML_1"/>
+                                <div class="imgBg" style="display:none;">
+                                    <img src="" />
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="videoML_form fl">
+                            <div class="layui-form-item">
+                                <div class="videoML_title">
+                                    <label class="layui-form-label"><em>*</em>标题</label>
+                                    <div class="layui-input-block videoML_Iput">
+                                        <input name="title" class="layui-input" type="text"  autocomplete="off" lay-verify="required" lay-reqtext="请输入标题">
+                                    </div>
+                                </div>
+                                <div class="videoML_title">
+                                    <div class="layui-inline">
+                                        <label class="layui-form-label"><em>*</em>类型</label>
+                                        <div class="layui-input-inline videoML_select ml-38">
+                                            <select name="modules" lay-verify="required">
+                                                <option value="">请选择</option>
+                                                <option value="1">layer</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="layui-inline">
+                                        <label class="layui-form-label"><em>*</em>价格</label>
+                                        <div class="layui-input-inline videoML_select">
+                                            <select name="modules" lay-verify="required">
+                                                <option value="">请选择</option>
+                                                <option value="1">layer</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="videoML_title">
+                                    <label class="layui-form-label"><em>*</em>关键词</label>
+                                    <div class="layui-input-block videoML_Iput">
+                                        <input name="title" class="layui-input" type="text"  autocomplete="off" lay-verify="required" lay-reqtext="请输入关键词">
+                                    </div>
+                                </div>
+                                <div class="videoML_title">
+
+                                    <div class="layui-inline">
+                                        <label class="layui-form-label"><em>*</em>转载设置</label>
+                                        <div class="layui-input-inline videoML_select">
+                                            <select name="modules" lay-verify="required">
+                                                <option value="">请选择</option>
+                                                <option value="1">layer</option>
+                                            </select>
+                                        </div>
+                                        <div class="layui-inline">
+                                            <div class="layui-form">
+                                                <input type="checkbox" name="allthis" lay-skin="primary" title="全部套用该条类型、价格、转载信息">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="Videotextarea">
+                    <div class="VideotextareaT"><em>*</em>简介</div>
+                    <textarea placeholder="请输入内容" class="layui-textarea"></textarea>
+                </div>
+                <div class="clearfix Video_Opera">
+                    <div class="fl Video_deleThis">
+                        <i class="layui-icon">&#xe640;</i>  删除
+                    </div>
+                    <div class="fr">
+                        <div class="layui-inline">
+                            <div class="layui-form">
+                                <input type="checkbox" name="submitthis" lay-skin="primary" title="我已阅读并同意遵守 《版权服务规则协议》">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <span class="layui-btn layui-btn-danger btn-radius">提交本条</span>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </li>
+    </ul>
+
+</div>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+
+    var totalRecords = [[${total}]];
+    var page = [[${pageNum}]];
+    var pageSize = [[${pageSize}]];
+
+
+    /*]]>*/
+</script>
+<script th:src="@{/static/pface/js/layui/layui.js}"></script>
+
+<script type='text/javascript'>
+    layui.use(['table','form', 'laydate'], function(){
+        var $ = layui.jquery
+            ,table = layui.table
+            ,form=layui.form
+            ,laydate=layui.laydate;
+        //时间选择
+        laydate.render({
+            elem: '#LAY_chice_s'
+            ,theme: '#ce0106'
+            ,trigger: 'click'
+            ,format: 'yyyy-MM-dd'
+            ,min: '2019-1-1'
+            ,max: '2099-06-16'
+            ,range: "至"
+            ,done: function(value, date, endDate){
+                console.log(value)
+                form.val('choiceForm', {
+                    "tabelTime":"1"
+                });
+            }
+        });
+        //重新选择最近一天
+        form.on("radio(timeradio)", function (data) {
+            if(this.value == '0') {
+                form.val('choiceForm', {
+                    "times":""
+                });
+
+            }
+        });
+        //全选按钮
+        form.on('checkbox(allChoice)', function(data){
+            var child = $(data.elem).parents('table').find('tbody input[type="checkbox"]');
+            child.each(function(index, item){
+                item.checked = data.elem.checked;
+            });
+            form.render('checkbox');
+        });
+        //checkbox选择
+        form.on('checkbox(tableCheck)', function(data){
+            console.log("a");
+            var dataChild=$("#tableM").find('tbody input[type="checkbox"]');
+            var allCheck=$("#tableM").find('thead input[type="checkbox"]');
+            if(data.elem.checked==true){
+                allCheck[0].checked=true;
+                dataChild.each(function(index, item){
+                    if(item.checked==false){
+                        allCheck[0].checked=false;
+                    };
+                });
+            }else{
+                allCheck[0].checked=false;
+            }
+            form.render('checkbox');
+        });
+        $(document).on('click','#search',function(){
+            //这里是查询操作
+            layer.alert("您点击了查询");
+        });
+        $(document).on('click','#getCheckData',function(){
+            //这里是批量编目
+            var dataChild=$("#tableM").find('tbody input[type="checkbox"]');
+            var data=[];
+            dataChild.each(function(index, item){
+                if(item.checked==true){
+                    data.push(index);
+                }
+            });
+            if (data.length == 0){
+                layer.msg('请选择需要编目的内容', {
+                    time: 3000, //3s后自动关闭
+                    icon: 5,
+                    anim: 6
+                });
+            }else{
+                for(var i=0,len=data.length;i<len;i++){
+                    var name=$(".video_edit").eq(data[i]).attr("data-name");
+                }
+                active.setTop();
+            }
+
+        });
+        $(document).on('click','.video_edit',function(){
+            //这里单个编目
+            var name=$(this).attr("data-name");
+            active.setTop();
+        });
+        //弹出层
+        var active = {
+            setTop: function(){
+                var that = this;
+                //多窗口模式，层叠置顶
+                layer.open({
+                    skin: 'Ldemo-class',
+                    type: 1
+                    ,title: '视频编目'
+                    ,btnAlign: 'l' //按钮居左
+                    ,shade: 0.65
+                    ,area: ['1050px', '550px']
+                    ,content:$('#newsedit')
+
+                    ,zIndex: layer.zIndex //重点1
+
+                });
+            }
+        }
+    });
+</script>
+</body>
+</html>

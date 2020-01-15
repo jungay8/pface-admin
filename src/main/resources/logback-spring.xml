@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <contextName>sms</contextName>
+    <!--设置系统日志目录-->
+    <property name="log.path" value="log" />
+    <!--最多保留15天log-->
+    <property name="log.maxHistory" value="15" />
+    <property name="log.pattern" value="%d{yyyy-MM-dd HH:mm:ss.SSS} %boldYellow(%thread) %highlight(%-5level) %boldGreen(%caller{1}) %msg%n" />
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${log.pattern}</pattern>
+        </encoder>
+    </appender>
+    <springProfile name="dev">
+        <root level="INFO,ERROR">
+            <appender class="ch.qos.logback.core.rolling.RollingFileAppender">
+                <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                    <FileNamePattern>${log.path}/dev/%d{yyyy-MM-dd}.log</FileNamePattern>
+                    <MaxHistory>${log.maxHistory}</MaxHistory>
+                </rollingPolicy>
+                <encoder>
+                    <pattern>${log.pattern}</pattern>
+                </encoder>
+                <!-- 此日志文件只记录info级别的 -->
+                <filter class="ch.qos.logback.classic.filter.LevelFilter">
+                    <level>INFO,ERROR</level>
+                    <onMatch>ACCEPT</onMatch>
+                    <onMismatch>DENY</onMismatch>
+                </filter>
+            </appender>
+        </root>
+        <root level="debug">
+            <!--debug级别输出到文件和控制台-->
+            <appender-ref ref="console" />
+        </root>
+
+    </springProfile>
+
+    <springProfile name="test">
+        <root level="INFO,ERROR">
+            <appender class="ch.qos.logback.core.rolling.RollingFileAppender">
+                <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                    <FileNamePattern>${log.path}/test/%d{yyyy-MM-dd}.log</FileNamePattern>
+                    <MaxHistory>${log.maxHistory}</MaxHistory>
+                </rollingPolicy>
+                <encoder>
+                    <pattern>${log.pattern}</pattern>
+                </encoder>
+                <!-- 此日志文件只记录info级别的 -->
+                <filter class="ch.qos.logback.classic.filter.LevelFilter">
+                    <level>INFO,ERROR</level>
+                    <onMatch>ACCEPT</onMatch>
+                    <onMismatch>DENY</onMismatch>
+                </filter>
+            </appender>
+        </root>
+        <root level="debug">
+            <!--debug级别输出到文件和控制台-->
+            <appender-ref ref="console" />
+        </root>
+    </springProfile>
+
+    <springProfile name="uat">
+        <root level="INFO,ERROR">
+            <appender class="ch.qos.logback.core.rolling.RollingFileAppender">
+                <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                    <FileNamePattern>${log.path}/uat/%d{yyyy-MM-dd}.log</FileNamePattern>
+                    <MaxHistory>${log.maxHistory}</MaxHistory>
+                </rollingPolicy>
+                <encoder>
+                    <pattern>${log.pattern}</pattern>
+                </encoder>
+                <!-- 此日志文件只记录info级别的 -->
+                <filter class="ch.qos.logback.classic.filter.LevelFilter">
+                    <level>INFO,ERROR</level>
+                    <onMatch>ACCEPT</onMatch>
+                    <onMismatch>DENY</onMismatch>
+                </filter>
+            </appender>
+        </root>
+        <root level="debug">
+            <!--debug级别输出到文件和控制台-->
+            <appender-ref ref="console" />
+        </root>
+    </springProfile>
+
+    <springProfile name="prod">
+        <root level="INFO,ERROR">
+            <appender class="ch.qos.logback.core.rolling.RollingFileAppender">
+                <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                    <FileNamePattern>${log.path}/prod/%d{yyyy-MM-dd}.log</FileNamePattern>
+                    <MaxHistory>${log.maxHistory}</MaxHistory>
+                </rollingPolicy>
+                <encoder>
+                    <pattern>${log.pattern}</pattern>
+                </encoder>
+                <!-- 此日志文件只记录info级别的 -->
+                <filter class="ch.qos.logback.classic.filter.LevelFilter">
+                    <level>INFO,ERROR</level>
+                    <onMatch>ACCEPT</onMatch>
+                    <onMismatch>DENY</onMismatch>
+                </filter>
+            </appender>
+        </root>
+        <root level="debug">
+            <!--debug级别输出到文件和控制台-->
+            <appender-ref ref="console" />
+        </root>
+    </springProfile>
+
+</configuration>

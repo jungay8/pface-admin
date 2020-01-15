@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pface.admin.modules.member.mapper.MemberMediaMapper">
+  <resultMap id="BaseResultMap" type="com.pface.admin.modules.member.po.MemberMedia">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <id column="media_file_id" jdbcType="BIGINT" property="mediaFileId" />
+    <result column="media_title" jdbcType="VARCHAR" property="mediaTitle" />
+    <result column="media_keyword" jdbcType="VARCHAR" property="mediaKeyword" />
+    <result column="belong_labelid" jdbcType="VARCHAR" property="belongLabelid" />
+    <result column="price_labelid" jdbcType="VARCHAR" property="priceLabelid" />
+    <result column="publish_labelid" jdbcType="VARCHAR" property="publishLabelid" />
+    <result column="catalogue_id" jdbcType="BIGINT" property="catalogueId" />
+    <result column="media_brief" jdbcType="LONGVARCHAR" property="mediaBrief" />
+    <result column="cover_url" jdbcType="VARCHAR" property="coverUrl" />
+    <result column="upload_cover_url" jdbcType="VARCHAR" property="uploadCoverUrl" />
+      <result column="file_cover_raw_name" jdbcType="VARCHAR" property="fileCoverRawName" />
+    <result column="file_cover_md5" jdbcType="VARCHAR" property="fileCoverMd5" />
+    <result column="cover_source_url" jdbcType="VARCHAR" property="coverSourceUrl" />
+    <result column="cover_origin" jdbcType="VARCHAR" property="coverOrigin" />
+    <result column="uid" jdbcType="BIGINT" property="uid" />
+    <result column="op_date" jdbcType="TIMESTAMP" property="opDate" />
+    <result column="del_flag" property="delFlag" jdbcType="INTEGER" />
+  </resultMap>
+
+  <!--<resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.pface.admin.modules.member.po.MemberMedia">-->
+    <!--<result column="media_brief" jdbcType="LONGVARCHAR" property="mediaBrief" />-->
+  <!--</resultMap>-->
+
+</mapper>

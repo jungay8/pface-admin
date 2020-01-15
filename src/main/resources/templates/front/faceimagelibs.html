@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+	<!--<script type="text/javascript" src="https://libs.baidu.com/jquery/1.8.3/jquery.min.js"></script>-->
+	<script type="text/javascript" th:src="@{/static/js/jquery183.js}"></script>
+	<script th:src="@{/static/pface/js/jquery.msgbox.min.js}"></script>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="context-path" th:content="@{/}"/>
+		<link rel="stylesheet" th:href="@{/static/pface/js/layui/css/layui.css}">
+		<link rel="stylesheet" th:href="@{/static/pface/css/common.css}">
+        <link rel="stylesheet" th:href="@{/static/pface/css/manage.css}" />
+        <link rel="stylesheet" th:href="@{/static/pface/css/upload.css}" />
+		<title>无感人脸——人像管理</title>
+		<script th:inline="javascript">
+            var CONTEXT_PATH = [[${#request.getContextPath()}]];
+		</script>
+	</head>
+	<body>
+		<!--导航-->
+		<div class="top clearfix" th:replace="~{front/header :: header}"></div>
+		<!--内容管理-->
+		<div class="container">
+			<div class="wapper">
+				<div class="m_conter clearfix hav_line">
+					<div class="fl left_nav" th:replace="~{front/leftnav::leftnav}"></div>
+					<!--右边-->
+					<div class="fr right_conter">
+
+						<div class="right_title">
+							<div class="colorblack manage_tit">
+								<img th:src="@{/static/pface/img/tit_inco.png}"/>
+								<span>人像库管理</span>
+
+								<span class="fr layui-btn layui-btn-danger btn-radius layui-edit btn_min" style="margin-left: 10px" id="getCheckData">
+											新建
+										</span>
+
+								<span class="fr layui-btn layui-btn-danger btn-radius layui-edit btn_min"  id="getCheckData2">
+											拉新人像库
+										</span>
+							</div>
+						</div>
+
+
+						<div class="layui-form videoListM">
+						<form  class="layui-form" lay-filter="choiceForm" id="search_form1" method="post" action="/front/faceimagelibs">
+							<!--<input type="radio" name="tabelTime"  lay-filter="timeradio" value="0" title="最近一天" th:attr ="checked=${tabelTime == '0' ?true:false}"/>-->
+							<!--<input type="radio" name="tabelTime"  lay-filter="timeradio" value="1" title="时间段:"  th:attr ="checked=${tabelTime == '1' ?true:false}"/>-->
+							<!--<div class="layui-inline timeChoice">-->
+								<!--<input class="layui-input" type="text" name="times" placeholder="请选择时间段"  th:value="${times}" id="LAY_chice_s">-->
+							<!--</div>-->
+							<input class="layui-input" type="text" name="libname" id="querylibname"
+								   style="display: inline-block;vertical-align: middle; width:200px;margin-top: 10px;margin-bottom: 10px;margin-right: 10px;margin-bottom: 10px"
+								   placeholder="请输入库名称"  th:value="${libname}">
+
+							<div style="display: inline-block;vertical-align: middle;  margin-left: 20px">
+								<label style="display: inline-block;">会议名称：</label>
+								<div class="layui-input-inline">
+									<select  id="querysyssceneid" name="syssceneid">
+										<option value="">全部</option>
+										<option th:each="usescene:${faceAppUsesceneAllList}" th:value="${usescene.id}"
+												th:text="${usescene.scenename}"
+												th:selected="${usescene.id} eq ${syssceneid}"
+										></option>
+									</select>
+								</div>
+							</div>
+
+							<div style="display: inline-block;vertical-align: middle;  margin-left: 20px">
+								<label style="display: inline-block;">库类型：</label>
+								<div class="layui-input-inline">
+									<select  id="querylibtype" name="libtype">
+										<option value="">全部</option>
+										<option value="2" th:selected="${libtype} eq 2">白名单库</option>
+										<option value="1" th:selected="${libtype} eq 1">黑名单库</option>
+									</select>
+								</div>
+							</div>
+
+							<div class="layui-inline">
+								<span class="layui-btn layui-btn-warm btn-radius closeBlack" id="search">查询</span>
+							</div>
+						</form>
+						<hr />
+						<table class="layui-table" lay-filter="demo" id="tableM">
+							<!--<colgroup>-->
+								<!--&lt;!&ndash;<col width="50">&ndash;&gt;-->
+								<!--<col width="210">-->
+								<!--<col width="150">-->
+								<!--<col width="230">-->
+								<!--<col width="180">-->
+								<!--<col width="180">-->
+								<!--<col width="180">-->
+								<!--<col width="180">-->
+								<!--<col width="250">-->
+							<!--</colgroup>-->
+							<thead>
+							<tr>
+								<!--<th><input type="checkbox" lay-skin="primary" lay-filter="allChoice"></th>-->
+								<th>设备ID</th>
+								<th>设备使用开始</th>
+								<th>设备使用结束</th>
+								<th>库名称</th>
+								<th>图片数量</th>
+								<th>类型</th>
+								<th>编辑时间</th>
+								<th>操作</th>
+							</tr>
+							</thead>
+							<tbody>
+							<tr th:each="imagelib : ${faceAppImageLibsList}">
+								<!--<td><input type="checkbox" lay-filter="tableCheck" lay-skin="primary" th:value="${usescene.id}+'#'+${usescene.fileName}"></td>-->
+								<td th:text="${imagelib.deviceId}"></td>
+								<td th:text="${#dates.format(imagelib.authBegindate, 'yyyy-MM-dd')}"></td>
+								<td th:text="${#dates.format(imagelib.authEnddate, 'yyyy-MM-dd HH:mm:ss')}"></td>
+								<td th:text="${imagelib.libName}"></td>
+								<td th:text="${imagelib.pictureNo}"></td>
+								<td th:if="${imagelib.libType == 1}" th:text="黑名单库"></td>
+								<td th:if="${imagelib.libType == 2}" th:text="白名单库"></td>
+								<td th:text="${#dates.format(imagelib.updateDate, 'yyyy-MM-dd HH:mm:ss')}"></td>
+								<td>
+									<a class="conterIntr_delet" th:onclick="'javascript:delfaceappimagelib(\''+${imagelib.id}+'\',\''+${imagelib.deviceId}+'\',\''+${imagelib.libId}+'\');'"><i class="layui-icon layui-icon-delete"></i>删除</a>
+
+									<a class="layui-edit conterIntr_edit video_edit"  data-name="人像库信息"
+									   th:data="${imagelib.id}
+									+'#'+${imagelib.sysSceneid}
+									+'#'+ ${imagelib.libName}
+									+'#'+ ${imagelib.libType}
+									+'#'+ ${imagelib.libId}
+									+'#'+ ${imagelib.deviceId}
+									+'#'+ ${imagelib.remark}
+									"><i class="layui-icon layui-icon-edit"></i>修改</a>
+
+									<a class="layui-edit conterIntr_edit imagelibmanage"  data-name="会议id" th:data="${imagelib.id}
+									+'#'+${imagelib.deviceId}
+									+'#'+${imagelib.libId}"><i class="layui-icon layui-icon-face-smile"></i>图片库管理</a>
+									<!--<a class="layui-btn layui-btn-primary layui-btn-xs video_delete" data-name="人像库系统id" th:data="${imagelib.id}">删除</a>-->
+								</td>
+							</tr>
+							</tbody>
+
+						</table>
+							<div class="conterIntro_bottom">
+								<div id="pageNum" class="pageNum textRight"></div>
+							</div>
+					</div>
+			</div>
+				</div>
+
+				</div>
+		</div>
+		
+<!--footer-->
+<div class="footer" th:replace="~{front/footer :: footer}"></div>
+<div>
+	<form name="listpage" id="listpage" method="post">
+		<input type="hidden" name="pageNumKey" id="pageNumKey" th:value="${pageNum}">
+		<input type="hidden" name="pageSizeKey" id="pageSizeKey" th:value="${pageSize}">
+		<input type="hidden" name="libname" id="pagelibname" th:value="${libname}">
+		<input type="hidden" name="syssceneid" id="pagesyssceneid" th:value="${syssceneid}">
+		<input type="hidden" name="libtype" id="pagelibtype" th:value="${libtype}">
+	</form>
+</div>
+
+<!-人像库编辑窗口-->
+		<div class="videoM_List" id="newsedit" style="display:none ;" >
+			<ul class="videoEdit layui-form" id="uploadVideoListDiv">
+				<div class="" style="margin-top: 20px;margin-right: 20px;margin-bottom: 20px">
+					<form class="layui-form" action="">
+						<input type="hidden" id="syslibid" value="">
+						<input type="hidden" id="editlibId" value="">
+						<input type="hidden" id="deviceid" value="">
+						<div class="layui-form-item">
+							<label class="layui-form-label" style="width: 100px"><font color="red">*</font>库名称</label>
+							<div class="layui-input-block">
+								<input type="text" name="editlibname" id="editlibname"  required  placeholder="请输入库名称" autocomplete="off" class="layui-input">
+							</div>
+						</div>
+
+						<div class="layui-form-item">
+							<label class="layui-form-label"  style="width: 100px"><font color="red">*</font>会议名称</label>
+							<div class="layui-input-block">
+								<select  id="editsyssceneid" name="editsyssceneid">
+									<option th:each="usescene:${faceAppUsesceneAllList}" th:value="${usescene.id}"
+											th:text="${usescene.scenename}"
+									></option>
+								</select>
+							</div>
+						</div>
+
+						<div class="layui-form-item">
+							<!--<div class="layui-inline">-->
+							<label class="layui-form-label" style="width: 100px"><font color="red">*</font>库类型</label>
+							<div class="layui-input-block">
+								<select  id="editlibtype" name="editlibtype">
+									<option value="2">白名单库</option>
+									<option value="1">黑名单库</option>
+								</select>
+							</div>
+							<!--</div>-->
+						</div>
+
+						<div class="layui-form-item">
+							<label class="layui-form-label" style="width: 100px">备注</label>
+							<div class="layui-input-block">
+								<input type="text" name="remark" id="remark" autocomplete="off" placeholder="备注" class="layui-input">
+							</div>
+						</div>
+					</form>
+				</div>
+			</ul>
+			<div class="textCenter upload_btnbt vidoe_upAll">
+				<div class="">
+					<button class="layui-btn layui-btn-warm btn-radius btn_min" id="commitAllFileBtnId">提交
+					</button>
+					<a href="javascript:void(0)"
+					   class="layui-btn layui-btn-warm btn-radius btn_min return_exq">取消</a>
+				</div>
+			</div>
+		</div>
+
+<script th:inline="javascript">
+            /*<![CDATA[*/
+
+            var totalRecords = [[${total}]];
+            var page = [[${pageNum}]];
+            var pageSize = [[${pageSize}]];
+			var libname = [[libname]];
+
+            /*]]>*/
+</script>
+<script th:src="@{/static/pface/js/layui/layui.js}"></script>
+<script th:src="@{/static/pface/js/layui/lay.modules/laydate.js}"></script>
+<script th:src="@{/static/pface/js/faceappimagelib.js}"></script>
+
+<script th:inline="javascript">
+	// var faceAppUsesceneAllList = [[${faceAppUsesceneAllList}]];
+</script>
+
+<script type='text/javascript' th:inline="javascript">
+	layui.use(['table','form', 'laydate'], function(){
+		var $ = layui.jquery
+				,table = layui.table
+				,form=layui.form
+				,laydate = layui.laydate;
+		//这里是查询操作
+		$(document).on('click','#search',function(){
+			$form = $("#search_form1");
+			$form.submit();
+		});
+
+		$(document).on('click','.imagelibmanage',function(){
+			var item=$(this).attr("data");
+			var itemArray = item.split("#");
+			window.location.href = CONTEXT_PATH + '/front/faceappimages?sysLibId='+itemArray[0] + '&deviceId='+itemArray[1] + '&libId='+itemArray[2];
+		})
+		//新增人像库
+		$(document).on('click','#getCheckData',function(){
+			active.editTitle = "新增人像库";
+			$("#syslibid").val("");
+			$("#editlibname").val("");
+			$("#editlibId").val("");
+			$("#deviceid").val("");
+			$("#remark").val("");
+			active.setTop();
+		});
+		//修改人像库
+		$(document).on('click','.video_edit',function(){
+			active.editTitle = "修改人像库";
+			var item=$(this).attr("data");
+			var itemArray = item.split("#");
+			$("#syslibid").val(itemArray[0]);
+			$("#editsyssceneid").val(itemArray[1]);
+			$("#editlibname").val(itemArray[2]);
+			$("#editlibtype").val(itemArray[3]);
+			$("#editlibId").val(itemArray[4]);
+			$("#deviceid").val(itemArray[5]);
+			$("#remark").val(itemArray[6]);
+			active.setTop();
+		});
+		//提交
+		$(document).on("click", "#commitAllFileBtnId", function (){
+			var syslibid = $("#syslibid").val();  //人像库本地系统id
+			var editsyssceneid = $("#editsyssceneid").val(); //会议名称id
+			var deviceid = $("#deviceid").val();
+			var editlibname = $("#editlibname").val(); //库名称
+			if ($.trim(editlibname) == ''){
+				active.myalert('库名称不能为空。');
+				return ;
+			}
+			var editlibtype = $("#editlibtype").val(); //库类型
+			var editlibId = $("#editlibId").val(); //人像库智能盒子那边的id
+
+			var remark = $("#remark").val();
+			var fd = new FormData();
+			fd.append("syslibid", syslibid);
+			fd.append("editsyssceneid", editsyssceneid);
+			fd.append("deviceid", deviceid);
+			fd.append("editlibname", editlibname);
+			fd.append("editlibtype", editlibtype);
+			fd.append("editlibId", editlibId);
+			fd.append("remark", remark);
+
+			$.ajax({
+				processData: false,
+				contentType: false,
+				type: "POST",
+				url: CONTEXT_PATH + '/front/appimagelibs/mysave',
+				data: fd,
+				success: function (response) {
+					if (response.success) {
+						layer.msg(response.msg, {
+							time: 2000,
+							icon: 5,
+							anim: 6
+						},function () {
+							window.location.href = response.extra.url;
+						});
+					} else {
+						active.myalert(response.msg);
+					}
+				},
+				error: function (error) {
+					console.log(error);
+				}
+			});
+		});
+		//拉新人像库
+		$(document).on("click", "#getCheckData2", function (){
+			debugger;
+			var reqid = new Date().getTime();
+
+			var fd = new FormData();
+			fd.append("reqid", reqid);
+			$.ajax({
+				processData: false,
+				contentType: false,
+				type: "POST",
+				url: CONTEXT_PATH + '/front/appimagelibs/refreshImageLibs',
+				data: fd,
+				success: function (response) {
+					if (response.success) {
+						layer.msg(response.msg, {
+							time: 2000,
+							icon: 5,
+							anim: 6
+						},function () {
+							window.location.href = response.extra.url;
+						});
+					} else {
+						active.myalert(response.msg);
+					}
+				},
+				error: function (error) {
+					console.log(error);
+				}
+			});
+		});
+		//关闭弹窗
+		$(document).on('click','.return_exq',function () {
+			layer.closeAll();
+		});
+
+		var wh=document.body.clientHeight*0.7;
+
+		//弹出层
+		var active = {
+			editTitle : '新增人像库',
+			setTop: function(){
+				var that = this;
+				//多窗口模式，层叠置顶
+				layer.open({
+					skin: 'Ldemo-class',
+					maxmin: true,
+					type: 1
+					,title: active.editTitle
+					,btnAlign: 'l' //按钮居左
+					,shade: 0.65
+					,area: ['300px', wh+"px"]
+					,content:$('#newsedit')
+					,cancel:function () {
+						console.log("cancel() in ");
+					}
+					,zIndex: layer.zIndex //重点1
+
+				});
+			},
+			myalert:function(msg){
+				layer.msg(msg, {
+					time: 3000, //3s后自动关闭
+					icon: 5,
+					anim: 6
+				});
+			}
+		}
+	});
+</script>
+</body>
+</html>

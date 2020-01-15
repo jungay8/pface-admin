@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.pface.admin.modules.member.mapper.MemberCatalogueMapper" >
+  <resultMap id="BaseResultMap" type="com.pface.admin.modules.member.po.MemberCatalogue" >
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="parent_id" property="parentId" jdbcType="BIGINT" />
+    <result column="parent_ids" property="parentIds" jdbcType="VARCHAR" />
+    <result column="available" property="available" jdbcType="BIT" />
+    <result column="priority" property="priority" jdbcType="INTEGER" />
+    <result column="leaf" property="leaf" jdbcType="BIT" />
+    <result column="op_date" property="opDate" jdbcType="TIMESTAMP" />
+    <result column="del_flag" property="delFlag" jdbcType="INTEGER" />
+  </resultMap>
+  <update id="updateSalefParentIds" parameterType="java.lang.String">
+    update jmgo_member_catalogue set parent_ids=concat(#{makeSelfAsParentIds}, substring(parent_ids, length(#{makeSelfAsParentIds}))) where parent_ids like #{makeSelfAsParentIds} + '%'
+  </update>
+</mapper>

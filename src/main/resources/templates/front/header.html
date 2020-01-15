@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+
+	<body>
+		<!--导航-->
+		<header class="top clearfix" th:fragment="header">
+			<div class="wapper">
+				<div class="fl logo">
+					<img class="WaImg" th:src="@{/static/pface/img/logo.jpg}"/>
+				</div>
+				<div class="fl nav">
+					<a href="#"><img  th:src="@{/static/pface/img/nav_index.jpg}"/>首页</a><span></span>
+					<!--<a href="http://www.jiemugo.com/Material/index" target="_blank">素材专区</a><span>|</span>-->
+					<!--<a href="http://www.jiemugo.com/pgm/list" target="_blank">节目专区</a><span>|</span>-->
+					<!--<a href="http://jumeng.jiemugo.com/" target="_blank">电视剧专区</a><span>|</span>-->
+					<!--<a href="http://www.jiemugo.com/" target="_blank">融媒体专区</a>-->
+				</div>
+				<div class="fr top_right">					
+					<a href="/front/login" th:if="${userinfo==null}"><img th:src="@{/static/pface/img/top_login.jpg}"/> 登录</a>
+					<a href="/front/logout" th:if="${userinfo!=null}"><img th:src="@{/static/pface/img/top_login.jpg}"/> 退出</a>
+					<!--<a href="/front/reg" th:if="${userinfo==null}"><img th:src="@{/static/pface/img/top_register.jpg}"/> 注册</a>-->
+					<!--<a href="/front/upload"  th:class="${userinfo.isCert.name} eq 'CERTIFIED' ? 'enabled update_btn btn':'disabled'" th:if="${userinfo!=null}">上传</a>-->
+				</div>
+			</div>			
+		</header>
+		<-- head end -->
+
+</body>
+</html>

@@ -1,0 +1,1167 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+	<!--<script type="text/javascript" src="https://libs.baidu.com/jquery/1.8.3/jquery.min.js"></script>-->
+	<script type="text/javascript" th:src="@{/static/js/jquery183.js}"></script>
+	<script th:src="@{/static/pface/js/jquery.msgbox.min.js}"></script>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="context-path" th:content="@{/}"/>
+		<link rel="stylesheet" th:href="@{/static/pface/js/layui/css/layui.css}">
+		<link rel="stylesheet" th:href="@{/static/pface/css/common.css}">
+        <link rel="stylesheet" th:href="@{/static/pface/css/manage.css}" />
+        <link rel="stylesheet" th:href="@{/static/pface/css/upload.css}" />
+		<title>节目购——视频暂存库管理</title>
+		<script th:inline="javascript">
+            var CONTEXT_PATH = [[${#request.getContextPath()}]];
+		</script>
+	</head>
+	<body>
+		<!--导航-->
+		<div class="top clearfix" th:replace="~{front/header :: header}"></div>
+		<!--内容管理-->
+		<div class="container">
+			<div class="wapper">
+				<div class="m_conter clearfix hav_line">
+					<div class="fl left_nav" th:replace="~{front/leftnav::leftnav}"></div>
+					<!--右边-->
+					<div class="fr right_conter">
+						<div class="layui-form videoListM">
+						<form  class="layui-form" lay-filter="choiceForm" id="search_form1" method="post" action="/front/contentPause">
+							<input type="radio" name="tabelTime"  lay-filter="timeradio" value="0" title="最近一天" th:attr ="checked=${tabelTime == '0' ?true:false}"/>
+							<input type="radio" name="tabelTime"  lay-filter="timeradio" value="1" title="时间段:"  th:attr ="checked=${tabelTime == '1' ?true:false}"/>
+							<div class="layui-inline timeChoice">
+								<input class="layui-input" type="text" name="times" placeholder="请选择时间段"  th:value="${times}" id="LAY_chice_s">
+							</div>
+							<div class="layui-inline">
+								<span class="layui-btn layui-btn-warm btn-radius closeBlack" id="search">查询</span>
+							</div>
+							<div class="layui-inline fr">
+								<span class="layui-btn layui-btn-warm btn-radius closeBlack" id="getCheckData">批量编目</span>
+							</div>
+						</form>
+
+						<table class="layui-table" lay-filter="demo" id="tableM">
+							<colgroup>
+								<col width="50">
+								<col width="310">
+								<col width="120">
+								<col width="180">
+								<col width="120">
+								<col>
+							</colgroup>
+							<thead>
+							<tr>
+								<th><input type="checkbox" lay-skin="primary" lay-filter="allChoice"></th>
+								<!--<th>序号</th>-->
+								<th>文件名</th>
+								<th>大小(Kb)</th>
+								<th>上传时间</th>
+								<th>操作</th>
+							</tr>
+							</thead>
+							<tbody>
+							<tr th:each="mediaFile : ${mediaFileList}">
+								<td><input type="checkbox" lay-filter="tableCheck" lay-skin="primary" th:value="${mediaFile.id}+'#'+${mediaFile.fileName}"></td>
+								<!--<td>1</td>-->
+								<td th:text="${mediaFile.fileName}"></td>
+								<td th:if="${mediaFile.fileSize} != null" th:text="${#numbers.formatDecimal(mediaFile.fileSize/1024,1,2)}"></td>
+								<td th:if="${mediaFile.fileSize} == null" th:text="0"></td>
+
+								<td th:text="${#dates.format(mediaFile.uploadDate, 'yyyy-MM-dd')}"></td>
+								<td><a class="layui-btn layui-btn-primary layui-btn-xs video_edit" data-name="上传的视频名称1" th:data="${mediaFile.id}+'#'+${mediaFile.fileName}">编目</a></td>
+							</tr>
+							</tbody>
+
+						</table>
+							<div class="conterIntro_bottom">
+								<div id="pageNum" class="pageNum textRight"></div>
+							</div>
+					</div>
+			</div>
+				</div>
+
+				</div>
+		</div>
+		
+		<!--footer-->
+<div class="footer" th:replace="~{front/footer :: footer}"> </div>
+		<div>
+			<form name="listpage" id="listpage" method="post">
+				<input type="hidden" name="pageNumKey" id="pageNumKey" th:value="${pageNum}">
+				<input type="hidden" name="pageSizeKey" id="pageSizeKey" th:value="${pageSize}">
+				<input type="hidden" name="times" id="times" th:value="${times}">
+				<input type="hidden" name="tabelTime" id="tabelTime" th:value="${tabelTime}">
+			</form>
+		</div>
+<!--编目弹出窗口-->
+<div class="videoM_List" id="newsedit" style="display:none ;" >
+	<ul class="videoEdit layui-form videoSearch" id="uploadVideoListCommonDiv">
+		<li>
+
+			<div class="videoML_m">
+
+				<div class="videoML_top">
+
+					<label>批量处理本页内容:</label>
+					<div class="layui-form-item">
+
+						<div class="videoML_title">
+							<div class="layui-inline">
+								<label class="layui-form-label"><em></em>类型</label>
+								<div class="layui-input-inline videosearch_select">
+									<select id="video_catalogueId" name="modules" lay-verify="required">
+										<option value="">请选择</option>
+										<option th:each="cata:${cataloguesLabels}" th:value="${cata.id}"
+												th:text="${cata.name}"></option>
+									</select>
+								</div>
+							</div>
+							<div class="layui-inline">
+								<label class="layui-form-label"><em></em>价格</label>
+								<div class="layui-input-inline videosearch_select">
+									<select name="modules" id="video_priceLabelid"
+											lay-verify="required">
+										<option value="">请选择</option>
+										<option th:each="price:${pricesLabels}" th:value="${price.id}"
+												th:text="${price.label}"></option>
+									</select>
+								</div>
+							</div>
+							<div class="layui-inline">
+								<label class="layui-form-label"><em></em>转载设置</label>
+								<div class="layui-input-inline videosearch_select">
+									<select id="video_publishLabelid" name="modules"
+											lay-verify="required">
+										<option value="">请选择</option>
+										<option th:each="publish:${publishLabels}"
+												th:value="${publish.id}"
+												th:text="${publish.label}">
+										</option>
+									</select>
+								</div>
+
+							</div>
+						</div>
+
+
+						<div class="videoML_title clearfix">
+							<label class="layui-form-label"><em></em>归属标签</label>
+
+							<input type="checkbox"
+								   name="imageTextBelongLabelName"
+								   th:each="belong:${belongLabels}" th:title="${belong.label}"
+								   th:value="${belong.id}">
+
+							<div class="layui-inline fr">
+								<button id="setvalueid"
+										class="layui-btn layui-btn-danger btn-radius">设置
+								</button>
+							</div>
+
+						</div>
+					</div>
+
+				</div>
+			</div>
+
+		</li>
+
+	</ul>
+
+
+	<ul class="videoEdit layui-form" id="uploadVideoListDiv"></ul>
+	<div class="textCenter upload_btnbt vidoe_upAll">
+		<div class="layui-form upload_agree">
+			<input type="checkbox" id="video_readAll" name="read" lay-skin="primary"
+				   title="我已阅读并同意遵守 《版权服务规则协议》">
+		</div>
+		<div class="">
+			<button class="layui-btn layui-btn-warm btn-radius btn_min" id="commitAllFileBtnId">提交所有
+			</button>
+			<a href="javascript:void(0)"
+			   class="layui-btn layui-btn-warm btn-radius btn_min return_exq">取消</a>
+		</div>
+	</div>
+
+</div>
+
+<!--内容关联，弹出窗口-->
+<div class="addCWindow" id="addCWindow" style="display:none ;">
+			<div class="addCW_search layui-form">
+				<div class="layui-form-item">
+					<div class="layui-inline">
+						<label class="layui-form-label">标题：</label>
+						<div class="layui-input-inline">
+							<input type="text" class="layui-input" id="relationQryTitle"/>
+						</div>
+					</div>
+					<div class="layui-inline">
+						<label class="layui-form-label">类别：</label>
+						<div class="layui-input-inline">
+							<select name="quiz" id="relationQryMediaType">
+								<option value="VIDEO">视频类</option>
+								<option value="AUDIO">影视类</option>
+								<option value="IMAGETEXT">图文</option>
+							</select>
+						</div>
+					</div>
+					<div class="layui-inline">
+						<span class="layui-btn layui-btn-danger btn-radius btn_min relationQry relationQryLocation">查询</span>
+					</div>
+				</div>
+			</div>
+			<div class="layui-form">
+				<table class="layui-table" id="tableMR">
+					<colgroup>
+						<col width="30">
+						<!--<col width="140">-->
+						<col>
+						<col width="100">
+					</colgroup>
+					<thead>
+					<tr>
+						<th>
+							<input type="checkbox" lay-skin="primary" title="选择" lay-filter="allChoice">
+						</th>
+						<!--<th>-->
+						<!--封面-->
+						<!--</th>-->
+						<th>
+							内容
+						</th>
+						<th>
+							操作
+						</th>
+					</tr>
+					</thead>
+					<tbody>
+					<!--<tr>-->
+					<!--<td>-->
+					<!--<input type="checkbox" lay-skin="primary" lay-filter="tableCheck">-->
+					<!--</td>-->
+					<!--<td>-->
+					<!--<img width="100" src="img/conter_Img.jpg" />-->
+					<!--</td>-->
+					<!--<td>-->
+					<!--<h3>标题标题1</h3>-->
+					<!--<p>标签</p >-->
+					<!--<p class="addCW_time"><span class="fr">价格：￥5.00</span>-->
+					<!--<span>时间：2019-7-17</span>-->
+					<!--</p >-->
+					<!--</td>-->
+					<!--<td>-->
+					<!--<a href="javascript:void(0)" class="addCW_choiceThis" data-title="标题标题1.mp3">选择</a>-->
+					<!--</td>-->
+					<!--</tr>-->
+					</tbody>
+				</table>
+			</div>
+		</div>
+<script th:inline="javascript">
+            /*<![CDATA[*/
+
+            var totalRecords = [[${total}]];
+            var page = [[${pageNum}]];
+            var pageSize = [[${pageSize}]];
+			var times = [[times]];
+			var tabelTime = [[tabelTime]];
+
+            /*]]>*/
+</script>
+<script th:src="@{/static/pface/js/layui/layui.js}"></script>
+<script th:src="@{/static/pface/js/contentPause.js}"></script>
+
+<script th:inline="javascript">
+	var cataloguesLabels = [[${cataloguesLabels}]];
+	var belongLabels = [[${belongLabels}]];
+	var pricesLabels = [[${pricesLabels}]];
+	var publishLabels = [[${publishLabels}]];
+</script>
+
+<script type='text/javascript' th:inline="javascript">
+	layui.use(['table','form', 'laydate'], function(){
+		var $ = layui.jquery
+				,table = layui.table
+				,form=layui.form
+				,laydate=layui.laydate;
+		//时间选择
+		laydate.render({
+			elem: '#LAY_chice_s'
+			,theme: '#ce0106'
+			,trigger: 'click'
+			,format: 'yyyy-MM-dd'
+			,min: '2018-1-1'
+			,max: '2099-06-16'
+			,range: "至"
+			,done: function(value, date, endDate){
+				console.log(value)
+				form.val('choiceForm', {
+					"tabelTime":"1"
+				});
+			}
+		});
+		//重新选择最近一天
+		form.on("radio(timeradio)", function (data) {
+			if(this.value == '0') {
+				form.val('choiceForm', {
+					"times":""
+				});
+			}
+		});
+		//全选按钮
+		form.on('checkbox(allChoice)', function(data){
+			var child = $(data.elem).parents('table').find('tbody input[type="checkbox"]');
+			child.each(function(index, item){
+				item.checked = data.elem.checked;
+			});
+			form.render('checkbox');
+		});
+		//checkbox选择
+		form.on('checkbox(tableCheck)', function(data){
+			console.log("a");
+			var dataChild=$("#tableM").find('tbody input[type="checkbox"]');
+			var allCheck=$("#tableM").find('thead input[type="checkbox"]');
+			if(data.elem.checked==true){
+				allCheck[0].checked=true;
+				dataChild.each(function(index, item){
+					if(item.checked==false){
+						allCheck[0].checked=false;
+					};
+				});
+			}else{
+				allCheck[0].checked=false;
+			}
+			form.render('checkbox');
+		});
+		$(document).on('click','#search',function(){
+			//这里是查询操作
+			// var datetype = active.getRadioCheckValue("tabelTime");
+			$form = $("#search_form1");
+			$form.submit();
+			// layer.alert("您点击了查询");
+		});
+		//批量编目
+		$(document).on('click','#getCheckData',function(){
+			//这里是批量编目
+			var dataChild=$("#tableM").find('tbody input[type="checkbox"]');
+			var data=[];
+			dataChild.each(function(index, item){
+				if(item.checked==true){
+					data.push(item.value);
+				}
+			});
+			if (data.length == 0){
+				layer.msg('请选择需要编目的内容', {
+					time: 3000, //3s后自动关闭
+					icon: 5,
+					anim: 6
+				});
+			}else{
+				// for(var i=0,len=data.length;i<len;i++){
+				// 	var name=$(".video_edit").eq(data[i]).attr("data-name");
+				// }
+				console.dir("data=\n"+data);
+				active.drawContent(data);
+				active.setTop();
+			}
+		});
+		//单个编目
+		$(document).on('click','.video_edit',function(){
+			//这里单个编目
+			var name=$(this).attr("data-name");
+			var item=$(this).attr("data");
+			var data = [item];
+
+			console.log('data = ' + data);
+			active.drawContent(data);
+
+			active.setTop();
+		});
+		//批量设置值
+		$(document).on('click','#setvalueid',function(){
+			console.log('setValue() in ');
+			var cur_video_catalogueId = $("#video_catalogueId").find("option:selected").val();
+			var cur_video_priceLabelid = $("#video_priceLabelid").find("option:selected").val();
+			var cur_video_publishLabelid = $("#video_publishLabelid").find("option:selected").val();
+
+			var uploadedResult = active.data;
+
+			for (var i = 0; i < uploadedResult.length; i++) {
+				var fileItem = uploadedResult[i];
+				var fileItemArray = fileItem.split('#');
+				var fileMediaId = fileItemArray[0];
+				var fileName = fileItemArray[1];
+
+				$("#video_catalogueId" + fileMediaId).val(cur_video_catalogueId);
+				if (cur_video_catalogueId != '' && cur_video_catalogueId != undefined) {
+					$("#video_catalogueId" + fileMediaId).find('option[value=' + cur_video_catalogueId + ']').prop('selected', true);
+				}
+
+				$("#video_priceLabelid" + fileMediaId).val(cur_video_priceLabelid);
+				if (cur_video_priceLabelid != '' && cur_video_priceLabelid != undefined) {
+					$("#video_priceLabelid" + fileMediaId).find('option[value=' + cur_video_priceLabelid + ']').prop('selected', true);
+				}
+
+				$("#video_publishLabelid" + fileMediaId).val(cur_video_publishLabelid);
+				if (cur_video_publishLabelid != '' && cur_video_publishLabelid != undefined) {
+					$("#video_publishLabelid" + fileMediaId).find('option[value=' + cur_video_publishLabelid + ']').prop('selected', true);
+				}
+
+				//归属标签
+				var cur_imageTextBelongLabelName = active.getCheckboxAllValues("video_belongLabelname_"+fileMediaId);
+
+				if (cur_imageTextBelongLabelName != '' && cur_imageTextBelongLabelName != undefined) {
+					if (cur_imageTextBelongLabelName.indexOf(',') > 0) {
+						var cur_imageTextBelongLabelNameArray = cur_imageTextBelongLabelName.split(",");
+						for (var j = 0; j < cur_imageTextBelongLabelNameArray.length; j++) {
+							var checkboxid = "#video_belongLabelname_" + fileMediaId + "_" + cur_imageTextBelongLabelNameArray[j];
+							//当前此值的checked属性值
+							var c = active.getCheckboxCheckedvalue("imageTextBelongLabelName", cur_imageTextBelongLabelNameArray[j]);
+							$(checkboxid).prop("checked", c);
+						}
+					} else {
+						var checkboxid = "#video_belongLabelname_" + fileMediaId + "_" + cur_imageTextBelongLabelName;
+						var c = active.getCheckboxCheckedvalue("imageTextBelongLabelName", cur_imageTextBelongLabelName);
+						$(checkboxid).prop("checked", c);
+					}
+				}
+
+
+			}
+			layui.form.render('select');
+			layui.form.render('checkbox');
+
+		});
+		//选择封面
+		$(document).on("change", ".videoML_input", function () {
+			var $imgBg = $(this).siblings(".imgBg");
+			var name = $(this).attr("date-name");
+			var $img = $imgBg.find("img");
+			//$("#people_headShow").attr("src","");
+			$imgBg.hide();
+			$img.attr("src", "")
+			var $file = $(this);
+			var fileObj = $file[0];
+			var windowURL = window.URL || window.webkitURL;
+
+			if (fileObj && fileObj.files && fileObj.files[0]) {
+				dataURL = windowURL.createObjectURL(fileObj.files[0]);
+				$img.attr('src', dataURL);
+			} else {
+				dataURL = $file.val();
+				//var imgObj = document.getElementById("people_headShow");
+				var imgObj = document.getElementById('' + name);
+				imgObj.style.filter = "progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=scale)";
+				imgObj.filters.item("DXImageTransform.Microsoft.AlphaImageLoader").src = dataURL;
+			}
+			$imgBg.show();
+
+		});
+		//提交所有
+		$(document).on("click", "#commitAllFileBtnId", function (){
+			console.dir('uploadedResult = ' + active.data);
+			if (!$('#video_readAll').is(':checked')) {
+				active.myalert('提交所有文件：必须同意《版权服务规则协议》');
+				return false;
+			}
+			for (var i = 0; i < active.data.length; i++) {
+				var fileItem = active.data[i];
+				var fileItemArray = fileItem.split('#');
+				var fileMediaId = fileItemArray[0];
+				var fileName = fileItemArray[1];
+				active.commitFileItem(fileMediaId, fileName, $('#commitOneBtnId' + fileMediaId), true);
+			}
+		});
+		//删除
+		$(document).on('click', '.Video_deleThis',function () {
+			var pfileMediaId = $(this).attr("data-id");
+			var obj = this;
+			console.log("pfileMediaId"+pfileMediaId+",obj="+obj);
+			layer.confirm('您确定要移除该项吗?', {btn: ['确定', '取消'], title: "提示"}, function (index) {
+				// relationMap.delete(pfileMediaId); //删除关联内容
+				layer.close(index);
+				active._deleteItem(pfileMediaId, obj);
+				// active.myalert('删除成功。');
+				// if (active.data.length <=0){
+				// 	layer.closeAll();
+				// }
+			});
+			return false;
+		});
+		//提交本条
+		$(document).on('click', '.locatclass',function () {
+			var pfileMediaId = $(this).attr("data-fileMediaId");
+			var filename = $(this).attr("data-fileName");
+			console.log("pfileMediaId=" +pfileMediaId + ",filename="+filename);
+			active.commitFileItem(pfileMediaId, filename, this, false);
+		});
+		//关闭弹窗
+		$(document).on('click','.return_exq',function () {
+			layer.closeAll();
+		});
+		var wh=document.body.clientHeight*0.9;
+
+		var ct_window;
+		var addHtml='';
+
+		var curFileMediaId = ""; //当前被关联的id
+		var relationMap = new Map();//关联的map对象，里面结构：关联id:被关联id数组
+
+		//内容关联
+		$(document).on('click', '.addConter', function (){
+			var fileMediaId = $(this).attr("data-id");
+			curFileMediaId = fileMediaId;
+			active.addSearch(fileMediaId);
+		})
+
+		$(document).on('click', '.relationQryLocation',function () {
+			var title = $.trim($("#relationQryTitle").val());
+			var mediaType = $("#relationQryMediaType").find("option:selected").val();
+			// if (title == ''){
+			//     myalert('标题查询条件不要空。');
+			//     return false;
+			// }
+			$.ajax({
+				type: "POST",
+				url: CONTEXT_PATH+"/front/queryMedia",
+				data: {
+					title: title,
+					mediaType:mediaType
+				},
+				success: function (data) {
+					if (data.success) {
+						var tbody=$("#tableMR").find('tbody');
+						tbody.html('');
+						var dataList = data.data;
+						var rows = '';
+						for (i=0,len=dataList.length; i<len; i++) {
+							var row = dataList[i];
+							rows = rows +
+									'<tr>\n' +
+									'                <td>\n' +
+									'                    <input type="checkbox" lay-skin="primary" lay-filter="tableCheck">\n' +
+									'                </td>\n' +
+									// '                <td>\n' +
+									// '                    <img width="100" src="img/conter_Img.jpg" />\n' +
+									// '                </td>\n' +
+									'                <td>\n' +
+									'                    <h3>标题：'+row.mediaTitle+'</h3>\n' +
+									'                    <p>类别：'+row.catalogueName+'</p >\n' +
+									'                    <p class="addCW_time"><span class="fr">价格：'+row.price+'('+row.priceLabelName+')</span>\n' +
+									'                        <span>时间：'+row.uploadDate+'</span>\n' +
+									'                    </p >\n' +
+									'                </td>\n' +
+									'                <td>\n' +
+									'                   <a href="javascript:void(0)" class="addCW_choiceThis" data-id="'+row.id+'" data-title="'+row.mediaTitle+'">选择</a>\n' +
+									'                </td>\n' +
+									'            </tr>';
+						}
+						tbody.append(rows);
+						layui.form.render();
+						return;
+					}else {
+						myalert('系统错误，请稍后再试。');
+						return;
+					}
+				},
+				error: function (e) {
+					myalert('系统错误，请稍后再试。');
+					return;
+				}
+
+			})
+		})
+
+		//单个选择
+		$("body").on("click",".addCW_choiceThis",function(e){
+			var tit=$(this).attr("data-title");
+			var id = $(this).attr("data-id");
+
+			var  addHtml='<li><div class="addConter_title"> <span> ◇ </span>'+tit+'</div>'+
+					'<div class="LQML_CloseVm" data-relaid="'+curFileMediaId+'" data-id="'+id+'"><i class="layui-icon">&#x1006;</i></div>'+
+					'</li>';
+
+			if(relationMap.has(curFileMediaId)){
+				console.dir("单个添加前："+relationMap.get(curFileMediaId));
+				var index = active.isInArray(relationMap.get(curFileMediaId), id);
+				if (index<0){
+					$("#addConterUl" + curFileMediaId).append(addHtml);
+					relationMap.get(curFileMediaId).push(id);
+				}
+			}else{
+				console.dir("单个添加前：空");
+				$("#addConterUl" + curFileMediaId).append(addHtml);
+				relationMap.set(curFileMediaId, [id]);
+			}
+			console.log("单个选择后："+relationMap.get(curFileMediaId));
+			layer.close(ct_window);
+		})
+		//删除关联内容
+		$("body").on("click",".LQML_CloseVm",function(){
+			var relaid = $(this).attr("data-relaid");
+			curFileMediaId = relaid;
+			console.dir('curFileMediaId = '+curFileMediaId);
+			console.dir('删除前：'+relationMap.get(curFileMediaId));
+			if(confirm('确定要删除此项吗?'))
+			{
+				//从数组中删除这个元素
+				var id = $(this).attr('data-id');
+				var index = active.isInArray(relationMap.get(curFileMediaId), id);
+				if (index>=0){
+					relationMap.get(curFileMediaId).splice(index,1);
+				}
+				// console.dir("a");
+				$(this).parent("li").remove();
+			}
+			console.dir('删除后：'+relationMap.get(curFileMediaId));
+
+			return false;
+		})
+
+		form.on('checkbox(allChoice)', function(data){
+			var child = $(data.elem).parents('table').find('tbody input[type="checkbox"]');
+			child.each(function(index, item){
+				item.checked = data.elem.checked;
+			});
+			form.render('checkbox');
+		});
+
+		//弹出层
+		var active = {
+			setTop: function(){
+				var that = this;
+				//多窗口模式，层叠置顶
+				layer.open({
+					skin: 'Ldemo-class',
+					maxmin: true,
+					type: 1
+					,title: '视频编目'
+					,btnAlign: 'l' //按钮居左
+					,shade: 0.65
+					,area: ['1050px', wh+"px"]
+					,content:$('#newsedit')
+					,cancel:function () {
+						console.log("cancel() in ");
+					}
+					,zIndex: layer.zIndex //重点1
+
+				});
+			},
+			isInArray:function(arr,value){
+				for(var i = 0; i < arr.length; i++){
+					if(value == arr[i]){
+						return i;
+					}
+				}
+				return -1;
+			},
+			data:[],
+			myalert:function(msg){
+				layer.msg(msg, {
+					time: 3000, //3s后自动关闭
+					icon: 5,
+					anim: 6
+				});
+			},
+			getCheckboxCheckedValues:function(ckname){
+				var type = '';
+				$('input[type=checkbox][name="' + ckname + '"]').each(function () {
+					if ($(this).prop("checked")) {
+						type += $(this).val() + ',';
+					}
+				});
+				if (type != '') {
+					type = type.substring(0, type.length - 1);
+				}
+				return type;
+			},
+			getCheckboxCheckedvalue:function(ckname, value){
+				var r = false;
+				$('input[type=checkbox][name="' + ckname + '"]').each(function () {
+					if ($(this).val() == value){
+						r =$(this).prop("checked");
+					}
+				});
+
+				return r;
+			},
+			getCheckboxAllValues:function(ckname){
+				var type = '';
+				$('input[type=checkbox][name="' + ckname + '"]').each(function () {
+					type += $(this).val() + ',';
+				});
+				if (type != '') {
+					type = type.substring(0, type.length - 1);
+				}
+				return type;
+			},
+			getRadioCheckValue:function(raName){
+				return $("input[name='" + raName + "']:checked").val();
+			},
+			_deleteItem:function(pfileMediaId, obj){
+				//从数组中删除
+				for (var i = 0; i < this.data.length; i++) {
+					var item = this.data[i];
+					var itemArray = item.split("#");
+					var fileMediaId = itemArray[0];
+					if (pfileMediaId == fileMediaId) {
+						this.data.splice(i, 1);
+						break;
+					}
+				}
+
+				relationMap.delete(pfileMediaId); //删除关联内容
+
+				$(obj).parents("li").remove();
+
+				if (this.data.length == 0){
+					layer.closeAll();
+					window.location.href = '/front/contentPause';
+				}
+			},
+			commitFileItem:function(pfileMediaId, filename, commitOneBtnObj, isallcommit){
+
+				var bb = active.validateVideoPost(pfileMediaId, filename,isallcommit);
+				if (!bb) {
+					return false;
+				}
+				//封面来源，单选
+				// var video_coverOrigin_value = 0;
+				var video_coverOrigin_value = this.getRadioCheckValue('uploadImg' + pfileMediaId); //0上传 1截取
+				var corverfile = $('#videoML_' + pfileMediaId)[0].files[0];
+
+				//勾选的归属ids，多选
+				var belongIds = this.getCheckboxCheckedValues('video_belongLabelname_' + pfileMediaId);
+				//视频基本字段
+				var mediaTitle = $("#video_mediaTitle" + pfileMediaId).val();
+				var catalogueId = $("#video_catalogueId" + pfileMediaId).find("option:selected").val();
+				var mediaKeyword = $("#video_mediaKeyword" + pfileMediaId).val();
+				var belongLabelid = belongIds;
+				var priceLabelid = $("#video_priceLabelid" + pfileMediaId).find("option:selected").val();
+				var publishLabelid = $("#video_publishLabelid" + pfileMediaId).find("option:selected").val();
+				var mediaBrief =  $.trim($("#video_mediaBrief" + pfileMediaId).val()) || $.trim($("#video_mediaBrief" + pfileMediaId).text());
+
+				var mediaType = "VIDEO";
+				//关联内容
+				var relationMediaFileIds = [];
+				if (relationMap.has(pfileMediaId)) {
+					relationMediaFileIds = relationMap.get(pfileMediaId);
+				}
+				if (video_coverOrigin_value == '0'){
+					//带文件
+					this.hasfileCommit(corverfile, pfileMediaId,relationMediaFileIds,
+							video_coverOrigin_value, mediaTitle,mediaType,
+							catalogueId,mediaKeyword,belongLabelid,priceLabelid,publishLabelid,mediaBrief, commitOneBtnObj);
+				}else if (video_coverOrigin_value == '1'){
+					//不带文件的视频编目提交
+					this.normalCommit(pfileMediaId,relationMediaFileIds,
+							video_coverOrigin_value, mediaTitle,mediaType,
+							catalogueId,mediaKeyword,belongLabelid,priceLabelid,publishLabelid,mediaBrief, commitOneBtnObj);
+				}
+			},
+			validateVideoPost:function(mediaFileId, filename,isallcommit){
+				console.log('validateVideoPost() in ');
+				var video_coverOrigin_value = this.getRadioCheckValue('uploadImg' + mediaFileId);
+				var coverfile = $('#videoML_' + mediaFileId)[0].files[0];
+				var coverfile1 = $('#videoML_' + mediaFileId).get(0).files[0];
+				if (video_coverOrigin_value == '0') { //0上传；1截取
+					if (coverfile1) {
+					} else {
+						this.myalert('请为文件：[' + filename + ']选择封面文件');
+						return false;
+					}
+				}
+				var catalogumediaKeywordeId = $("#video_catalogueId" + mediaFileId).find("option:selected").val();
+				if (catalogumediaKeywordeId == '') {
+					this.myalert('请为文件：[' + filename + ']选择类型');
+					return false;
+				}
+
+				//标题
+				var mediaTitle = $.trim($("#video_mediaTitle" + mediaFileId).val());
+				if (mediaTitle == '') {
+					this.myalert('请为文件：[' + filename + ']输入标题');
+					return false;
+				}
+				//关键字
+				var video_mediaKeyword = $.trim($("#video_mediaKeyword" + mediaFileId).val());
+				if (video_mediaKeyword == '') {
+					this.myalert('请为文件：[' + filename + ']输入关键字');
+					return false;
+				}
+
+				//简介
+				// var mediaBrief = $.trim($("#video_mediaBrief" + mediaFileId).val()) || $.trim($("#video_mediaBrief" + mediaFileId).text());
+				// if (mediaBrief == '') {
+				// 	this.myalert('请为文件：['+filename+']输入简介');
+				// 	return false;
+				// }
+
+				//价格
+				var priceLabelid = $("#video_priceLabelid" + mediaFileId).find("option:selected").val();
+				if (priceLabelid == '') {
+					this.myalert('请为文件：[' + filename + ']选择价格');
+					return false;
+				}
+				if (!isallcommit) {
+					if (!$('#video_read' + mediaFileId).is(':checked')) {
+						this.myalert('提交文件：[' + filename + ']必须同意《版权服务规则协议》');
+						return false;
+					}
+				}
+
+				return true;
+			},
+			normalCommit:function(pfileMediaId,relationMediaFileIds,
+								  video_coverOrigin_value,  mediaTitle,mediaType,
+								  catalogueId, mediaKeyword, belongLabelid, priceLabelid, publishLabelid, mediaBrief, obj){
+				var fd = new FormData();
+				fd.append("mediaFileId", pfileMediaId);
+				fd.append("relationMediaIds", relationMediaFileIds);
+				fd.append("coverOrigin", video_coverOrigin_value);
+				fd.append("mediaType", mediaType);
+				// fd.append("coverfile", coverfile);
+				fd.append("mediaTitle", mediaTitle);
+				fd.append("catalogueId", catalogueId);
+				fd.append("mediaKeyword", mediaKeyword);
+				fd.append("belongLabelid", belongLabelid);
+				fd.append("priceLabelid", priceLabelid);
+				fd.append("publishLabelid", publishLabelid);
+				fd.append("mediaBrief", mediaBrief);
+
+				$.ajax({
+					processData: false,
+					contentType: false,
+					type: "POST",
+					url: CONTEXT_PATH + '/front/file/normalCommit',
+					data: fd,
+					success: function (response) {
+						if (response.success) {
+
+							layer.msg("操作成功", {
+								time: 2000,
+								icon: 5,
+								anim: 6
+							},function () {
+								active._deleteItem(pfileMediaId, obj);
+								// window.location.href = '/front/contentPause';
+							});
+
+							// active.myalert("保存成功");
+							// active._deleteItem(pfileMediaId, obj);
+						} else {
+							active.myalert("操作失败，请检查输入数据，稍后再试。");
+						}
+					},
+					error: function (error) {
+						console.log(error);
+					}
+				});
+			},
+			hasfileCommit:function(coverfile, pfileMediaId,relationMediaFileIds,
+								   video_coverOrigin_value, mediaTitle,mediaType,
+								   catalogueId,mediaKeyword,belongLabelid,priceLabelid,publishLabelid,mediaBrief, obj){
+				var fd = new FormData();
+				fd.append("coverfile", coverfile);
+				fd.append("mediaFileId", pfileMediaId);
+				fd.append("relationMediaIds", relationMediaFileIds);
+				fd.append("coverOrigin", video_coverOrigin_value);
+				fd.append("mediaType", mediaType);
+				fd.append("mediaTitle", mediaTitle);
+				fd.append("catalogueId", catalogueId);
+				fd.append("mediaKeyword", mediaKeyword);
+				fd.append("belongLabelid", belongLabelid);
+				fd.append("priceLabelid", priceLabelid);
+				fd.append("publishLabelid", publishLabelid);
+				fd.append("mediaBrief", mediaBrief);
+
+				$.ajax({
+					processData: false,
+					contentType: false,
+					type: "POST",
+					url: CONTEXT_PATH + '/front/file/hasfileCommit',
+					data: fd,
+					success: function (response) {
+						if (response.success) {
+
+							layer.msg("操作成功", {
+								time: 2000,
+								icon: 5,
+								anim: 6
+							},function () {
+								active._deleteItem(pfileMediaId, obj);
+								// window.location.href = '/front/contentPause';
+							});
+
+							// active.myalert("保存成功");
+							// active._deleteItem(pfileMediaId, obj);
+						} else {
+							active.myalert("操作失败，请检查输入数据，稍后再试。");
+						}
+					},
+					error: function (error) {
+						console.log(error);
+					}
+				});
+			},
+			addSearch: function(fileMediaId){
+				var wh=document.body.clientHeight*0.9;
+				layui.use(['layer'],function () {
+					ct_window=layer.open({
+						skin: 'Ldemo-class',
+						type: 1
+						,title: '关联内容'
+						,btnAlign: 'c' //按钮居左
+						,shade: 0.65
+						,area: ['1050px',wh+"px"]
+						,content:$('#addCWindow')
+						//,content:'滚滚滚'
+						,btn:["批量选择","关闭"]
+						,cancel:function(){
+							//layer.alert("您点击了取消")
+						},
+						btn1:function(){
+							var dataChild=$("#tableMR").find('tbody input[type="checkbox"]');
+							var data=[];
+							dataChild.each(function(index, item){
+								if(item.checked==true){
+									data.push(index);
+								}
+							});
+							if (data.length == 0){
+								layer.alert("请选择需要增加的条目");
+							}else{
+								if(relationMap.has(fileMediaId)){
+									console.dir(" 批量添加前 : " + relationMap.get(fileMediaId));
+								}else {
+									console.dir(" 批量添加前 : 空 ");
+								}
+								var conterUlObj =  $("#addConterUl"+fileMediaId);
+								for(var i=0,len=data.length;i<len;i++){
+
+									var tit=$(".addCW_choiceThis").eq(data[i]).attr("data-title");
+									var id = $(".addCW_choiceThis").eq(data[i]).attr("data-id");
+									var  addHtml='<li><div class="addConter_title"> <span> ◇ </span>'+tit+'</div>'+
+											'<div class="LQML_CloseVm" data-relaid="'+fileMediaId+'" data-id="'+id+'"><i class="layui-icon">&#x1006;</i></div>'+
+											'</li>';
+
+									if(relationMap.has(fileMediaId)){
+										var index = active.isInArray(relationMap.get(fileMediaId), id);
+										if (index<0){
+											conterUlObj.append(addHtml);
+											relationMap.get(fileMediaId).push(id);
+										}
+									}else{
+										conterUlObj.append(addHtml);
+										relationMap.set(fileMediaId, [id]);
+									}
+								}
+
+								console.dir(" 批量添加后 : " + relationMap.get(fileMediaId));
+								layer.close(ct_window);
+							}
+						}
+						,zIndex: layer.zIndex//重点1
+
+					});
+				});
+			},
+			drawContent : function(dataarray) {
+				if (this.data.length > 0){
+					this.data.length = 0;
+				};
+
+				$("#uploadVideoListDiv").html("");
+
+				this.data = dataarray;
+				var that = active;
+				var cataloguesLabelsString = "";
+				for (var i = 0; i < cataloguesLabels.length; i++) {
+					cataloguesLabelsString = cataloguesLabelsString + '		<option value="' + cataloguesLabels[i].id + '">' + cataloguesLabels[i].name + '</option>'
+				}
+
+				var pricesLabelsString = "";
+				for (var i = 0; i < pricesLabels.length; i++) {
+					pricesLabelsString = pricesLabelsString + '		<option value="' + pricesLabels[i].id + '">' +pricesLabels[i].price +'元（'+ pricesLabels[i].label + '）</option>'
+				}
+
+				var publishLabelsString = "";
+				for (var i = 0; i < publishLabels.length; i++) {
+					publishLabelsString = publishLabelsString + '		<option value="' + publishLabels[i].id + '">' + publishLabels[i].label + '</option>'
+				}
+
+				var htmlItem = '';
+				for (var i = 0; i < dataarray.length; i++) {
+					var fileItem = dataarray[i];
+					var fileItemArray = fileItem.split('#');
+					var fileMediaId = fileItemArray[0];
+					var fileName = fileItemArray[1];
+
+					fileName = fileName.replace(new RegExp("#","g"),"");//全局去掉#号
+
+					var fileNameNoExt = fileName;
+					var pos = fileNameNoExt.lastIndexOf(".");
+					if ( pos> 0){
+						fileNameNoExt = fileNameNoExt.substring(0, pos);
+					}
+
+					var belongLabelsString = "";
+					for (var j = 0; j < belongLabels.length; j++) {
+						belongLabelsString = belongLabelsString
+								+ '<input type="checkbox" id="video_belongLabelname_' + fileMediaId + '_' + belongLabels[j].id + '" name="video_belongLabelname_' + fileMediaId + '" title="' + belongLabels[j].label
+								+ '" value="' + belongLabels[j].id + '"/>';
+					}
+					var relationHtml = '<div class="uplInf_list">' +
+							' <h4 class="uplInf_tit">内容关联 </h4>' +
+							' <div class="layui-input-inline pt-1">' +
+							'<span class="layui-btn layui-btn-danger btn-radius addConter" data-id="'+fileMediaId+'">增加</span>' +
+							'</div>' +
+							' <div class="addConter_list">' +
+							' <ul  id="addConterUl'+fileMediaId+'" class="addConterUl">' +
+							' </ul>' +
+							'  </div>' +
+							' </div>';
+
+					htmlItem = htmlItem + '<li>'
+							+ '<div class="videoML_m">'
+							// + '		<div class="choicethis">'
+							// + '		<input type="checkbox" name="videocheck" lay-skin="primary">'
+							// + '		</div>'
+							+ '		<div class="choicethis" style="margin-left:-62px; width: 90px; text-align: center;">'
+							+ '<font color="red" style="font-size:36px;">'+(i+1)+'</font>'
+							+ '		</div>'
+							+ '		<div class="videoML_top">'
+							+ '		<div class="videoML_Pic fl">'
+							+ '<input type="radio"  name="uploadImg' + fileMediaId + '" lay-filter="uploadImg" value="0" title="手动上传封面">' +
+							'<input type="radio" name="uploadImg' + fileMediaId + '"  lay-filter="uploadImg" value="1" title="系统自动截取" checked="true">'
+							+ ' <div class="layui-upload-drag viedo_picZD" style="display: block;">' +
+							' <i class="layui-icon layui-iconup">&#xe64a;</i>' +
+							' <p>此封面图<br/>由系统自动截取</p>' +
+							'</div>' +
+							'<div class="layui-upload-drag viedo_pic" style="display: none;"  onclick="getElementById(\'videoML_' + fileMediaId + '\').click()">\n' +
+							' <i class="layui-icon layui-iconup">&#xe67c;</i>' +
+							'<p>点击上传封面</p>' +
+							' <input type="file"  class="videoML_input" style="display: none;" id="videoML_' + fileMediaId + '"/>' +
+							' <div class="imgBg" style="display:none;">' +
+							' <img src="" />' +
+							' </div>' +
+							' </div>' +
+							'</div>'
+							+ '<div class="videoML_form fl">'
+							+ '		<div class="layui-form-item">'
+							+ '		<div class="videoML_title">'
+							+ '		<label class="layui-form-label"><em>*</em>标题</label>'
+							+ '<div class="layui-input-block videoML_Iput">'
+							+ '		<input name="title" id="video_mediaTitle' + fileMediaId + '" class="layui-input" value="' + fileNameNoExt + '"  type="text"  autocomplete="off" lay-verify="required" lay-reqtext="请输入标题">'
+							+ '		</div>'
+							+ '		</div>'
+							+ '		<div class="videoML_title">'
+							+ '		<div class="layui-inline">'
+							+ '		<label class="layui-form-label"><em>*</em>类型</label>'
+							+ '<div class="layui-input-inline videoML_select">'
+							+ '		<select name="modules" id="video_catalogueId' + fileMediaId + '" lay-verify="required">'
+							+ '		<option value="">请选择</option>'
+							+ cataloguesLabelsString
+							+ '		</select>'
+							+ '		</div>'
+							+ '		</div>'
+							+ '		<div class="layui-inline margin0">'
+							+ '		<label class="layui-form-label"><em>*</em>关键词</label>'
+							+ '<div class="layui-input-block videokey_Iput">'
+							+ '		<input name="title" id="video_mediaKeyword' + fileMediaId + '" class="layui-input" type="text" value="' + fileNameNoExt + '"  autocomplete="off" lay-verify="required" lay-reqtext="请输入关键词">'
+							+ '		</div>'
+							+ '		</div>'
+							+ '		</div>'
+							+ '		<div class="videoML_title">'
+							+ '		<div class="layui-inline">'
+							+ '		<label class="layui-form-label"><em>*</em>价格</label>'
+							+ '<div class="layui-input-inline videoML_select">'
+							+ '		<select name="modules" id="video_priceLabelid' + fileMediaId + '" lay-verify="required">'
+							+ '		<option value="">请选择</option>'
+							+ pricesLabelsString
+							+ '		</select>'
+							+ '		</div>'
+							+ '		</div>'
+							+ '		<div class="layui-inline">'
+							+ '		<label class="layui-form-label"><em>&nbsp;</em>转载</label>'
+							+ '<div class="layui-input-inline videoML_select">'
+							+ '		<select name="modules" id="video_publishLabelid' + fileMediaId + '" lay-verify="required">'
+							+ '		<option value="">请选择</option>'
+							+ publishLabelsString
+							+ '		</select>'
+							+ '		</div>'
+							+ '		<div class="layui-inline">'
+							+ '<p style="color: #888;">若为原创请勿选择</p>'
+							+ '		</div>'
+							+ '		</div>'
+							+ '		</div>'
+							+ '		<div class="videoML_title">'
+							+ '		<div class="layui-form">'
+							// + '		<input type="checkbox" name="allthis" lay-skin="primary" title="全部套用该条类型、价格、转载信息">'
+							+ '		<label class="layui-form-label"><em></em>归属标签</label>'
+							+ belongLabelsString
+
+							+ '		</div>'
+							+ '		</div>'
+							+ '		</div>'
+							+ '		</div>'
+							+ '		</div>'
+							+ '		</div>'
+							+ '		<div class="Videotextarea">'
+							+ '		<div class="VideotextareaT"><em></em>简介</div>'
+							+ '<textarea id="video_mediaBrief' + fileMediaId + '" placeholder="请输入内容" class="layui-textarea"></textarea>'
+							+ '		</div>'
+							+ '		<div class="Videotextarea">'
+							+ 			relationHtml
+							+ '		</div>'
+							+ '		<div class="clearfix Video_Opera">'
+							+ '		<div class="fl Video_deleThis" data-id="'+fileMediaId+'" >'
+							+ '		<i class="layui-icon">&#xe640;</i>  移除该视频'
+							+ '</div>'
+							+ '<div class="fr">'
+							+ '		<div class="layui-inline">'
+							+ '		<div class="layui-form">'
+							+ '		<input type="checkbox"id="video_read' + fileMediaId + '" name="submitthis" lay-skin="primary" title="我已阅读并同意遵守 《版权服务规则协议》" checked="checked">'
+							+ '		</div>'
+							+ '		</div>'
+							+ '		<div class="layui-inline">'
+							// + '		<button id="commitOneBtnId' + fileMediaId + '" data-id="'+fileMediaId+'" data-filename="'+fileName+'" class="layui-btn layui-btn-danger btn-radius locatclass" ' + 'onclick="commitFileItem(' + fileMediaId + ',\'' + fileName + '\',this,false)">提交本条</button>'
+							+ '		<button id="commitOneBtnId' + fileMediaId + '" data-fileMediaId="'+fileMediaId+'" data-fileName="'+fileName+'" class="layui-btn layui-btn-danger btn-radius locatclass">提交本条</button>'
+
+							+ '		</div>'
+							+ '		</div>'
+							+ '		</div>'
+							+ '		</li>'
+							+ ''
+					;
+				}
+
+				$("#uploadVideoListDiv").append(htmlItem);
+
+				layui.use(['form'], function () {
+					form = layui.form;
+
+					//视频上传封面单选
+					form.on("radio(uploadImg)", function (data) {
+						if (this.value == '0') {
+							$(this).siblings(".viedo_pic").show();
+							$(this).siblings(".viedo_picZD").hide();
+							//这是选中了自动选择封面
+						} else if (this.value == '1') {
+							$(this).siblings(".viedo_picZD").show();
+							$(this).siblings(".viedo_pic").hide();
+							//$Inputfile.val("");
+							$(this).siblings(".viedo_pic").find(".imgBg").hide();
+							$(this).siblings(".viedo_pic").find("img").attr("src", "");
+						}
+					});
+					form.render();
+				})
+
+			}
+		}
+	});
+</script>
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+	  xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+
+		<!--footer-->
+		<footer class="footer" th:fragment="footer">
+			<!--<div class="footer-bottom ">-->
+			    <!--<div class="wapper">-->
+			        <!--<ul>-->
+			            <!--<li class="title">关于***</li>-->
+			            <!--<li><a href="#">我们是谁</a></li>-->
+			            <!--<li><a href="#">隐私政策</a></li>-->
+			            <!--<li><a href="#">版权信息</a></li>-->
+			            <!--<li><a href="#">联系方式</a></li>-->
+			            <!--<li><a href="#">帮助信息</a></li>-->
+			        <!--</ul>-->
+			        <!--<ul>-->
+			            <!--<li class="title">品牌栏目</li>-->
+			            <!--<li><a href="#">真人秀</a></li>-->
+			        <!--</ul>-->
+			        <!--<ul>-->
+			            <!--<li class="title">素材专区</li>-->
+			            <!--<li><a href="#">成品素材</a></li>-->
+			        <!--</ul>-->
+			        <!--<ul>-->
+			            <!--<li class="title">联系我们</li>-->
+			            <!--<li><a href="#">0731-99988867</a></li>-->
+			            <!--<li><a href="#">商务合作：BD@zhihuizw.com</a></li>-->
+			            <!--<li><a href="#">版权合作：CR@zhihuizw.com</a></li>-->
+			        <!--</ul>-->
+			        <!--<div class="qr">-->
+			            <!--<ul class="nav">-->
+			                <!--<li class="pt-2">-->
+			                    <!--<p>关注智慧政务官方订阅号</p>-->
+			                    <!--<p>及时获取最新业内资讯</p>-->
+			                <!--</li>-->
+			                <!--<li>-->
+			                    <!--<img th:src="@{/static/pface/img/wxpic.jpg}">-->
+			                <!--</li>-->
+			            <!--</ul>-->
+			        <!--</div>-->
+			<!---->
+			    <!--</div>-->
+			<!---->
+			<!--</div>-->
+			     <div class="footer-text">			 
+			         COPYRIGHT @ 2019-2020 长沙智慧政务技术有限公司 版权所有 湘ICP备188899765号-2
+			     <div class="footer-link">
+			         <a target="_blank" href="http://www.beian.miit.gov.cn?recordcode=43010306677906" style="display:inline-block;text-decoration:none;height:20px;line-height:20px;">
+			         	<img th:src="@{/static/pface/img/ba.png}" style="float:left;">
+			         	<p>湘公网安备 43010302000906号</p>
+			         </a>
+			     </div>
+			</div>
+	<![endif]-->
+	<script th:inline="javascript">
+          var CONTEXT_PATH = [[${#request.getContextPath()}]];
+          var basePath= CONTEXT_PATH;
+           var http= [[${#request.getScheme()}]]+"://"+[[${#request.getServerName()}]]+":"+[[${#request.getServerPort()}]]+CONTEXT_PATH;
+                //var baseUpload="/www/wwwroot/rmt.jiemugo.com/upload/";
+           var baseUpload=[[${@imageFileBean.getPublicPath()}]];
+           function getUrlPath(dir){
+              if(dir==''|| dir=='undefined' ||dir==null){
+                        return '';
+                }else{
+                        //alert(dir);
+                        //var idx=dir.indexOf(baseUpload);
+                        //alert(idx);
+                        rs=dir.substr(baseUpload.length,dir.length);
+                        rs=rs.replace(/\\/g,"/");
+                        return "/pubfile/"+rs;
+                 }
+            }
+	</script>
+</footer>
+</body>
+</html>
