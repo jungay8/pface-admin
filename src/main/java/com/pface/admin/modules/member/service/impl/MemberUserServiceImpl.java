@@ -45,7 +45,7 @@ public class MemberUserServiceImpl extends BaseService<MemberUser> implements Me
             throw new BizException(ResultCodeEnum.FAILED_USER_ALREADY_EXIST);
         }
         // 加密密码
-         passwordHelper.encryptPassword(user);
+        passwordHelper.encryptPassword(user);
         memberUserMapper.insertSelective(user);
     }
 
@@ -62,15 +62,15 @@ public class MemberUserServiceImpl extends BaseService<MemberUser> implements Me
     @Transactional
     public boolean auditNoPass(AuditLogVo auditLogVo) {
 
-      //用户表更新
-        MemberUser memberUser=new MemberUser();
+        //用户表更新
+        MemberUser memberUser = new MemberUser();
         memberUser.setId(auditLogVo.getBelongUid());
         memberUser.setIsCert(CertTypeEnum.CERTFAIL);
         memberUser.setOpDate(new Date());
         super.updateNotNull(memberUser);
 
         //更新审核记录表
-        MemberAuditLog memberAuditLog=new MemberAuditLog();
+        MemberAuditLog memberAuditLog = new MemberAuditLog();
         memberAuditLog.setAuditStatus(AuditStatusEnum.UNAUDITED);
         memberAuditLog.setBelongUid(auditLogVo.getBelongUid());
         memberAuditLog.setMsgOriginId(auditLogVo.getMsgOriginId());
@@ -79,9 +79,9 @@ public class MemberUserServiceImpl extends BaseService<MemberUser> implements Me
         memberAuditLog.setAuditMsg(auditLogVo.getAuditMsg());
         memberAuditLog.setAuditUid(auditLogVo.getAuditUid());
 
-       int row= memberAuditLogMapper.insert(memberAuditLog);
+        int row = memberAuditLogMapper.insert(memberAuditLog);
 
-        return row>0;
+        return row > 0;
     }
 
 
@@ -91,14 +91,14 @@ public class MemberUserServiceImpl extends BaseService<MemberUser> implements Me
 
         //用户表更新
 
-        MemberUser memberUser=new MemberUser();
+        MemberUser memberUser = new MemberUser();
         memberUser.setId(auditLogVo.getBelongUid());
         memberUser.setIsCert(CertTypeEnum.CERTIFIED);
         memberUser.setOpDate(new Date());
         super.updateNotNull(memberUser);
 
         //更新审核记录表
-        MemberAuditLog memberAuditLog=new MemberAuditLog();
+        MemberAuditLog memberAuditLog = new MemberAuditLog();
         memberAuditLog.setAuditStatus(AuditStatusEnum.AUDITED);
         memberAuditLog.setBelongUid(auditLogVo.getBelongUid());
         memberAuditLog.setMsgOriginId(auditLogVo.getMsgOriginId());
@@ -107,16 +107,16 @@ public class MemberUserServiceImpl extends BaseService<MemberUser> implements Me
         memberAuditLog.setAuditMsg(auditLogVo.getAuditMsg());
         memberAuditLog.setAuditUid(auditLogVo.getAuditUid());
 
-        int row= memberAuditLogMapper.insert(memberAuditLog);
+        int row = memberAuditLogMapper.insert(memberAuditLog);
 
-        return row>0;
+        return row > 0;
     }
 
 
     @Override
     @Transactional
     public void logicDeleteBatchByIds(Long[] ids) {
-        for(int i=0;i<ids.length;i++) {
+        for (int i = 0; i < ids.length; i++) {
             MemberUser label = new MemberUser();
             label.setId(ids[i]);
             label.setDelFlag(1);

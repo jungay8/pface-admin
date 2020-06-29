@@ -61,11 +61,14 @@ public class WebConfig extends WebMvcConfigurerAdapter  implements EnvironmentAw
     public void addInterceptors(InterceptorRegistry registry) {
         //registry.addInterceptor(new LogInterceptor()).addPathPatterns();
        registry.addInterceptor(frontLoginInterceptor).addPathPatterns("/front/**")
-               .excludePathPatterns("/front/login").excludePathPatterns("/front/reg")
-               .excludePathPatterns("/front/user/login").excludePathPatterns("/front/user/sendSmsCode")
+               .excludePathPatterns("/front/login")
+               .excludePathPatterns("/front/reg")
+               .excludePathPatterns("/front/user/login")
+               .excludePathPatterns("/front/user/sendSmsCode")
                .excludePathPatterns("/front/user/regUser");
 
-        registry.addInterceptor(jiekouIntercepter).addPathPatterns("/appapi/**")
+        registry.addInterceptor(jiekouIntercepter)
+                .addPathPatterns("/appapi/**")
                 .excludePathPatterns("/appapi/content/list");
        super.addInterceptors(registry);
 
