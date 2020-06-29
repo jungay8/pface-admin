@@ -1,0 +1,10 @@
+2020-01-15 13:44:35.329 [1;33mbackground-preinit[0;39m [39mDEBUG[0;39m [1;32mCaller+0	 at org.hibernate.validator.internal.engine.ValidatorFactoryImpl.logValidatorFactoryScopedConfiguration(ValidatorFactoryImpl.java:578)
+[0;39m HV000234: Using org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator as ValidatorFactory-scoped message interpolator.
+2020-01-15 13:44:35.337 [1;33mbackground-preinit[0;39m [39mDEBUG[0;39m [1;32mCaller+0	 at org.hibernate.validator.internal.engine.ValidatorFactoryImpl.logValidatorFactoryScopedConfiguration(ValidatorFactoryImpl.java:579)
+[0;39m HV000234: Using org.hibernate.validator.internal.engine.resolver.TraverseAllTraversableResolver as ValidatorFactory-scoped traversable resolver.
+2020-01-15 13:44:35.338 [1;33mbackground-preinit[0;39m [39mDEBUG[0;39m [1;32mCaller+0	 at org.hibernate.validator.internal.engine.ValidatorFactoryImpl.logValidatorFactoryScopedConfiguration(ValidatorFactoryImpl.java:580)
+[0;39m HV000234: Using org.hibernate.validator.internal.util.ExecutableParameterNameProvider as ValidatorFactory-scoped parameter name provider.
+2020-01-15 13:44:35.339 [1;33mbackground-preinit[0;39m [39mDEBUG[0;39m [1;32mCaller+0	 at org.hibernate.validator.internal.engine.ValidatorFactoryImpl.logValidatorFactoryScopedConfiguration(ValidatorFactoryImpl.java:581)
+[0;39m HV000234: Using org.hibernate.validator.internal.engine.DefaultClockProvider as ValidatorFactory-scoped clock provider.
+2020-01-15 13:44:35.340 [1;33mbackground-preinit[0;39m [39mDEBUG[0;39m [1;32mCaller+0	 at org.hibernate.validator.internal.engine.ValidatorFactoryImpl.logValidatorFactoryScopedConfiguration(ValidatorFactoryImpl.java:582)
+[0;39m HV000234: Using org.hibernate.validator.internal.engine.scripting.DefaultScriptEvaluatorFactory as ValidatorFactory-scoped script evaluator factory.
